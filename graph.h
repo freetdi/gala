@@ -93,10 +93,9 @@ struct vertex_helper<void*>{ //
 	template<class VL>
 	static bool is_valid(typename VL::value_type const* v, VL const& _v)
 	{ itested();
-
 		intptr_t B= intptr_t(v) - intptr_t(&*_v.begin());
 		if(!std::is_same<std::random_access_iterator_tag,
-		                 typename VL::iterator::iterator_category > :: value) { //incomplete();
+		                 typename VL::iterator::iterator_category > :: value) { untested();
 			return true; // don't know...
 		}else if(B<0){untested();
 			return false;
@@ -751,7 +750,7 @@ public:
 //			_v.erase(*v);
 	}
 	bool is_valid(const_vertex_type v) const
-	{
+	{ itested();
 		return bits::vertex_helper<VDP>::is_valid(v,_v);
 	}
 	void remove_vertex(iterator v);

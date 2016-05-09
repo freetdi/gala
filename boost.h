@@ -133,16 +133,23 @@ namespace boost { //
 		};
 
 		class adjacency_iterator
-			: public iterator_facade<adjacency_iterator,
-			typename ::gala::graph<SGARGS>::out_vertex_iterator, // <= value_type
-			bidirectional_traversal_tag,
-			/*const*/ typename ::gala::graph<SGARGS>::vertex_type, // <= reference
-			const typename ::gala::graph<SGARGS>::vertex_type*>
+		    : public iterator_facade<adjacency_iterator,
+		        typename gala::graph<SGARGS>::out_vertex_iterator,
+		        bidirectional_traversal_tag,
+		        /*const*/ typename ::gala::graph<SGARGS>::vertex_type, // <= reference
+		        const typename ::gala::graph<SGARGS>::vertex_type*>
 		{ //
+		public:
+			typedef typename gala::graph<SGARGS>::out_vertex_iterator value_type;
+			typedef typename gala::graph<SGARGS>::out_vertex_const_iterator const_value_type;
 		public:
 			adjacency_iterator(typename ::gala::graph<SGARGS>::out_vertex_iterator
 			    e=typename gala::graph<SGARGS>::out_vertex_iterator()) : base(e)
 			{
+			}
+			bool operator==(const_value_type other) const
+			{
+				return const_value_type(base) == other;
 			}
 			bool operator==(const adjacency_iterator& other) const
 			{
@@ -421,19 +428,27 @@ namespace boost { //
 	{
 		assert(g.is_valid(v));
 		assert(g.is_valid(u));
+
+		bool is_edge;
 		if(g.degree(u)<g.degree(v)){ itested();
-			std::swap(u,v); // does it really help?
+		//	std::swap(u,v); // does it really help?
+			auto i = g.out_edges(u).find(v);
+			is_edge = (i!=g.out_edges(u).end());
 		}else{
+			auto i = g.out_edges(v).find(u);
+			is_edge = (i!=g.out_edges(v).end());
 		}
-		auto i = g.out_edges(v).find(u);
-		bool is_edge = (i!=g.out_edges(v).end());
+
 
 		assert((!is_edge) || (u!=v));
 		
 		//i = g.out_edges(u).find(v);
 		//assert(is_edge == (i!=g.out_edges(u).end()));
 
-		auto e = typename graph_traits<gala::graph<SGARGS> >::edge_descriptor(); // incomplete
+		auto e = typename graph_traits<gala::graph<SGARGS> >::edge_descriptor(u,v);
+		if(!is_edge){
+		}else{itested();
+		}
 		return std::make_pair(e, is_edge);
 	}
 

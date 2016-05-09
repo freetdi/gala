@@ -44,60 +44,97 @@
 
 namespace noboost{ // here??
 
+template<class CB, class G>
+class callback_proxy{
+public:
+	typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+public:
+	callback_proxy(vertex_descriptor v, CB* cb, G const& g)
+	    : _done(false), _v(v), _cb(cb), _g(g)
+	{
+		assert( g.is_valid(v) );
+	}
+	void operator()(vertex_descriptor w)
+	{
+//		BUG:: :w
+		if(!_cb){ untested();
+		}else if(_v<w){
+			(*_cb)(boost::edge(_v,w,_g).first);
+			_done=true;
+		}else{
+		}
+	}
+	bool done() const
+	{
+		return _done;
+	}
+private:
+	bool _done;
+	vertex_descriptor _v;
+	CB* _cb;
+	const G& _g;
+};
+
 template< template<class T, class... > class ECT, \
           template<class T, class... > class VCT,
           class VDP,
           template<class G, class...> class DEG,
           class CB, typename=void /*required for sfinae*/ >
 struct sghelp_hack{
-static void mcah(
+static size_t mcah(
 		typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor c,
-		gala::graph<SGARGS>& g, CB* cb,
-		typename outedge_set< gala::graph<SGARGS> >::type &bag)
+		gala::graph<SGARGS>& g,
+		typename outedge_set< gala::graph<SGARGS> >::type& bag,
+		CB* cb)
 {
 	typedef gala::graph<SGARGS> G;
 	typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+	typedef typename boost::graph_traits<G>::adjacency_iterator Iter;
+	typedef typename boost::graph_traits<G>::vertex_descriptor VD;
 #ifndef NDEBUG
-	 noboost::check(g);
+	noboost::check(g);
 #endif
-    // misc::make_clique(boost::adjacent_vertices(c, G), G, cb);
-    typedef typename boost::graph_traits<G>::adjacency_iterator Iter;
-	 typedef typename boost::graph_traits<G>::vertex_descriptor VD;
-	 VD x; (void) x;
-//	 typedef typename outedge_set< gala::graph<SGARGS> >::type bag_type;
-    Iter I, J, K, E;
-    boost::tie(I, E) = boost::adjacent_vertices(c, g);
-    long n=0;
-    for(J=boost::adjacent_vertices(c, g).first; J!=E; ++J){ itested();
-		 assert(*J!=c);
-		 //unsigned m=(*J)->n.erase(c);
-		 vertex_descriptor JJ=*J;
-		 unsigned m=g.out_edges(JJ).erase(c);
-		 assert(m==1); (void) m;
-		 n += -g.out_edges(JJ).size();
+	VD x; (void) x;
+	Iter I, J, K, E;
+	boost::tie(I, E) = boost::adjacent_vertices(c, g);
+	long n=0;
 
-		 auto II(sethack::make_skip_it(I, E, JJ));
+	for(J=boost::adjacent_vertices(c, g).first; J!=E; ++J){
+		vertex_descriptor N=*J;
+		if(cb){
+			(*cb)(N);
+		}
 
-		 itested();
-		 zipfwdb4(g.out_edges(JJ), II, E);
+		assert(*J!=c);
+		assert(g.is_valid(N));
+		unsigned m=g.out_edges(N).erase(c);
+		assert(m==1); (void) m;
+		n += -g.out_edges(N).size();
+		auto II(sethack::make_skip_it(I, E, N));
 
-		 assert(m==1);
-		 n += g.out_edges(JJ).size(); // (*J)->n.size();
-	 }
+		callback_proxy<CB, G> cbp(N, cb, g);
 
-	 assert(!(n%2));
-	 n /= 2; // edges added.
-	 n -= g.out_edges(c).size();
-//	 typedef typename outedge_set< gala::graph<SGARGS> >::type bag_type;
-    bag = MOVE(g.out_edges(c));
-	 g.out_edges(c).clear();
+		// merge II .. E into out_edges(N)
+		zipfwdb4(g.out_edges(N), II, E, &cbp);
+		if(cbp.done()){
+			assert(cb);
+		// 	(*cb)(N); not yet.
+		}else{
+		}
+		n += g.out_edges(N).size();
+	}
 
-	 // FIXME: this might be completely unnecessary.
-	 g._num_edges += n;
-#ifndef NDEBUG
-	 noboost::check(g);
-#endif
-//	 return X;
+	assert(!(n%2));
+	n /= 2; // edges added.
+//	typedef typename outedge_set< gala::graph<SGARGS> >::type bag_type;
+	assert(!bag.size());
+	bag = std::move(g.out_edges(c));
+
+	// FIXME: this might be completely unnecessary.
+	g._num_edges += n;
+	g._num_edges -= g.out_edges(c).size();
+	g.out_edges(c).clear();
+	return n;
 }
 
 /*----------------------------------*/
@@ -254,13 +291,17 @@ namespace noboost { // BUG in graphviz?
 		return v;
 	}
 
+} // noboost
+namespace treedec{
 // FIXME: always hijack like this, if
 // noboost::outedge_set<gala::graph<SGARGS> >::type is treedec_chooser::bag_type?
 	VCTtemplate
-	typename noboost::outedge_set<gala::graph<SGARGS> >::type hijack_neighborhood(
+	typename noboost::outedge_set<gala::graph<SGARGS> >::type detach_neighborhood(
 			  typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor& c,
-			  gala::graph<SGARGS> & g)
+			  gala::graph<SGARGS> & g,
+			  typename noboost::outedge_set<gala::graph<SGARGS> >::type* N)
 	{ untested();
+		assert(N==nullptr); // for now..
 		incomplete(); //	unreachable...
 		 typename noboost::outedge_set<gala::graph<SGARGS> >::type bag;
 		 typename boost::graph_traits<gala::graph<SGARGS> >::adjacency_iterator nIt1, nIt2, nEnd;
@@ -272,21 +313,23 @@ namespace noboost { // BUG in graphviz?
 		 return bag;
 	}
 
-
 	//VCTtemplate // FIXME
 	template< template<class T, class... > class ECT, \
 				 template<class T, class... > class VCT,
 				 class VDP,
-				 template<class G, class...> class DEG,
-				 class CB>
-	// typename noboost::outedge_set<gala::graph<SGARGS> >::type
-	void make_clique_and_hijack(
+				 template<class G, class...> class DEG>
+	size_t make_clique_and_detach(
 			typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor c,
-			gala::graph<SGARGS>& g, CB* cb,
-			typename outedge_set< gala::graph<SGARGS> >::type &bag)
+			gala::graph<SGARGS>& g,
+			typename outedge_set< gala::graph<SGARGS> >::type& bag,
+			typename treedec::graph_callback<gala::graph<SGARGS> >* cb=NULL)
 	{
-		sghelp_hack<ECT, VCT, VDP, DEG, CB>::mcah(c, g, cb, bag);
+		typedef typename treedec::graph_callback<gala::graph<SGARGS> > CB;
+		return noboost::sghelp_hack<ECT, VCT, VDP, DEG, CB>::mcah(c, g, bag, cb);
 	}
+
+}//treedec
+namespace noboost{
 
 	// theres no Vertex. use the position instead
 	template< template<class T, class... > class ECT, class VDP >
@@ -485,13 +528,14 @@ namespace treedec{
 
 VCTtemplate
 inline size_t count_missing_edges(
-		typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor v,
+		const typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor v,
 		gala::graph<SGARGS> const &g)
 { itested();
 
 	size_t missing_edges=0;
 
-	auto e=g.out_edges(v);
+	auto V=v;
+	auto e=g.out_edges(V);
 	for(auto nIt1 = e.begin(); nIt1!=e.end(); ++nIt1){
 		auto nIt2 = nIt1;
 		++nIt2;
@@ -501,8 +545,58 @@ inline size_t count_missing_edges(
 	return missing_edges;
 }
 
-} // treedec
+namespace detail{
+	// iterate over edges adjacent to both v and s
+	// implementation: iterate over outedges(v), skip non-outedges(s).
+	// TODO: reuse generic set iterator stuff
+	VCTtemplate
+	class shared_adj_iter<gala::graph<SGARGS> >
+	    : public boost::graph_traits<gala::graph<SGARGS> >::adjacency_iterator {
+	public:
+		typedef typename gala::graph<SGARGS> G;
+		typedef typename boost::graph_traits<G>::adjacency_iterator adjacency_iterator;
+		typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+		shared_adj_iter(adjacency_iterator v, adjacency_iterator ve,
+		                vertex_descriptor w, G const& g)
+		    : boost::graph_traits<G>::adjacency_iterator(v),
+		      _ve(ve), _s(g.out_edges(w).begin()),
+		      _w(g.out_edges(w)), _g(g)
+		{ untested();
+			skip();
+		}
+		shared_adj_iter& operator++(){
+			adjacency_iterator::operator++();
+			skip();
+			assert(adjacency_iterator::operator==(_ve)
+					|| *_s == **this);
+			return *this;
+		}
+	private:
+		void skip()
+		{ itested();
+			while(true){
+				if(unlikely(adjacency_iterator::operator==(_ve))){
+					return;
+				}else if(unlikely(_s==_w.end())){ untested();
+					adjacency_iterator::operator=(_ve);
+					return;
+				}else if(**this<*_s){
+					adjacency_iterator::operator++();
+				}else if(*_s<**this){
+					++_s;
+				}else{
+					return;
+				}
+			}
+		}
+		adjacency_iterator _ve, _s;
+		typename G::EL const& _w;
+		G const& _g;
+	};
 
+}// detail
+
+} // treedec
 
 
 #endif
