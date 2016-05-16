@@ -29,10 +29,10 @@
 
 template <class S>
 inline S& operator<<( S& o, const std::set<unsigned> &s)
-{
+{untested();
 	o << "(";
 	std::string comma;
-	for(auto i : s){
+	for(auto i : s){untested();
 		o << comma << i;
 		comma=", ";
 	}
@@ -41,10 +41,10 @@ inline S& operator<<( S& o, const std::set<unsigned> &s)
 }
 template <class S>
 inline S& operator<<( S& o, const std::set<short unsigned> &s)
-{
+{untested();
 	o << "(";
 	std::string comma;
-	for(auto i : s){
+	for(auto i : s){untested();
 		o << comma << i;
 		comma=", ";
 	}
@@ -56,10 +56,10 @@ namespace detail{ // ??
 //inline std::basic_ostream<char>& operator<<( std::basic_ostream<char>& o, std::set<short unsigned int> s)
 template <class S>
 inline S& operator<<( S& o, const std::set<short unsigned> &s)
-{
+{untested();
 	o << "(";
 	std::string comma;
-	for(auto i : s){
+	for(auto i : s){untested();
 		o << comma << i;
 		comma=", ";
 	}
@@ -71,7 +71,7 @@ inline S& operator<<( S& o, const std::set<short unsigned> &s)
 namespace sethack{ //
 
 template<class I, class ref>
-class skip_it : public I{
+class skip_it : public I{//
 public:
 //	skip_it(const skip_it& p) : I(p)
 //	{ untested();
@@ -119,32 +119,32 @@ inline skip_it<I,S> make_skip_it(I b, I e, S s)
 
 template<class C, class B>
 inline skip_it<C,B> make_skip_it(C c, B b)
-{
+{untested();
 	return make_skip_it(c.begin(), c.end() ,b);
 }
 
 } // sethack
 /*--------------------------------------------------------------------------*/
 template<class S>
-struct sethack_{
+struct sethack_{ //
 	static typename S::iterator reverse(typename S::reverse_iterator& x)
-	{
+	{untested();
 		return x.base();
 	}
 };
 /*--------------------------------------------------------------------------*/
 template<>
-struct sethack_<stx::btree_set<size_t> >{
+struct sethack_<stx::btree_set<size_t> >{ //
 	typedef stx::btree_set<size_t> S;
 	static typename S::iterator reverse(typename S::reverse_iterator& x)
-	{
+	{untested();
 		return S::iterator(x);
 	}
 };
 
 template<class S>
 typename S::iterator reverse(typename S::reverse_iterator& x, S const& s)
-{
+{untested();
 	return sethack_<S>::reverse(x);
 }
 
@@ -157,8 +157,8 @@ struct merge{ //
 	static size_t count_missing(S const& tgt, S_iterator src_begin, T_iterator src_end)
 	{ untested();
 		size_t missing=0;
-		while(src_begin!=src_end){
-			if(tgt.find(*src_begin)==tgt.end()){
+		while(src_begin!=src_end){untested();
+			if(tgt.find(*src_begin)==tgt.end()){untested();
 				++missing;
 			}
 			++src_begin;
@@ -174,21 +174,21 @@ struct merge{ //
 	static void zipfwd(S& tgt, S_iterator src_begin, T_iterator src_end)
 	{ untested();
 		auto i=src_begin;
-		for(; i!=src_end; ++i){
+		for(; i!=src_end; ++i){untested();
 			tgt.insert(*i);
 		}
 	}
 }; // merge
 /*--------------------------------------------------------------------------*/
 template<class X>
-struct is_ordered_set{
+struct is_ordered_set{ //
 	typedef void type;
 };
 template<class X>
 struct is_ordered_set<std::unordered_set<X> >{ };
 /*--------------------------------------------------------------------------*/
 template<class D>
-class my_counter{
+class my_counter{ //
 	size_t _cnt;
 	D _dummy;
 	public:
@@ -207,7 +207,7 @@ class my_counter{
 		}
 };
 /*--------------------------------------------------------------------------*/
-namespace std{
+namespace std{ //
 template<class D>
 struct iterator_traits<my_counter<D> >{ //
 	typedef D value_type;
@@ -226,8 +226,8 @@ struct merge<S, S_iterator, T_iterator, typename is_ordered_set<S>::type >{ //
 
 #if 0 // essentially this...
 		size_t missing2=0;
-		while(src_begin!=src_end){
-			if(tgt.find(*src_begin)==tgt.end()){
+		while(src_begin!=src_end){untested();
+			if(tgt.find(*src_begin)==tgt.end()){untested();
 				++missing2;
 			}
 			++src_begin;
@@ -248,6 +248,15 @@ struct merge<S, S_iterator, T_iterator, typename is_ordered_set<S>::type >{ //
 			return;
 		}
 
+#if 1
+		// find twice? should be optimized out (hopefully).
+		// turns out faster in FI2, could be the callback...
+		hint = tgt.find(*seek);
+		if(hint == tgt.end()){
+			(*cb)(*seek);
+			hint = tgt.insert(*seek).first;
+		}
+#else
 		bool done;
 		boost::tie(hint, done) = tgt.insert(*seek);
 		if(!done){ itested();
@@ -255,6 +264,7 @@ struct merge<S, S_iterator, T_iterator, typename is_ordered_set<S>::type >{ //
 		}else if(cb){ itested();
 			(*cb)(*seek);
 		}
+#endif
 
 		++hint;
 		++seek;
@@ -263,7 +273,7 @@ struct merge<S, S_iterator, T_iterator, typename is_ordered_set<S>::type >{ //
 			return;
 		}
 
-		if(unlikely(hint==tgt.end())){
+		if(unlikely(hint==tgt.end())){itested();
 		}else{
 
 		while(true){
@@ -277,7 +287,7 @@ struct merge<S, S_iterator, T_iterator, typename is_ordered_set<S>::type >{ //
 				tgt.insert(hint,*seek);
 				(void) l; assert(l+1==tgt.size());
 				++seek;
-				if(seek==src_end){
+				if(seek==src_end){itested();
 					return;
 				}
 			}else if(unlikely(*seek==*hint)){
@@ -290,25 +300,36 @@ struct merge<S, S_iterator, T_iterator, typename is_ordered_set<S>::type >{ //
 				}
 			}else if(unlikely(*seek>100+*hint)){ // TODO: fine tuning?
 				// hint = tgt.insert(hint,*seek); // slower
+#if 1
+				// is this slower?
+				// maybe if the second find is NOT being opimized out...
+				hint = tgt.find(*seek);
+
+				if(hint == tgt.end()){itested();
+					(*cb)(*seek);
+					hint = tgt.insert(*seek).first;
+				}
+#else
 				bool done;
-				boost::tie(hint, done) = tgt.insert(*seek); // faster?
+				boost::tie(hint, done) = tgt.insert(*seek);
 				if(!done){ itested();
 					// no need to callback...
 				}else if(cb){ itested();
 					(*cb)(*seek);
 				}
+#endif
 				++seek;
 				++hint;
 
-				if(unlikely(seek==src_end)){
+				if(unlikely(seek==src_end)){itested();
 					return;
-				}else if(unlikely(hint==tgt.end())){
+				}else if(unlikely(hint==tgt.end())){itested();
 					break; // h_at_end
 				}
 			}else{
 				while(*seek>*hint){
 					++hint;
-					if(hint==tgt.end()){
+					if(hint==tgt.end()){itested();
 						goto h_at_end;
 					}else{
 					}
@@ -333,12 +354,13 @@ struct merge<S, S_iterator, T_iterator, typename is_ordered_set<S>::type >{ //
 };
 
 template<class arg>
-class dummy{
+class dummy{ //
 	public:
 		void operator()(arg){}
 };
 
 // S_iterator and T_iterator must be comparable...
+// call back BEFORE insertion (if possible?)
 template<class S, class S_iterator, class T_iterator, class CB=dummy<typename S::value_type> >
 void zipfwdb4(S& tgt, S_iterator src_begin, T_iterator src_end, CB* cb=nullptr)
 {
@@ -354,12 +376,12 @@ size_t count_missing(S const& tgt, S_iterator src_begin, T_iterator src_end)
 
 template<class S>
 void zipfwdb42(S& tgt, S const& src)
-{
+{untested();
 	zipfwdb42(tgt, src.begin(), src.end());
 }
 template<class S>
 void zipfwdb4(S& tgt, S const& src)
-{
+{untested();
 	zipfwdb4(tgt, src.begin(), src.end());
 }
 
@@ -368,47 +390,47 @@ void zipfwdb4(S& tgt, S const& src)
 // (does not really help)
 template<class S>
 void ziprevb4(S& tgt, S const& src)
-{
+{untested();
 	auto s=src.rbegin();
 	auto hint=tgt.rbegin();
-	if(s==src.rend()){
+	if(s==src.rend()){untested();
 		return;
-	}else if(hint==tgt.rend()){
+	}else if(hint==tgt.rend()){untested();
 		goto h_at_rend;
 	}
 
-	while(true){
+	while(true){untested();
 		assert(s!=src.rend());
 		assert(hint!=tgt.rend());
-		if(unlikely(*s>*hint)){
+		if(unlikely(*s>*hint)){untested();
 			tgt.insert(reverse(hint,tgt),*s);
 			++s;
-			if(s==src.rend()){
+			if(s==src.rend()){untested();
 				return;
 			}
 		}else if(*s==*hint){;
 			++hint;
 			++s;
-			if(hint==tgt.rend()){
+			if(hint==tgt.rend()){untested();
 				break;
 			}
-			if(s==src.rend()){
+			if(s==src.rend()){untested();
 				return;
 			}
 		}
 
-		while(*hint>*s){
+		while(*hint>*s){untested();
 			++hint;
-			if(hint==tgt.rend()){
+			if(hint==tgt.rend()){untested();
 				goto h_at_rend;
-			}else{
+			}else{untested();
 			}
 		}
 	}
 
 h_at_rend:
 	assert(hint==tgt.rend());
-	while(s!=src.rend()){
+	while(s!=src.rend()){untested();
 		tgt.insert(reverse(hint,tgt),*s);
 		++s;
 	}

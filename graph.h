@@ -77,7 +77,7 @@ struct vertex_helper{ //
 	}
 	template<class E, class S>
 	static void rebase(E& e, S const& s, intptr_t delta)
-	{ untested();
+	{ itested();
 		e=s;
 	}
 };

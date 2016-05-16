@@ -41,11 +41,12 @@
 //#include "parallel.h"
 #include "degs.h"
 
+#define q_in_cb
 
 namespace noboost{ // here??
 
 template<class CB, class G>
-class callback_proxy{
+class callback_proxy{ //
 public:
 	typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 public:
@@ -57,9 +58,13 @@ public:
 	void operator()(vertex_descriptor w)
 	{
 //		BUG:: :w
-		if(!_cb){ untested();
+		if(!_cb){ itested();
 		}else if(_v<w){
 			(*_cb)(boost::edge(_v,w,_g).first);
+#ifdef q_in_cb
+			(*_cb)(_v);
+			(*_cb)(w);
+#endif
 			_done=true;
 		}else{
 		}
@@ -80,7 +85,7 @@ template< template<class T, class... > class ECT, \
           class VDP,
           template<class G, class...> class DEG,
           class CB, typename=void /*required for sfinae*/ >
-struct sghelp_hack{
+struct sghelp_hack{ //
 static size_t mcah(
 		typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor c,
 		gala::graph<SGARGS>& g,
@@ -101,9 +106,11 @@ static size_t mcah(
 
 	for(J=boost::adjacent_vertices(c, g).first; J!=E; ++J){
 		vertex_descriptor N=*J;
-		if(cb){
+#ifndef q_in_cb
+		if(cb){untested();
 			(*cb)(N);
 		}
+#endif
 
 		assert(*J!=c);
 		assert(g.is_valid(N));
@@ -132,7 +139,7 @@ static size_t mcah(
 
 	// FIXME: this might be completely unnecessary.
 	g._num_edges += n;
-	g._num_edges -= g.out_edges(c).size();
+	g._num_edges -= bag.size();
 	g.out_edges(c).clear();
 	return n;
 }
@@ -183,15 +190,15 @@ typedef typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor ve
 					assert(inserted_new);
 #endif
 					// edge has moved.
-				}else{
+				}else{untested();
 					// there are two, one of which will be gone.
-					if(cb){
+					if(cb){untested();
 						(*cb)(I);
 					}
 					--g._num_edges; // hack!!
 				}
 
-				{
+				{untested();
 				assert(g.out_edges(I).end() != g.out_edges(I).find(vd));
 				g.out_edges(I).erase(vd);
 				}
@@ -206,7 +213,7 @@ typedef typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor ve
 
 } //noboost
 
-namespace noboost {
+namespace noboost { //
 	template<typename G>
 	using vertex_iterator = typename boost::graph_traits<G>::vertex_iterator;
 	template<typename G>
@@ -292,7 +299,8 @@ namespace noboost { // BUG in graphviz?
 	}
 
 } // noboost
-namespace treedec{
+
+namespace treedec{ //
 // FIXME: always hijack like this, if
 // noboost::outedge_set<gala::graph<SGARGS> >::type is treedec_chooser::bag_type?
 	VCTtemplate
@@ -329,7 +337,7 @@ namespace treedec{
 	}
 
 }//treedec
-namespace noboost{
+namespace noboost{ //
 
 	// theres no Vertex. use the position instead
 	template< template<class T, class... > class ECT, class VDP >
@@ -345,18 +353,18 @@ namespace noboost{
 	VCTtemplate
 	unsigned get_id(const gala::graph<SGARGS>& /*g*/,
 			const vertex_descriptor<gala::graph<SGARGS> >& /*v*/ )
-	{
+	{untested();
 		incomplete();
 		return 0;
 	}
 
 	VCTtemplate
-	struct outedge_set< gala::graph<SGARGS> >{
+	struct outedge_set< gala::graph<SGARGS> >{ //
 		typedef typename gala::graph<SGARGS>::EL type;
 	};
 
 	VCTtemplate
-	struct treedec_chooser< gala::graph<SGARGS> >{
+	struct treedec_chooser< gala::graph<SGARGS> >{ //
 		typedef vertex_descriptor< gala::graph<SGARGS> > value_type;
 		typedef typename outedge_set< gala::graph<SGARGS> >::type bag_type;
 		typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, bag_type> type;
@@ -364,7 +372,7 @@ namespace noboost{
 
 #if 0
 VCTtemplate
-struct treedec_traits< treedec_chooser<gala::graph<SGARGS> > >{
+struct treedec_traits< treedec_chooser<gala::graph<SGARGS> > >{ //
 	typedef vertex_descriptor<gala::graph<SGARGS> > vd_type;
 	typedef typename outedge_set< gala::graph<SGARGS> >::type bag_type;
 };
@@ -374,7 +382,7 @@ struct treedec_traits< treedec_chooser<gala::graph<SGARGS> > >{
 // FIXME: more sgs.
 template<>
 struct treedec_traits< boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS,
-	std::set<gala::graph<std::set, std::vector, void*>::vertex_*> > >{
+	std::set<gala::graph<std::set, std::vector, void*>::vertex_*> > >{ //
 	typedef typename gala::graph<std::set, std::vector, void*>::vertex_* vd_type;
  	typedef typename outedge_set< gala::graph<std::set, std::vector, void*> >::type bag_type;
 };
@@ -382,14 +390,14 @@ struct treedec_traits< boost::adjacency_list<boost::setS, boost::vecS, boost::un
 #if 0
 /// something like that...
 template<class T>
-struct treedec_traits {
+struct treedec_traits { //
 	typedef typename T::vertex_property_type::value_type;
  	typedef typename outedge_set< G::vertex_property_type >::type bag_type;
 };
 ///
 template<class U>
 struct treedec_traits< typename boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS,
-	 std::set< typename gala::graph<std::set, std::vector, U>::vertex_*> > >{
+	 std::set< typename gala::graph<std::set, std::vector, U>::vertex_*> > >{ //
 	typedef typename gala::graph<std::set, std::vector, U>::vertex_* vd_type;
  	typedef typename outedge_set< gala::graph<std::set, std::vector, U> >::type bag_type;
 };
@@ -427,19 +435,19 @@ inline typename treedec_traits<TDT>::bag_type&
 //    bag( typename treedec_chooser< gala::graph<SGARGS> >::type&,
 // 			vertex_descriptor< treedec_chooser<gala::graph<SGARGS> > >& )
 // 
-// {
+// {untested();
 // 	incomplete();
 // }
 //
 // TODO:: not here
 template<class G>
 size_t degree(G const& g)
-{
+{untested();
 	size_t ret=0;
 	auto i = boost::vertices(g).first;
 	auto e = i;
 
-	for(boost::tie(i,e) = boost::vertices(g); i!=e; ++i){
+	for(boost::tie(i,e) = boost::vertices(g); i!=e; ++i){untested();
 		size_t d=boost::degree(*i,g);
 		if(ret<d) ret = d;
 	}
@@ -448,13 +456,13 @@ size_t degree(G const& g)
 
 VCTtemplate
 size_t degree(gala::graph<SGARGS> const& g)
-{
+{untested();
 	return g.degree();
 }
 
 VCTtemplate
 void check(gala::graph<SGARGS> const& g)
-{
+{untested();
 	typedef gala::graph<SGARGS> G;
 
 	unsigned edges=0;
@@ -464,16 +472,16 @@ void check(gala::graph<SGARGS> const& g)
 	auto E = i;
 
 #ifndef NDEBUG
-	for(boost::tie(i,e) = boost::vertices(g); i!=e; ++i){
+	for(boost::tie(i,e) = boost::vertices(g); i!=e; ++i){untested();
 //		assert(noboost::is_valid(iter::deref(i),g));
 	}
 #endif
 
-	for(boost::tie(i,e) = boost::vertices(g); i!=e; ++i){
+	for(boost::tie(i,e) = boost::vertices(g); i!=e; ++i){untested();
 	//	assert(noboost::is_valid(*i,g));
 		auto j = boost::out_edges(*i,g).first;
 		auto f = j;
-		for(boost::tie(j,f) = boost::out_edges(*i,g); j!=f; ++j){
+		for(boost::tie(j,f) = boost::out_edges(*i,g); j!=f; ++j){untested();
 			++edges;
 		}
 	}
@@ -484,9 +492,9 @@ void check(gala::graph<SGARGS> const& g)
 
 
 	trace2("check edgecount", edges, boost::num_edges(g));
-	if (edges > boost::num_edges(g)){
+	if (edges > boost::num_edges(g)){untested();
 		assert(false);
-	}else if (edges < boost::num_edges(g)){
+	}else if (edges < boost::num_edges(g)){untested();
 		assert(false);
 	}
 
@@ -522,7 +530,7 @@ void check(gala::graph<SGARGS> const& g)
 	};
 }
 
-namespace treedec{
+namespace treedec{ //
 
 	// namespace graph?!
 
@@ -545,13 +553,13 @@ inline size_t count_missing_edges(
 	return missing_edges;
 }
 
-namespace detail{
+namespace detail{ //
 	// iterate over edges adjacent to both v and s
 	// implementation: iterate over outedges(v), skip non-outedges(s).
 	// TODO: reuse generic set iterator stuff
 	VCTtemplate
 	class shared_adj_iter<gala::graph<SGARGS> >
-	    : public boost::graph_traits<gala::graph<SGARGS> >::adjacency_iterator {
+	    : public boost::graph_traits<gala::graph<SGARGS> >::adjacency_iterator { //
 	public:
 		typedef typename gala::graph<SGARGS> G;
 		typedef typename boost::graph_traits<G>::adjacency_iterator adjacency_iterator;
@@ -561,7 +569,7 @@ namespace detail{
 		    : boost::graph_traits<G>::adjacency_iterator(v),
 		      _ve(ve), _s(g.out_edges(w).begin()),
 		      _w(g.out_edges(w)), _g(g)
-		{ untested();
+		{
 			skip();
 		}
 		shared_adj_iter& operator++(){
@@ -577,10 +585,10 @@ namespace detail{
 			while(true){
 				if(unlikely(adjacency_iterator::operator==(_ve))){
 					return;
-				}else if(unlikely(_s==_w.end())){ untested();
+				}else if(unlikely(_s==_w.end())){itested();
 					adjacency_iterator::operator=(_ve);
 					return;
-				}else if(**this<*_s){
+				}else if(**this<*_s){itested();
 					adjacency_iterator::operator++();
 				}else if(*_s<**this){
 					++_s;
