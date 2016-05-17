@@ -190,15 +190,15 @@ typedef typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor ve
 					assert(inserted_new);
 #endif
 					// edge has moved.
-				}else{untested();
+				}else{itested();
 					// there are two, one of which will be gone.
-					if(cb){untested();
+					if(cb){itested();
 						(*cb)(I);
 					}
 					--g._num_edges; // hack!!
 				}
 
-				{untested();
+				{itested();
 				assert(g.out_edges(I).end() != g.out_edges(I).find(vd));
 				g.out_edges(I).erase(vd);
 				}
@@ -564,14 +564,28 @@ namespace detail{ //
 		typedef typename gala::graph<SGARGS> G;
 		typedef typename boost::graph_traits<G>::adjacency_iterator adjacency_iterator;
 		typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+		shared_adj_iter(vertex_descriptor v,
+		                vertex_descriptor w, G const& g)
+		    : boost::graph_traits<G>::adjacency_iterator(g.out_edges(v).begin()),
+		      _ve(g.out_edges(v).end()),
+				_s(g.out_edges(w).begin()),
+		      _w(g.out_edges(w)), _g(g)
+		{ itested();
+			adjacency_iterator::operator=(g.out_edges(v).lower_bound(*_s));
+			_s = g.out_edges(w).lower_bound(**this);
+			skip();
+		}
+		// inefficient. probably obsolete
 		shared_adj_iter(adjacency_iterator v, adjacency_iterator ve,
 		                vertex_descriptor w, G const& g)
 		    : boost::graph_traits<G>::adjacency_iterator(v),
 		      _ve(ve), _s(g.out_edges(w).begin()),
 		      _w(g.out_edges(w)), _g(g)
 		{
+			_s = g.out_edges(w).lower_bound(**this);
 			skip();
 		}
+	public: //ops
 		shared_adj_iter& operator++(){
 			adjacency_iterator::operator++();
 			skip();
@@ -579,6 +593,7 @@ namespace detail{ //
 					|| *_s == **this);
 			return *this;
 		}
+		// inefficient
 	private:
 		void skip()
 		{ itested();
