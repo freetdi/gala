@@ -199,12 +199,14 @@ namespace boost { //
 			typedef ptrdiff_t difference_type; // is this correct?
 			typedef std::input_iterator_tag iterator_category; // makes sense!?
 		public:
-			edge_iterator(){}
+			edge_iterator()
+			{
+			}
 			edge_iterator(typename gala::graph<SGARGS>::iterator v,
 			              typename gala::graph<SGARGS>::out_vertex_iterator e,
 					const ::gala::graph<SGARGS>* g)
 				: base(std::make_pair(v,e)), _g(g)
-			{ itested();
+			{
 				typename gala::graph<SGARGS>::iterator &f = base.first;
 				typename gala::graph<SGARGS>::out_vertex_iterator &s = base.second;
 
@@ -236,7 +238,7 @@ namespace boost { //
 			}
 			// fixme: more efficient for ordered edgelist
 			void increment()
-			{ itested();
+			{
 				typedef gala::graph<SGARGS> G;
 				typedef typename G::storage storage;
 				typedef typename G::iterator vertex_iterator_type;
@@ -257,6 +259,9 @@ namespace boost { //
 						break;
 					}else if(s==storage::out_edges(*f, VC).end()) {
 						++f;
+						if(f==_g->end()){
+							break;
+						}
 						e = storage::out_edges(*f, VC).end();
 						s = storage::out_edges(*f, VC).begin();
 					}else if(*s == G::iter::deref(f)){
@@ -477,16 +482,16 @@ namespace boost { //
 	}
 
 	VCTtemplate
-	typename graph_traits< ::gala::graph<SGARGS> >::vertex_descriptor target(
-	  typename graph_traits< ::gala::graph<SGARGS> >::edge_descriptor e,
+	typename graph_traits<gala::graph<SGARGS> >::vertex_descriptor target(
+	  typename graph_traits<gala::graph<SGARGS> >::edge_descriptor e,
 	  const  ::gala::graph<SGARGS>&)
 	{
 		return e.second;
 	}
 
 	VCTtemplate
-	inline std::pair<typename graph_traits< ::gala::graph<SGARGS> >::edge_iterator,
-	                 typename graph_traits< ::gala::graph<SGARGS> >::edge_iterator>
+	inline std::pair<typename graph_traits<gala::graph<SGARGS> >::edge_iterator,
+	                 typename graph_traits<gala::graph<SGARGS> >::edge_iterator>
 	             edges(const ::gala::graph<SGARGS>& g)
 	{
 		typedef gala::graph<SGARGS> G;

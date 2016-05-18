@@ -22,16 +22,9 @@
 
 #include <gala/boost.h>
 
-#ifdef OLDTDLIB
-#include <tdlib/TD_degree.hpp>
-#include <tdlib/TD_noboost.hpp>
-#include <tdlib/TD_std.hpp>
-#else
 #include <tdlib/degree.hpp>
 #include <tdlib/graph.hpp>
 #include <tdlib/std.hpp>
-#endif
-// #include <tdlib/TD_misc.hpp>
 
 #include <boost/graph/iteration_macros.hpp>
 //hack
@@ -462,7 +455,7 @@ size_t degree(gala::graph<SGARGS> const& g)
 
 VCTtemplate
 void check(gala::graph<SGARGS> const& g)
-{untested();
+{itested();
 	typedef gala::graph<SGARGS> G;
 
 	unsigned edges=0;
@@ -471,17 +464,17 @@ void check(gala::graph<SGARGS> const& g)
 	auto I = i;
 	auto E = i;
 
-#ifndef NDEBUG
+#ifdef MORE_DEBUG
 	for(boost::tie(i,e) = boost::vertices(g); i!=e; ++i){untested();
 //		assert(noboost::is_valid(iter::deref(i),g));
 	}
 #endif
 
-	for(boost::tie(i,e) = boost::vertices(g); i!=e; ++i){untested();
+	for(boost::tie(i,e) = boost::vertices(g); i!=e; ++i){
 	//	assert(noboost::is_valid(*i,g));
 		auto j = boost::out_edges(*i,g).first;
 		auto f = j;
-		for(boost::tie(j,f) = boost::out_edges(*i,g); j!=f; ++j){untested();
+		for(boost::tie(j,f) = boost::out_edges(*i,g); j!=f; ++j){
 			++edges;
 		}
 	}
@@ -586,8 +579,16 @@ namespace detail{ //
 			skip();
 		}
 	public: //ops
-		shared_adj_iter& operator++(){
+		shared_adj_iter& operator++()
+		{
+			// still inefficient...
 			adjacency_iterator::operator++();
+			if(unlikely(**this>10+*_s)){
+				auto w=&_w; /// HACK
+				_s = (const_cast<typename G::EL*>(w))->lower_bound(**this);
+			}else{
+				++_s;
+			}
 			skip();
 			assert(adjacency_iterator::operator==(_ve)
 					|| *_s == **this);
@@ -612,7 +613,8 @@ namespace detail{ //
 				}
 			}
 		}
-		adjacency_iterator _ve, _s;
+		adjacency_iterator _ve;
+	  	adjacency_iterator _s;
 		typename G::EL const& _w;
 		G const& _g;
 	};

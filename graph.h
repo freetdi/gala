@@ -72,7 +72,7 @@ struct vertex_helper{ //
 	}
 	template<class VL>
 	static bool is_valid(VDP const& v, VL const& _v)
-	{ untested();
+	{ itested();
 		return v<_v.size();
 	}
 	template<class E, class S>
@@ -595,14 +595,16 @@ public: //assign
 private:
 	void assign_(graph const& G);
 public: // construct
+#if 0 // does not work
 	// construct a graph from a boost graph
 	// warning: assuming vertex_descriptors are 0,1,2 ...
 	template <typename G_t>
-	graph(G_t const &G)
+	explicit graph(G_t const &G)
 	    : _num_edges(0)
 	{
 		assign(G);
 	}
+#endif
 	template <typename G_t>
 	void assign(G_t const& G);
 public: // iterators
@@ -689,6 +691,8 @@ public:
 	//O(log max{d_1, d_2}), where d_1 is the degree of a and d_2 is the degree of b
 	std::pair<edge,bool> add_edge(vertex_type a, vertex_type b)
 	{
+		assert(is_valid(a));
+		assert(is_valid(b));
 		vertex_type* A=&a;
 		vertex_type* B=&b;
 #ifdef ADDEDGESWAP
@@ -737,6 +741,7 @@ public:
 	// neighbours of v
 	void clear_vertex(vertex_type v)
 	{
+		assert(is_valid(v));
 		unsigned c = 0;
 		for(auto& nIt : out_edges(v)){
 			remove_edge_single(nIt, v);
@@ -807,6 +812,7 @@ VCTtemplate
 typename graph<SGARGS>::EL const&
     graph<SGARGS>::out_edges(const_vertex_type& v) const
 {
+	assert(is_valid(v));
 	return storage::out_edges(v, _v);
 }
 /*--------------------------------------------------------------------------*/
@@ -814,6 +820,7 @@ VCTtemplate
 typename graph<SGARGS>::EL&
 	graph<SGARGS>::out_edges(const_vertex_type& v)
 {
+	assert(is_valid(v));
 	return storage::out_edges(v, _v);
 }
 /*--------------------------------------------------------------------------*/
@@ -828,6 +835,7 @@ VCTtemplate
 typename graph<SGARGS>::EL& // const?!
 	graph<SGARGS>::out_edges(vertex_type& v) const
 {
+	assert(is_valid(v));
 	auto&_V = const_cast<graph<SGARGS>*>(this)->_v;
 	return storage::out_edges(v, _V);
 }
