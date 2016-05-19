@@ -171,8 +171,12 @@ struct merge{ //
 // { incomplete();
 // }
 	//typedef typename std::unordered_set<X> S;
-	static void zipfwd(S& tgt, S_iterator src_begin, T_iterator src_end)
+	template<class CB>
+	static void zipfwd(S& tgt, S_iterator src_begin, T_iterator src_end, CB* cb=NULL)
 	{ untested();
+		if(cb){incomplete();
+		}
+
 		auto i=src_begin;
 		for(; i!=src_end; ++i){untested();
 			tgt.insert(*i);
@@ -184,6 +188,7 @@ template<class X>
 struct is_ordered_set{ //
 	typedef void type;
 };
+// incomplete.
 template<class X>
 struct is_ordered_set<std::unordered_set<X> >{ };
 /*--------------------------------------------------------------------------*/
@@ -364,7 +369,7 @@ class dummy{ //
 template<class S, class S_iterator, class T_iterator, class CB=dummy<typename S::value_type> >
 void zipfwdb4(S& tgt, S_iterator src_begin, T_iterator src_end, CB* cb=nullptr)
 {
-	return merge<S, S_iterator,T_iterator>::zipfwd(tgt, src_begin, src_end, cb);
+	return merge<S, S_iterator, T_iterator>::zipfwd(tgt, src_begin, src_end, cb);
 }
 
 // S_iterator and T_iterator must be comparable...
