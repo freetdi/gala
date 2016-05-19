@@ -137,50 +137,49 @@ namespace boost { //
 		        typename gala::graph<SGARGS>::out_vertex_iterator,
 		        bidirectional_traversal_tag,
 		        /*const*/ typename ::gala::graph<SGARGS>::vertex_type, // <= reference
-		        const typename ::gala::graph<SGARGS>::vertex_type*>
-		{ //
+		        const typename ::gala::graph<SGARGS>::vertex_type*> { //
 		public:
 			typedef typename gala::graph<SGARGS>::out_vertex_iterator value_type;
 			typedef typename gala::graph<SGARGS>::out_vertex_const_iterator const_value_type;
 		public:
 			adjacency_iterator(typename ::gala::graph<SGARGS>::out_vertex_iterator
-			    e=typename gala::graph<SGARGS>::out_vertex_iterator()) : base(e)
+			    e=typename gala::graph<SGARGS>::out_vertex_iterator()) : _base(e)
 			{
 			}
 			bool operator==(const_value_type other) const
 			{
-				return const_value_type(base) == other;
+				return const_value_type(_base) == other;
 			}
 			bool operator==(const adjacency_iterator& other) const
 			{
-				return base == other.base;
+				return _base == other._base;
 			}
 			bool operator!=(const adjacency_iterator& other) const
 			{
-				return base != other.base;
+				return _base != other._base;
 			}
 		private: // reference
 			typename gala::graph<SGARGS>::vertex_type dereference() const
 			{
-				return *base;
+				return *_base;
 			}
 
 			bool equal(const adjacency_iterator& other) const
 			{
-				return base == other.base;
+				return _base == other._base;
 			}
 			void increment()
 			{
-				++base;
+				++_base;
 			}
 			void decrement()
 			{ untested();
-				--base;
+				--_base;
 			}
+		public: // bug? use friends...
+			const value_type base(){return _base;}
 		private:
-			//value_type
-			typename ::gala::graph<SGARGS>::out_vertex_iterator base;
-
+			value_type _base;
 			friend class iterator_core_access;
 		};
 
