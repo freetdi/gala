@@ -206,7 +206,7 @@ typedef typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor ve
 
 } //noboost
 
-namespace noboost { //
+namespace treedec { //
 	template<typename G>
 	using vertex_iterator = typename boost::graph_traits<G>::vertex_iterator;
 	template<typename G>
@@ -243,11 +243,11 @@ namespace noboost { //
 	                   vertex_callback<typename gala::graph<SGARGS>::vertex_type >* cb=NULL)
 	{ itested();
 //		typedef typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor vertex_descriptor;
-		typedef noboost::vertex_callback<typename gala::graph<SGARGS>::vertex_type> CB;
+		typedef vertex_callback<typename gala::graph<SGARGS>::vertex_type> CB;
 //		typedef gala::graph<SGARGS> G;
 		(void) erase;
 		assert(vd!=into);
-		sghelp_hack<ECT, VCT, VDP, DEG, CB>::ce(vd, into, g, erase, cb);
+		noboost::sghelp_hack<ECT, VCT, VDP, DEG, CB>::ce(vd, into, g, erase, cb);
 	}
 
 	// weird wrapper. maybe irrelevant.
@@ -272,7 +272,7 @@ namespace noboost { //
 			//			(*v)->n.clear();
 		}
 	}
-} // noboost
+} // treedec
 
 namespace noboost { // BUG in graphviz?
 	// required for _new algo...?
@@ -283,6 +283,9 @@ namespace noboost { // BUG in graphviz?
 		 G.add_edge(v, w);
 	}
 
+}
+namespace treedec{
+
 	// get a vertex identifier.
 	VCTtemplate
 	vertex_descriptor<gala::graph<SGARGS> > get_vd(const gala::graph<SGARGS>&,
@@ -291,16 +294,45 @@ namespace noboost { // BUG in graphviz?
 		return v;
 	}
 
-} // noboost
+	VCTtemplate
+	void insert_neighbours
+	   (typename outedge_set< gala::graph<SGARGS> >::type &b,
+	    typename gala::graph<SGARGS>::vertex_type v,
+	    gala::graph<SGARGS> const &g)
+	{
+		zipfwdb4(b, g.out_edges(v));
+	}
 
-namespace treedec{ //
+	VCTtemplate
+	void assign_neighbours
+	   (typename outedge_set< gala::graph<SGARGS> >::type &b,
+	    typename gala::graph<SGARGS>::vertex_type v,
+	    gala::graph<SGARGS> const &g)
+	{ itested();
+		b = g.out_edges(v);
+	}
+
+	VCTtemplate
+	void assign_neighbours
+	   (typename outedge_set< gala::graph<SGARGS> >::type &b,
+	    typename gala::graph<SGARGS>::vertex_type v,
+	    typename gala::graph<SGARGS>::vertex_type w,
+	    typename gala::graph<SGARGS>::vertex_type x,
+	    gala::graph<SGARGS> const &g)
+	{
+		// not efficient yet...
+		b = g.out_edges(v);
+		insert_neighbours(b, w, g);
+		insert_neighbours(b, x, g);
+	}
+
 // FIXME: always hijack like this, if
 // noboost::outedge_set<gala::graph<SGARGS> >::type is treedec_chooser::bag_type?
 	VCTtemplate
-	typename noboost::outedge_set<gala::graph<SGARGS> >::type detach_neighborhood(
+	typename outedge_set<gala::graph<SGARGS> >::type detach_neighborhood(
 			  typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor& c,
 			  gala::graph<SGARGS> & g,
-			  typename noboost::outedge_set<gala::graph<SGARGS> >::type* N)
+			  typename outedge_set<gala::graph<SGARGS> >::type* N)
 	{ untested();
 		assert(N==nullptr); // for now..
 		incomplete(); //	unreachable...
@@ -324,13 +356,10 @@ namespace treedec{ //
 			gala::graph<SGARGS>& g,
 			typename outedge_set< gala::graph<SGARGS> >::type& bag,
 			typename treedec::graph_callback<gala::graph<SGARGS> >* cb=NULL)
-	{
+	{ itested();
 		typedef typename treedec::graph_callback<gala::graph<SGARGS> > CB;
 		return noboost::sghelp_hack<ECT, VCT, VDP, DEG, CB>::mcah(c, g, bag, cb);
 	}
-
-}//treedec
-namespace noboost{ //
 
 	// theres no Vertex. use the position instead
 	template< template<class T, class... > class ECT, class VDP >
@@ -506,9 +535,6 @@ void check(gala::graph<SGARGS> const& g)
 	}
 }
 
-//} // noboost
-//namespace misc{ // really?!
-
 	VCTtemplate
 	struct deg_chooser<gala::graph<SGARGS> >{ //
 		typedef gala::graph<SGARGS> G;
@@ -549,79 +575,62 @@ inline size_t count_missing_edges(
 namespace detail{ //
 	// iterate over edges adjacent to both v and s
 	// implementation: iterate over outedges(v), skip non-outedges(s).
-	// TODO: reuse generic set iterator stuff
-	VCTtemplate
+	template<galaPARMS>
 	class shared_adj_iter<gala::graph<SGARGS> >
-	    : public boost::graph_traits<gala::graph<SGARGS> >::adjacency_iterator { //
-	public:
+	    : public intersection_iterator<typename gala::graph<SGARGS>::EL,
+		                                typename gala::graph<SGARGS>::EL> { //
+	public: // types
 		typedef typename gala::graph<SGARGS> G;
+		typedef typename gala::graph<SGARGS>::EL S;
+		typedef intersection_iterator<S, S> parent;
 		typedef typename boost::graph_traits<G>::adjacency_iterator adjacency_iterator;
 		typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+	public: // construct
 		shared_adj_iter(vertex_descriptor v,
 		                vertex_descriptor w, G const& g)
-		    : boost::graph_traits<G>::adjacency_iterator(g.out_edges(v).begin()),
-		      _ve(g.out_edges(v).end()),
-				_s(g.out_edges(w).begin()),
-		      _w(g.out_edges(w)), _g(g)
-		{ itested();
-			adjacency_iterator::operator=(g.out_edges(v).lower_bound(*_s));
-			_s = g.out_edges(w).lower_bound(**this);
-			skip();
+		    : parent(g.out_edges(v), g.out_edges(w))
+		{untested();
 		}
-		// inefficient. probably obsolete
 		shared_adj_iter(adjacency_iterator v, adjacency_iterator ve,
 		                vertex_descriptor w, G const& g)
-		    : boost::graph_traits<G>::adjacency_iterator(v),
-		      _ve(ve), _s(g.out_edges(w).begin()),
-		      _w(g.out_edges(w)), _g(g)
+		    : parent(v.base(), ve.base(), g.out_edges(w))
 		{
-			_s = g.out_edges(w).lower_bound(**this);
-			skip();
 		}
-	public: //ops
-		shared_adj_iter& operator++()
-		{
-			// still inefficient...
-			adjacency_iterator::operator++();
-			if(unlikely(**this>10+*_s)){
-				auto w=&_w; /// HACK
-				_s = (const_cast<typename G::EL*>(w))->lower_bound(**this);
-			}else{
-				++_s;
-			}
-			skip();
-			assert(adjacency_iterator::operator==(_ve)
-					|| *_s == **this);
-			return *this;
-		}
-		// inefficient
-	private:
-		void skip()
-		{ itested();
-			while(true){
-				if(unlikely(adjacency_iterator::operator==(_ve))){
-					return;
-				}else if(unlikely(_s==_w.end())){itested();
-					adjacency_iterator::operator=(_ve);
-					return;
-				}else if(**this<*_s){itested();
-					adjacency_iterator::operator++();
-				}else if(*_s<**this){
-					++_s;
-				}else{
-					return;
-				}
-			}
-		}
-		adjacency_iterator _ve;
-	  	adjacency_iterator _s;
-		typename G::EL const& _w;
-		G const& _g;
 	};
 
 }// detail
 
+
+VCTtemplate
+bool check_twins(typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor v,
+                 typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor w,
+                 const gala::graph<SGARGS>& g)
+{ itested();
+    return(g.out_edges(v) == g.out_edges(w));
+}
+
 } // treedec
+
+// transition?
+namespace noboost{
+    using treedec::bag;
+    using treedec::check;
+    using treedec::deg_chooser;
+    using treedec::contract_edge;
+    using treedec::edge_callback;
+//    using treedec::eliminate_vertex;
+//    using treedec::fetch_neighbourhood; // obsolete?
+    using treedec::get_min_degree_vertex;
+    using treedec::get_pos;
+    using treedec::get_vd;
+    using treedec::make_clique;
+    using treedec::make_degree_sequence;
+    using treedec::outedge_set;
+    using treedec::remove_vertex;
+    using treedec::treedec_traits;
+    using treedec::treedec_chooser;
+    using treedec::vertex_callback;
+} // noboost
 
 
 #endif

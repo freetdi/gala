@@ -386,7 +386,7 @@ void zipfwdb42(S& tgt, S const& src)
 }
 template<class S>
 void zipfwdb4(S& tgt, S const& src)
-{untested();
+{
 	zipfwdb4(tgt, src.begin(), src.end());
 }
 
@@ -440,4 +440,114 @@ h_at_rend:
 		++s;
 	}
 }
+
+/*--------------------------------------------------------------------------*/
+template<class S, class T, typename=void>
+class intersection_iterator : public S::const_iterator { //
+public: // types
+	typedef typename S::const_iterator S_iterator;
+	typedef typename T::const_iterator T_iterator;
+public: // construct
+	intersection_iterator(S_iterator v, S_iterator ve, T& s)
+		: S_iterator(v), _ve(ve), _s(s)
+	{
+		skip();
+	}
+	intersection_iterator(S const& v, T const& s)
+		: S_iterator(v.begin()), _ve(v.end()),
+		_s(s)
+	{ untested();
+		skip();
+	}
+	intersection_iterator(const intersection_iterator& p)
+		: S_iterator(p), _ve(p._ve), _s(p._s)
+	{
+	}
+public: //ops
+	S_iterator& operator++()
+	{
+		assert(_ve!=S_iterator(*this));
+		assert(S_iterator(*this)!=_ve);
+		S_iterator::operator++();
+		skip();
+
+		return *this;
+	}
+private:
+	void skip()
+	{
+		while(true){
+			if(S_iterator(*this)==_ve){
+				return;
+			}else if(_s.find(**this) == _s.end()){
+				S_iterator::operator++();
+			}else{
+				return;
+			}
+		}
+	}
+private: // data
+	S_iterator _ve;
+	T _s;
+};
+/*--------------------------------------------------------------------------*/
+template<class S, class T>
+class intersection_iterator<S, T,
+		std::pair<typename is_ordered_set<S>::type,
+		          typename is_ordered_set<T>::type> >
+    : public S::const_iterator { //
+public: // types
+	typedef typename S::const_iterator S_iterator;
+	typedef typename T::const_iterator T_iterator;
+public: // construct
+	intersection_iterator(S_iterator v, S_iterator ve, T& s)
+		: S_iterator(v), _ve(ve), _s(s)
+	{ untested();
+		skip();
+	}
+	intersection_iterator(S const& v, T const& s)
+		: S_iterator(v.begin()), _ve(v.end()),
+		_s(s), _w(v)
+	{ untested();
+		skip();
+	}
+	intersection_iterator(const intersection_iterator& p)
+		: S_iterator(p), _ve(p._ve), _s(p._s)
+	{ untested();
+	}
+public: //ops
+	S_iterator& operator++()
+	{ untested();
+		assert(_ve!=S_iterator(*this));
+		assert(S_iterator(*this)!=_ve);
+		// still inefficient...
+		S_iterator::operator++();
+		if(unlikely(**this>10+*_s)){
+			_s = _w->lower_bound(**this);
+		}else{
+			++_s;
+		}
+		skip();
+		assert(S_iterator::operator==(_ve)
+				|| *_s == **this);
+		return *this;
+	}
+private:
+	void skip()
+	{
+		while(true){ untested();
+			if(S_iterator(*this)==_ve){
+				return;
+			}else if(_s.find(**this) == _s.end()){
+				S_iterator::operator++();
+			}else{
+				return;
+			}
+		}
+	}
+private: // data
+	S_iterator _ve;
+	T _s;
+	S _w;
+};
 #endif

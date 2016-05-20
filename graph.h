@@ -45,12 +45,11 @@
 namespace gala{ //
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-#define VCTtemplate template< \
-                     template<class T, typename... > class ECT, \
+#define galaPARMS    template<class T, typename... > class ECT, \
                      template<class T, typename... > class VCT, \
                      class VDP, \
-                     template<class G, class ... > class DEG \
-                    >
+                     template<class G, class ... > class DEG
+#define VCTtemplate template< galaPARMS >
 #define SGARGS ECT,VCT,VDP,DEG
 /*--------------------------------------------------------------------------*/
 #define VCTtemplateP template< \
