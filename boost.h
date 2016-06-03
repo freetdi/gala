@@ -472,6 +472,7 @@ namespace boost { //
 		return boost::out_degree(u,g);
 	}
 
+#if 0
 	VCTtemplate
 	typename graph_traits< ::gala::graph<SGARGS> >::vertex_descriptor source(
 	  typename graph_traits< ::gala::graph<SGARGS> >::edge_descriptor e,
@@ -483,10 +484,14 @@ namespace boost { //
 	VCTtemplate
 	typename graph_traits<gala::graph<SGARGS> >::vertex_descriptor target(
 	  typename graph_traits<gala::graph<SGARGS> >::edge_descriptor e,
-	  const  ::gala::graph<SGARGS>&)
+	  const ::gala::graph<SGARGS>&)
 	{
 		return e.second;
 	}
+#else
+	using std::source;
+	using std::target;
+#endif
 
 	VCTtemplate
 	inline std::pair<typename graph_traits<gala::graph<SGARGS> >::edge_iterator,
