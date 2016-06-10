@@ -640,7 +640,7 @@ public: // BUG: should not expose this...?
 	}
 public:
 	void clear()
-	{
+	{ incomplete(); // inefficient
 		_v.resize(0);
 		_num_edges = 0;
 	}

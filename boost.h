@@ -24,7 +24,6 @@
 #include <gala/graph.h>
 #include <boost/graph/graph_traits.hpp> // bidirectional_graph_tag
 #include <boost/graph/properties.hpp>
-#include <boost/graph/adjacency_list.hpp>
 
 namespace boost { //
 	struct simplegraph_traversal_category :
@@ -50,18 +49,20 @@ namespace boost { //
 		typedef typename myVDP<VDP>::type degree_size_type;
 
 		typedef typename gala::graph<SGARGS>::vertex_type vertex_descriptor;
-		typedef typename gala::graph<SGARGS>::edge edge_descriptor;
+		typedef typename gala::graph<SGARGS>::edge_type edge_descriptor;
 
 		typedef undirected_tag directed_category;
 		typedef simplegraph_traversal_category traversal_category;
 		typedef disallow_parallel_edge_tag edge_parallel_category;
 
-		class vertex_iterator : public iterator_facade<
+		class vertex_iterator
+		    : public iterator_facade<
 		        vertex_iterator, //  <= Derived
 		        typename gala::graph<SGARGS>::iterator, // <= value_type
 		        typename gala::graph<SGARGS>::iterator::iterator_category,
 		        typename gala::graph<SGARGS>::vertex_type, // <= value&
-		        ptrdiff_t /*Difference*/  >{ // FIX: indentation!
+		        ptrdiff_t /*Difference*/
+		    >{
 		public:
 			typedef gala::graph<SGARGS> G;
 			typedef typename gala::graph<SGARGS>::vertex_type reference;
@@ -105,16 +106,20 @@ namespace boost { //
 
 		private:
 			// reference
-			reference dereference() { untested();
+			reference dereference()
+			{ untested();
 				return &*base;
 			}
-			const reference dereference() const { // untested();
+			const reference dereference() const
+			{ // untested();
 				// BUG. don't use detail...
 				return G::iter::deref(base);
 			}
 
 			bool equal(const vertex_iterator& other) const
-			{ return base == other.base; }
+			{
+				return base == other.base;
+			}
 			void increment()
 			{
 				++base;
@@ -133,14 +138,20 @@ namespace boost { //
 		};
 
 		class adjacency_iterator
-		    : public iterator_facade<adjacency_iterator,
-		        typename gala::graph<SGARGS>::out_vertex_iterator,
-		        bidirectional_traversal_tag,
+		    : public iterator_facade<
+		        adjacency_iterator,
+		        typename gala::graph<SGARGS>::out_vertex_iterator, // value_type
+//		        bidirectional_traversal_tag,
+				  std::input_iterator_tag, // for now.
 		        /*const*/ typename ::gala::graph<SGARGS>::vertex_type, // <= reference
-		        const typename ::gala::graph<SGARGS>::vertex_type*> { //
+		        typename ::gala::graph<SGARGS>::vertex_type* // difference_type
+		    >{ //
 		public:
 			typedef typename gala::graph<SGARGS>::out_vertex_iterator value_type;
 			typedef typename gala::graph<SGARGS>::out_vertex_const_iterator const_value_type;
+			typedef typename gala::graph<SGARGS>::vertex_type reference;
+//		   typedef typename gala::graph<SGARGS>::vertex_type* difference_type; ??
+		   typedef intptr_t difference_type; // why?
 		public:
 			adjacency_iterator(typename ::gala::graph<SGARGS>::out_vertex_iterator
 			    e=typename gala::graph<SGARGS>::out_vertex_iterator()) : _base(e)
@@ -159,7 +170,7 @@ namespace boost { //
 				return _base != other._base;
 			}
 		private: // reference
-			typename gala::graph<SGARGS>::vertex_type dereference() const
+			reference dereference() const
 			{
 				return *_base;
 			}
@@ -303,18 +314,26 @@ namespace boost { //
 		};
 
 		class out_edge_iterator
-			: public iterator_facade<out_edge_iterator,
-			typename std::pair<typename gala::graph<SGARGS>::vertex_type,
-			                   typename gala::graph<SGARGS>::out_vertex_iterator>,
-			bidirectional_traversal_tag,
-			const typename ::gala::graph<SGARGS>::edge&,
-			const typename gala::graph<SGARGS>::out_vertex_iterator*>
-		{
+			: public iterator_facade<
+			   out_edge_iterator,
+			   std::pair<typename gala::graph<SGARGS>::vertex_type,
+			             typename gala::graph<SGARGS>::out_vertex_iterator>,
+			   // bidirectional_traversal_tag, // breaks InputIterator (why?)
+				std::input_iterator_tag,
+			   const typename gala::graph<SGARGS>::edge, // <= reference
+			   const typename gala::graph<SGARGS>::out_vertex_iterator* // difference_type
+			>{ //
+		public: // types
 			typedef typename std::pair<
-				typename gala::graph<SGARGS>::vertex_type,
-			   // typename boost::graph_traits<gala::graph<SGARGS> >::adjacency_iterator> value_type;
-			   typename gala::graph<SGARGS>::out_vertex_iterator> value_type;
-		public:
+			    typename gala::graph<SGARGS>::vertex_type,
+			    typename gala::graph<SGARGS>::out_vertex_iterator> value_type;
+		   typedef intptr_t difference_type; // why?
+			typedef typename gala::graph<SGARGS>::edge reference;
+
+		public: // construct
+			out_edge_iterator()
+			{
+			}
 			out_edge_iterator(
 			    typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor v,
 			    typename gala::graph<SGARGS>::out_vertex_iterator w)
@@ -323,10 +342,14 @@ namespace boost { //
 				base.second = w;
 			}
 		private:
-			const typename gala::graph<SGARGS>::edge& dereference() const { return base; }
-
+			reference dereference() const
+			{
+				return std::make_pair(base.first, *base.second);
+			}
 			bool equal(const out_edge_iterator& other) const
-			{ return base.second == other.base.second; }
+			{
+				return base.second == other.base.second;
+			}
 			void increment()
 			{ itested();
 				++(base.second);
@@ -335,6 +358,14 @@ namespace boost { //
 			{ itested();
 				--(base.second);
 			}
+//			bool operator==(const out_edge_iterator& other) const
+//			{ incomplete();
+//				return false;
+//			}
+//			bool operator!=(const out_edge_iterator& other) const
+//			{ incomplete();
+//				return false;
+//			}
 
 		private:
 			value_type base;
@@ -434,6 +465,7 @@ namespace boost { //
 		assert(g.is_valid(u));
 
 		bool is_edge;
+#if 0
 		if(g.degree(u)<g.degree(v)){ itested();
 		//	std::swap(u,v); // does it really help?
 			auto i = g.out_edges(u).find(v);
@@ -442,6 +474,10 @@ namespace boost { //
 			auto i = g.out_edges(v).find(u);
 			is_edge = (i!=g.out_edges(v).end());
 		}
+#else
+		auto i = g.out_edges(u).find(v);
+		is_edge = (i!=g.out_edges(u).end());
+#endif
 
 
 		assert((!is_edge) || (u!=v));
@@ -449,11 +485,13 @@ namespace boost { //
 		//i = g.out_edges(u).find(v);
 		//assert(is_edge == (i!=g.out_edges(u).end()));
 
-		auto e = typename graph_traits<gala::graph<SGARGS> >::edge_descriptor(u,v);
-		if(!is_edge){
+		if(is_edge){
+			auto e = typename graph_traits<gala::graph<SGARGS> >::edge_descriptor(u,v);
+			return std::make_pair(e, is_edge);
 		}else{itested();
+			auto e = typename graph_traits<gala::graph<SGARGS> >::edge_descriptor();
+			return std::make_pair(e, is_edge);
 		}
-		return std::make_pair(e, is_edge);
 	}
 
 	VCTtemplate
@@ -764,6 +802,14 @@ namespace boost { //
 	}
 
 	VCTtemplate
+	typename boost::graph_traits<gala::graph<SGARGS > >::vertices_size_type
+	get(boost::vertex_index_t t, const gala::graph<SGARGS>& g,
+			typename boost::graph_traits< gala::graph<SGARGS> >::vertex_descriptor v)
+	{
+		return get(get(t, g), v);
+	}
+
+	VCTtemplate
 	inline std::pair<typename boost::graph_traits< gala::graph<SGARGS> >::out_edge_iterator,
 						  typename boost::graph_traits< gala::graph<SGARGS> >::out_edge_iterator >
 						out_edges(typename boost::graph_traits< gala::graph<SGARGS> >::vertex_descriptor v,
@@ -779,8 +825,8 @@ namespace boost { //
 } // namespace boost
 
 
-
-// HERE? requires boost...
+// HERE? requires boost... (bug?)
+#include <boost/graph/adjacency_list.hpp>
 // does not work if vertex_descriptor is not contiguous
 // should be obsolete with boost::copy_graph
 VCTtemplate template<class H>

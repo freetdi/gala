@@ -36,6 +36,26 @@
 
 #define q_in_cb
 
+#if 1
+// HACK HACK HACK
+#ifndef TD_DEFS_NETWORK_FLOW
+#define TD_DEFS_NETWORK_FLOW
+namespace treedec{
+
+struct Vertex_NF{
+    bool visited;
+    int predecessor;
+};
+
+struct Edge_NF{
+    bool path; //true if a path uses the edge
+};
+
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Vertex_NF, Edge_NF> digraph_t;
+}
+#endif
+#endif
+
 namespace noboost{ // here??
 
 template<class CB, class G>
@@ -438,7 +458,6 @@ inline typename treedec_traits<gala::graph<SGARGS> >::bag_type&
 using boost::setS;
 using boost::vecS;
 using boost::undirectedS;
-using boost::graph_traits;
 
 typedef  boost::adjacency_list<setS, vecS, undirectedS, \
 	 std::set< gala::graph<std::set, std::vector, void*>::vertex_*> > TDT;
@@ -446,22 +465,11 @@ typedef  boost::adjacency_list<setS, vecS, undirectedS, \
 //VCTtemplate //not yet.
 inline typename treedec_traits<TDT>::bag_type&
    bag(TDT& t,
-	const typename graph_traits<TDT>::vertex_descriptor& v)
+	const typename boost::graph_traits<TDT>::vertex_descriptor& v)
 { itested();
    return t[v];
 }
 
-// does not work
-// VCTtemplate
-// std::set<typename gala::graph<SGARGS>::vertex_descriptor>&
-//    bag( typename treedec_chooser< gala::graph<SGARGS> >::type&,
-// 			vertex_descriptor< treedec_chooser<gala::graph<SGARGS> > >& )
-// 
-// {untested();
-// 	incomplete();
-// }
-//
-// TODO:: not here
 template<class G>
 size_t degree(G const& g)
 {untested();
@@ -510,17 +518,12 @@ void check(gala::graph<SGARGS> const& g)
 	assert(!(edges%2));
 	edges/=2;
 
-//	std::cout << "OK\n";
-
-
 	trace2("check edgecount", edges, boost::num_edges(g));
 	if (edges > boost::num_edges(g)){untested();
 		assert(false);
 	}else if (edges < boost::num_edges(g)){untested();
 		assert(false);
 	}
-
-//	std::cout << "OK2"<< *i <<"\n";
 
 	using adjacency_iterator = typename boost::graph_traits<G>::adjacency_iterator;
 	adjacency_iterator aI, aE;
@@ -550,8 +553,6 @@ void check(gala::graph<SGARGS> const& g)
 }
 
 namespace treedec{ //
-
-	// namespace graph?!
 
 VCTtemplate
 inline size_t count_missing_edges(
@@ -597,9 +598,7 @@ namespace detail{ //
 		{
 		}
 	};
-
-}// detail
-
+} // detail
 
 VCTtemplate
 bool check_twins(typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor v,
@@ -607,6 +606,14 @@ bool check_twins(typename boost::graph_traits<gala::graph<SGARGS> >::vertex_desc
                  const gala::graph<SGARGS>& g)
 { itested();
     return(g.out_edges(v) == g.out_edges(w));
+}
+
+VCTtemplate
+inline typename boost::graph_traits<gala::graph<SGARGS> >::vertices_size_type
+   get_pos(typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor v,
+			const gala::graph<SGARGS>& G)
+{ itested();
+    return boost::get(boost::vertex_index, G, v);
 }
 
 } // treedec
@@ -632,5 +639,21 @@ namespace noboost{
     using treedec::vertex_callback;
 } // noboost
 
+// should not be necessary.
+// remove. and remove Vertex_NF/Edge_NF declarations.
+namespace treedec{
+VCTtemplate
+struct graph_traits<gala::graph<SGARGS> >{ //
+	using G_t = typename gala::graph<SGARGS>;
+
+	typedef typename treedec_chooser<G_t>::type treedec_type;
+	typedef typename outedge_set<G_t>::type outedge_set_type;
+	typedef typename boost::adjacency_list<boost::vecS, boost::vecS,
+	    boost::bidirectionalS, Vertex_NF, Edge_NF> directed_overlay;
+
+    typedef typename boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> immutable_type;
+	//                                 for now. ^^^^^
+};
+} // treedec
 
 #endif
