@@ -293,8 +293,6 @@ namespace boost { //
 						s = storage::out_edges(*f, VC).begin();
 					}
 				}
-
-				trace2("increment done", &*(base.first), &*(base.second));
 			}
 
 			void decrement() { untested();
@@ -729,7 +727,7 @@ namespace boost { //
 	template< template<class T, class=std::less<T>, class=std::allocator<T> > class ECT,
 	          template<class T, class=std::allocator<T> > class VCT,
 				 class VDP,
-	          template<class G> class DEG,
+	          template<class G> class CFG,
 				 class Tag>
 	struct property_map<gala::graph<SGARGS>, Tag> {
 		typedef typename simplegraph_property_map<Tag>::template bind_<SGARGS> map_gen;
@@ -740,7 +738,7 @@ namespace boost { //
 	template< template<class T, class=std::less<T>, class=std::allocator<T> > class ECT,
 	          template<class T, class=std::allocator<T> > class VCT,
 				 class VDP,
-	          template<class G> class DEG>
+	          template<class G> class CFG>
 	struct property_map<gala::graph<SGARGS>,
 	                    typename gala::graph<SGARGS>::vertex_index_type> {
 //		typedef typename simplegraph_property_map<Tag>::template bind_<SGARGS> map_gen;

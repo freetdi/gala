@@ -24,7 +24,7 @@
 
 #include <tdlib/degree.hpp>
 #include <tdlib/graph.hpp>
-#include <tdlib/std.hpp>
+// #include <tdlib/platform.hpp>
 
 #include <boost/graph/iteration_macros.hpp>
 //hack
@@ -93,11 +93,8 @@ private:
 	const G& _g;
 };
 
-template< template<class T, class... > class ECT, \
-          template<class T, class... > class VCT,
-          class VDP,
-          template<class G, class...> class DEG,
-          class CB, typename=void /*required for sfinae*/ >
+template<galaPARMS, class CB,
+         typename=void /*required for sfinae*/ >
 struct sghelp_hack{ //
 static size_t mcah(
 		typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor c,
@@ -267,7 +264,7 @@ namespace treedec { //
 //		typedef gala::graph<SGARGS> G;
 		(void) erase;
 		assert(vd!=into);
-		noboost::sghelp_hack<ECT, VCT, VDP, DEG, CB>::ce(vd, into, g, erase, cb);
+		noboost::sghelp_hack<ECT, VCT, VDP, CFG, CB>::ce(vd, into, g, erase, cb);
 	}
 
 	// weird wrapper. maybe irrelevant.
@@ -366,11 +363,7 @@ namespace treedec{
 		 return bag;
 	}
 
-	//VCTtemplate // FIXME
-	template< template<class T, class... > class ECT, \
-				 template<class T, class... > class VCT,
-				 class VDP,
-				 template<class G, class...> class DEG>
+	template<galaPARMS>
 	size_t make_clique_and_detach(
 			typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor c,
 			gala::graph<SGARGS>& g,
@@ -378,7 +371,7 @@ namespace treedec{
 			typename treedec::graph_callback<gala::graph<SGARGS> >* cb=NULL)
 	{ itested();
 		typedef typename treedec::graph_callback<gala::graph<SGARGS> > CB;
-		return noboost::sghelp_hack<ECT, VCT, VDP, DEG, CB>::mcah(c, g, bag, cb);
+		return noboost::sghelp_hack<ECT, VCT, VDP, CFG, CB>::mcah(c, g, bag, cb);
 	}
 
 	// theres no Vertex. use the position instead
@@ -486,7 +479,7 @@ size_t degree(G const& g)
 
 VCTtemplate
 size_t degree(gala::graph<SGARGS> const& g)
-{untested();
+{
 	return g.degree();
 }
 
@@ -541,7 +534,8 @@ void check(gala::graph<SGARGS> const& g)
 	VCTtemplate
 	struct deg_chooser<gala::graph<SGARGS> >{ //
 		typedef gala::graph<SGARGS> G;
-		typedef DEG<G> type;
+		typedef CFG<G> cfg;
+		typedef typename cfg::degs_type type;
 		typedef typename G::vertex_type vd_type;
 
 #if __cplusplus < 201103L

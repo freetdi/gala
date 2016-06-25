@@ -699,7 +699,7 @@ inline immvecgraph<G_t> const& immutable_clone(
 			}
 		}
 	}
-	ig.add_vertex(); // HACK!
+	ig.add_vertex(); // actually not adding vertex, just end.
 	assert(ig.num_vertices()); // not sure what happens with empty bags...
 	assert(ig.num_vertices() == bag_nv);
 

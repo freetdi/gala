@@ -48,16 +48,16 @@ namespace gala{ //
 #define galaPARMS    template<class T, typename... > class ECT, \
                      template<class T, typename... > class VCT, \
                      class VDP, \
-                     template<class G, class ... > class DEG
+                     template<class G> class CFG
 #define VCTtemplate template< galaPARMS >
-#define SGARGS ECT,VCT,VDP,DEG
+#define SGARGS ECT,VCT,VDP,CFG
 /*--------------------------------------------------------------------------*/
 #define VCTtemplateP template< \
                      template<class T, typename... > class ECT, \
                      template<class T, typename... > class VCT \
-                     template<class G, class ... > class DEG \
+                     template<class G> class CFG \
                      >
-#define SGARGSP ECT,VCT,DEG
+#define SGARGSP ECT,VCT,CFG
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 namespace bits{ //
@@ -481,10 +481,21 @@ struct iter<ECT, VCT, void*>{ //
 }// bits
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+template<class C>
+void prealloc(C const&, size_t howmany)
+{
+}
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+template<class G>
+struct graph_cfg_default{
+	typedef default_DEGS<G> degs_type;
+};
+/*--------------------------------------------------------------------------*/
 template< template<class T, typename... > class ECT=GALA_DEFAULT_SET,
           template<class T, typename... > class VCT=GALA_DEFAULT_VECTOR,
           typename VDP=void*,
-          template<class G, class... > class DEG=default_DEGS >
+          template<class G> class CFG=graph_cfg_default>
 class graph{ //
 public: // types
 	template<class T>
@@ -553,8 +564,8 @@ public: // move
 	    : _v(n), _num_edges(0)
 	{
 		if(m){
-			// incomplete();
-			// prealloc...
+			EL a;
+			prealloc(a, 2*m);
 		}
 	}
 public: // Required by Iterator Constructible Graph

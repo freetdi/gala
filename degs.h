@@ -16,6 +16,8 @@
 //
 //
 // prototype implementation for deg tracking.
+// TODO: much simpler prototype.
+// TODO: use from tdlib.
 //
 #ifndef DEGS_H
 #define DEGS_H
@@ -172,6 +174,9 @@ private:
     G& _g;
 }; // default_DEGS
 
-}
+}// gala
+
+// transition.
+using gala::default_DEGS;
 
 #endif
