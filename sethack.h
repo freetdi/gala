@@ -257,7 +257,7 @@ struct merge<S, S_iterator, T_iterator, typename is_ordered_set<S>::type >{ //
 		// find twice? should be optimized out (hopefully).
 		// turns out faster in FI2, could be the callback...
 		hint = tgt.find(*seek);
-		if(hint == tgt.end()){
+		if(hint == tgt.end()){ untested();
 			(*cb)(*seek);
 			hint = tgt.insert(*seek).first;
 		}

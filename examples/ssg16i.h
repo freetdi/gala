@@ -44,8 +44,8 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, V
 }
 #endif
 
-#include "digraph.h"
-#include "immutable.h"
+#include <gala/digraph.h>
+#include <gala/immutable.h>
 
 namespace treedec{
 template<>

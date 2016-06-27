@@ -589,8 +589,19 @@ namespace boost { //
 	}
 
 	VCTtemplate
-	inline void copy_graph(const gala::graph<SGARGS>&, gala::graph<SGARGS>&)
-	{ incomplete();
+	inline void copy_graph(const gala::graph<SGARGS>& g, gala::graph<SGARGS>& h)
+	{ untested();
+		h = g;
+	}
+
+   template<galaPARMS,
+	         template<class T, typename... > class ECT2,
+	         template<class T, typename... > class VCT2,
+	         class VDP2,
+	         template<class G> class CFG2>
+	inline void copy_graph(const gala::graph<SGARGS>& g, gala::graph<ECT2, VCT2, VDP2, CFG2>& h)
+	{ untested();
+		h = g;
 	}
 
 //	VCTtemplate

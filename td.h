@@ -72,11 +72,15 @@ public:
 	{
 //		BUG:: :w
 		if(!_cb){ itested();
-		}else if(_v<w){
-			(*_cb)(boost::edge(_v,w,_g).first);
+		}else if(_v<w){ untested();
+			trace2("", _v, w);
+//			assert(boost::edge(_v,w,_g).second); //not necessarily
+			(*_cb)(_v, w);
 #ifdef q_in_cb
-			(*_cb)(_v);
-			(*_cb)(w);
+			{ untested();
+				(*_cb)(_v);
+				(*_cb)(w);
+			}
 #endif
 			_done=true;
 		}else{
@@ -101,7 +105,7 @@ static size_t mcah(
 		gala::graph<SGARGS>& g,
 		typename outedge_set< gala::graph<SGARGS> >::type& bag,
 		CB* cb)
-{
+{ untested();
 	typedef gala::graph<SGARGS> G;
 	typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 	typedef typename boost::graph_traits<G>::adjacency_iterator Iter;
@@ -202,7 +206,7 @@ typedef typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor ve
 					// edge has moved.
 				}else{itested();
 					// there are two, one of which will be gone.
-					if(cb){itested();
+					if(cb){untested();
 						(*cb)(I);
 					}
 					--g._num_edges; // hack!!
@@ -369,7 +373,7 @@ namespace treedec{
 			gala::graph<SGARGS>& g,
 			typename outedge_set< gala::graph<SGARGS> >::type& bag,
 			typename treedec::graph_callback<gala::graph<SGARGS> >* cb=NULL)
-	{ itested();
+	{ untested();
 		typedef typename treedec::graph_callback<gala::graph<SGARGS> > CB;
 		return noboost::sghelp_hack<ECT, VCT, VDP, CFG, CB>::mcah(c, g, bag, cb);
 	}

@@ -573,9 +573,15 @@ public: // Required by Iterator Constructible Graph
 	graph(EdgeIterator first, EdgeIterator last,
 	      vertices_size_type nv, edges_size_type ne=0);
 public: //assign
+
+   template<template<class T, typename... > class ECT2, \
+            template<class T, typename... > class VCT2, \
+            class VDP2, \
+            template<class G> class CFG2>
+	graph& operator=(graph<ECT2,VCT2,VDP2,CFG2> const&);
+
 	graph& operator=(graph<SGARGS> const& x);
-	// VCTtemplate?
-	// graph& operator=(graph<...??...> const&)
+
 	graph& operator=(graph&& x)
 	{
 #ifndef NDEBUG
@@ -603,7 +609,11 @@ public: //assign
 		return *this;
 	}
 private:
-	void assign_(graph const& G);
+   template<template<class T, typename... > class ECT2, \
+            template<class T, typename... > class VCT2, \
+            class VDP2, \
+            template<class G> class CFG2>
+	void assign_(graph<ECT2,VCT2,VDP2,CFG2> const&);
 public: // construct
 #if 0 // does not work
 	// construct a graph from a boost graph
@@ -858,16 +868,32 @@ typename graph<SGARGS>::EL& // const?!
 // }
 /*--------------------------------------------------------------------------*/
 VCTtemplate
+   template<template<class T, typename... > class ECT2, \
+            template<class T, typename... > class VCT2, \
+            class VDP2, \
+            template<class G> class CFG2>
+graph<SGARGS>& graph<SGARGS>::operator=(graph<ECT2,VCT2,VDP2,CFG2> const& x)
+{ itested();
+	assign_(x);
+	typedef graph<ECT2, VCT2, VDP2, CFG2> oG;
+	return *this;
+}
+/*--------------------------------------------------------------------------*/
+VCTtemplate
 graph<SGARGS>& graph<SGARGS>::operator=(graph<SGARGS> const& x)
 {
-	if (&x == this) {
+	typedef graph<ECT, VCT, VDP, CFG> oG;
+	typedef typename oG::const_iterator other_const_iterator;
+	typedef typename oG::const_vertex_type other_const_vertex_type;
+
+	if (intptr_t(&x) == intptr_t(this)) {
 	}else if (num_vertices()==0){ itested();
 		assign_(x);
 	}else if (num_vertices()!=x.num_vertices()){ incomplete();
 	}else{
 		// why not assign_?
 		const_iterator b = begin();
-		const_iterator s = x.begin();
+		other_const_iterator s = x.begin();
 		intptr_t delta = intptr_t(&*b) - intptr_t(&*s);
 		trace1("op=", delta);
 		iterator v = begin();
@@ -875,7 +901,7 @@ graph<SGARGS>& graph<SGARGS>::operator=(graph<SGARGS> const& x)
 		_num_edges = x._num_edges;
 		for(; v!=e ; ++v){
 			vertex_type vd = iter::deref(v);
-			const_vertex_type sd = iter::deref(s);
+			other_const_vertex_type sd = oG::iter::deref(s);
 			EL& E = out_edges(vd); // ?!
 			EL const& S = x.out_edges(sd); // ?!
 			bits::vertex_helper<VDP>::rebase(E, S, delta);
@@ -912,15 +938,20 @@ graph<SGARGS>& graph<SGARGS>::operator=(graph<SGARGS> const& x)
 // FIXME: likely simpler for ssg
 // FIXME: operator= ...
 VCTtemplate
-void graph<SGARGS>::assign_(graph<SGARGS> const& G)
+   template<template<class T, typename... > class ECT2, \
+            template<class T, typename... > class VCT2, \
+            class VDP2, \
+            template<class G> class CFG2>
+void graph<SGARGS>::assign_(graph<ECT2,VCT2,VDP2,CFG2> const& G)
 {
+	typedef graph<ECT2, VCT2, VDP2, CFG2> oG;
 	size_t nv = G.num_vertices();
 	size_t ne = G.num_edges();
 	trace4("assign_",nv, ne, num_vertices(), num_edges());
 	_v.resize(nv);
 	assert(_v.size()==nv);
 	vertex_type map[nv];
-	std::map<vertex_type, size_t> reverse_map;
+	std::map<typename oG::vertex_type, size_t> reverse_map;
 	size_t i=0;
 	_num_edges = 0;
 
@@ -934,12 +965,11 @@ void graph<SGARGS>::assign_(graph<SGARGS> const& G)
 	trace2("resize v", i, nv);
 	assert(i==nv);
 
-	graph<SGARGS>* GG = const_cast< graph<SGARGS>* >(&G);
+	oG* GG = const_cast<oG*>(&G);
 	i = 0;
 	// FIXME: use const_iter
-	for( iterator v=GG->begin(); v!=GG->end(); ++v)
-	{
-		reverse_map[iter::deref(v)] = i;
+	for(typename oG::iterator v=GG->begin(); v!=GG->end(); ++v){
+		reverse_map[oG::iter::deref(v)] = i;
 		++i;
 	}
 
@@ -947,9 +977,9 @@ void graph<SGARGS>::assign_(graph<SGARGS> const& G)
 	assert(i==nv);
 
 	assert(_num_edges == 0);
-	for(iterator V=GG->begin(); V!=GG->end(); ++V){
-		vertex_type v=iter::deref(V);
-		for(vertex_type w : G.out_edges(v)) {
+	for(typename oG::iterator V=GG->begin(); V!=GG->end(); ++V){
+		typename oG::vertex_type v=oG::iter::deref(V);
+		for(typename oG::vertex_type w : G.out_edges(v)){
 			assert(w!=v);
 			assert(reverse_map[v]<num_vertices());
 			assert(reverse_map[w]<num_vertices());
