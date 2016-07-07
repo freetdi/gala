@@ -22,6 +22,7 @@
 #include <iostream>
 #include <iomanip>
 #include <map>
+#include <gala/graph.h>
 
 typedef gala::graph<std::set, std::vector, uint16_t> SSG_16i;
 
