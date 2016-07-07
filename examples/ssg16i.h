@@ -18,7 +18,6 @@
  *------------------------------------------------------------------
  *
  */
-#include "trace.h"
 #include <iostream>
 #include <iomanip>
 #include <map>
