@@ -22,6 +22,8 @@
 #include <iomanip>
 #include <map>
 #include <gala/graph.h>
+#include <boost/functional/hash.hpp> // BUG?!
+#include <boost/graph/adjacency_matrix.hpp>
 
 typedef gala::graph<std::set, std::vector, uint16_t> SSG_16i;
 
@@ -58,7 +60,7 @@ struct graph_traits<SSG_16i>{ //
 	typedef immvecgraph<SSG_16i> immutable_type;
 	typedef immvecgraph<SSG_16i> immutable_undirected_type;
 #else
-	typedef typename boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> immutable_type;
+	typedef typename boost::adjacency_matrix<boost::undirectedS> immutable_type;
 #endif
 };
 

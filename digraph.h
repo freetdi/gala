@@ -16,6 +16,24 @@
 // along with this program; if not, write to the Free Software
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
+//
+#ifndef DIGRAPH_H
+#define DIGRAPH_H
+
+#ifndef HAVE_MYBOOL
+#define HAVE_MYBOOL
+class mybool{ //
+public:
+	mybool() : value_(bool())
+	{
+	}
+	/* explicit */ mybool(bool const& t): value_(t) {}
+	// /* explicit */ operator bool&() { return value_; }
+	/* explicit */ operator bool() const { return value_; }
+private:
+	char value_;
+};
+#endif
 
 // a digraph with edge labels overlay for an immutable graph.
 //
@@ -420,3 +438,5 @@ template<class G>
 		}
 #endif
 	}
+
+#endif // guard

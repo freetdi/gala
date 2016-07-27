@@ -27,11 +27,14 @@
 #include <forward_list>
 
 #include <boost/iterator/counting_iterator.hpp>
+#include <boost/mpl/bool.hpp>
 #include <boost/tuple/tuple.hpp>
+
 
 #include "degs.h"
 #include "trace.h"
 #include <assert.h>
+#include <boost/mpl/bool.hpp>
 
 /*--------------------------------------------------------------------------*/
 #ifndef GALA_DEFAULT_OVERRIDE
@@ -65,7 +68,7 @@ namespace bits{ //
 template<class VDP>
 struct vertex_helper{ //
 	template<class T, class V, class VC>
-	static void insert(T& v, V& w, VC* wp)
+	static void insert(T& v, V& w, VC*)
 	{ itested();
 		v.insert(w);
 	}
@@ -85,7 +88,7 @@ struct vertex_helper{ //
 template<>
 struct vertex_helper<void*>{ //
 	template<class T, class V, class VC>
-	static void insert(T& v, V& w, VC* wp)
+	static void insert(T& v, V&, VC* wp)
 	{ itested();
 		v.n.insert(wp);
 	}
@@ -128,6 +131,7 @@ struct iter_helper{ //
 	template<class iter, class VL>
 	static size_t fill_pos(iter first, iter last, size_t nv, VL& _v)
 	{
+		(void)nv;
 		size_t c=0;
 		for(;first!=last; ++first){
 			unsigned v=first->first;
@@ -204,11 +208,10 @@ struct vertex_selector<ECT, void*>{ //
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-#define STtemplate template< \
-                   template<class T, typename... > class ECT, \
+#define STPARMS    template<class T, typename... > class ECT, \
                    template<class T, typename... > class VCT, \
-                   class VDP \
-                   >
+                   class VDP
+#define STtemplate template< STPARMS >
 #define STARGS ECT, VCT, VDP
 /*--------------------------------------------------------------------------*/
 STtemplate
@@ -232,6 +235,7 @@ struct storage : storage_base<STARGS>{ //
 	typedef typename vs::type vertex_type;
 	typedef typename vs::vertex_index_type vertex_index_type;
 	typedef typename vs::const_type const_vertex_type;
+	typedef std::pair<vertex_type, vertex_type> edge_type;
 	typedef ECT<vertex_type> edge_container_type;
 	typedef VCT<vertex_> VL;
 	static bool need_rewire()
@@ -286,6 +290,7 @@ struct storage : storage_base<STARGS>{ //
 	{ incomplete();
 		e = s;
 	}
+
 }; // storage<VDP>
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -311,6 +316,7 @@ struct storage<ECT, VCT, void*> : public storage_base<ECT, VCT, void*>{ //
 	typedef typename bits::vertex_selector<ECT,VDP>::type vertex_type;
 	typedef typename bits::vertex_selector<ECT,VDP>::vertex_index_type vertex_index_type;
 	typedef typename bits::vertex_selector<ECT,VDP>::const_type const_vertex_type;
+	typedef std::pair<vertex_type, vertex_type> edge_type;
 	typedef VCT<vertex_> container_type;
 	typedef ECT<vertex_type> edge_container_type;
 	typedef VCT<vertex_> VL;
@@ -390,6 +396,77 @@ public:
 }; //storage<void*>
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+template<class C, class E>
+void edge_insert(C& c, E e)
+{
+	c.insert(e);
+}
+template<class E>
+void edge_insert(std::vector<E>& c, E e)
+{
+	c.push_back(e);
+}
+/*--------------------------------------------------------------------------*/
+template< STPARMS, class directed_tag >
+struct edge_helper : public storage<STARGS> { //
+	using typename storage<STARGS>::edge_type;
+	using typename storage<STARGS>::vertex_type;
+	using storage<STARGS>::out_edges;
+	// to storage base?!
+	template<class N, class VC>
+	static std::pair<edge_type, bool> add_edge(vertex_type a, vertex_type b,
+	                                           N& num_edges, VC& vc)
+	{ untested();
+		vertex_type* A=&a;
+		vertex_type* B=&b;
+#ifdef ADDEDGESWAP
+		// does not really help...
+		if(out_edges(a).size()>out_edges(b).size()){ untested();
+			std::swap(A,B);
+		}else{untested();
+		}
+#endif
+		size_t s = out_edges(*A, vc).size();
+		edge_insert(out_edges(*A, vc), (*B));
+		// since the graph is undirected,
+		// if (a, b) already exists, then (b, a) does too
+		bool added=false;
+		if(s == out_edges(*A, vc).size()){
+		}else{
+			edge_insert(out_edges(*B, vc), *A);
+			++num_edges;
+			added = true;
+		}
+		return std::make_pair(edge_type(*A, *B), added);
+	}
+};
+/*--------------------------------------------------------------------------*/
+template<STPARMS>
+struct edge_helper<STARGS, boost::mpl::true_>
+    : public storage<STARGS>{ //
+	using typename storage<STARGS>::edge_type;
+	using typename storage<STARGS>::vertex_type;
+	using storage<STARGS>::out_edges;
+	template<class N, class VC>
+	static std::pair<edge_type, bool> add_edge(vertex_type a, vertex_type b,
+															 N& num_edges, VC& vc)
+	{
+		vertex_type* A=&a;
+		vertex_type* B=&b;
+		size_t s = out_edges(*A, vc).size();
+		edge_insert(out_edges(*A, vc), *B);
+		// since the graph is undirected,
+		// if (a, b) already exists, then (b, a) does too
+		bool added=false;
+		if(s == out_edges(*A, vc).size()){
+		}else{
+			++num_edges;
+			added = true;
+		}
+		return std::make_pair(edge_type(*A, *B), added);
+	}
+};
+/*--------------------------------------------------------------------------*/
 STtemplate
 struct iter{ //
 	typedef boost::counting_iterator<VDP> vertex_iterator;
@@ -418,7 +495,7 @@ struct iter{ //
 	typedef typename bits::vertex_selector<ECT,VDP>::type vertex_type;
 	typedef typename bits::vertex_selector<ECT,VDP>::stype vertex_;
 	typedef VCT<vertex_> container_type;
-	static unsigned pos(const vertex_type v, container_type const& _v)
+	static unsigned pos(const vertex_type v, container_type const&)
 	{
 		return v;
 	}
@@ -482,22 +559,45 @@ struct iter<ECT, VCT, void*>{ //
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 template<class C>
-void prealloc(C const&, size_t howmany)
+void prealloc(C const&, size_t /*howmany*/)
 {
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+struct directed_tag { };
+struct undirected_tag { };
+// typedef void* use_pointers;
+/*--------------------------------------------------------------------------*/
 template<class G>
 struct graph_cfg_default{
 	typedef default_DEGS<G> degs_type;
+	// typedef boost::mpl::true_ is_directed_t;
 };
+/*--------------------------------------------------------------------------*/
+template<typename T>
+struct tovoid { typedef void type; };
+/*--------------------------------------------------------------------------*/
+namespace detail{
+template<class CFG, class X=void>
+struct is_directed
+{
+	typedef boost::mpl::false_ value;
+};
+template<class CFG>
+struct is_directed<CFG, typename tovoid<typename CFG::is_directed_t>::type >
+{
+	typedef typename CFG::is_directed_t value;
+};
+}
 /*--------------------------------------------------------------------------*/
 template< template<class T, typename... > class ECT=GALA_DEFAULT_SET,
           template<class T, typename... > class VCT=GALA_DEFAULT_VECTOR,
-          typename VDP=void*,
+          typename VDP=void*, // use_pointers,
           template<class G> class CFG=graph_cfg_default>
 class graph{ //
 public: // types
+	using this_type = graph<SGARGS>;
+
 	template<class T>
 	using vertex_container_t = VCT<T>;
 
@@ -505,6 +605,9 @@ public: // types
 	using edgecontainer = ECT<T>;
 	
 	using vs = bits::vertex_selector<ECT,VDP>;
+
+	typedef CFG<this_type> myCFG;
+	typedef typename detail::is_directed<myCFG>::value is_directed;
 
 	typedef typename vs::type vertex_type;
 	typedef typename vs::const_type const_vertex_type;
@@ -514,6 +617,7 @@ public: // types
 	typedef typename vs::vertex_index_type vertex_index_type;
 // private: hmm not yet.
 	typedef typename bits::storage<STARGS> storage;
+	typedef typename bits::edge_helper<STARGS, is_directed> edge_helper;
 	typedef typename bits::iter<STARGS> iter;
 	typedef edgecontainer<vertex_type> EL;
 public:
@@ -526,13 +630,13 @@ public:
 	typedef typename EL::iterator out_vertex_iterator;
 	typedef typename EL::const_iterator out_vertex_const_iterator;
 
-	typedef std::pair<vertex_type, vertex_type> edge; // FIXME: remove.
-	typedef std::pair<vertex_type, vertex_type> edge_type;
+	//typedef std::pair<vertex_type, vertex_type> edge; // FIXME: remove.
+	typedef typename storage::edge_type edge_type;
 
 	typedef std::pair<iterator, out_vertex_iterator> edge_iterator;
 public: // construct
-	graph(const graph& x)
-	{
+	graph(const graph& x) : _num_edges(0)
+	{ untested();
 		assign_(x);
 		assert(num_vertices()==x.num_vertices());
 		assert(_num_edges==x._num_edges);
@@ -709,31 +813,11 @@ public:
 	}
 public:
 	//O(log max{d_1, d_2}), where d_1 is the degree of a and d_2 is the degree of b
-	std::pair<edge,bool> add_edge(vertex_type a, vertex_type b)
+	std::pair<edge_type, bool> add_edge(vertex_type a, vertex_type b)
 	{
 		assert(is_valid(a));
 		assert(is_valid(b));
-		vertex_type* A=&a;
-		vertex_type* B=&b;
-#ifdef ADDEDGESWAP
-		// does not really help...
-		if(out_edges(a).size()>out_edges(b).size()){ untested();
-			std::swap(A,B);
-		}else{untested();
-		}
-#endif
-		size_t s = out_edges(*A).size();
-		out_edges(*A).insert(*B);
-		// since the graph is undirected,
-		// if (a, b) already exists, then (b, a) does too
-		bool added=false;
-		if(s == out_edges(*A).size()){
-		}else{
-			out_edges(*B).insert(*A);
-			++_num_edges;
-			added = true;
-		}
-		return std::make_pair(edge(*A, *B), added);
+		return edge_helper::add_edge(a, b, _num_edges, _v);
 	}
 	// O(log max{d_1, d_2}), where d_1 is the degree of a and d_2 is the degree of b
 	void remove_edge(vertex_type a, vertex_type b)
@@ -875,7 +959,6 @@ VCTtemplate
 graph<SGARGS>& graph<SGARGS>::operator=(graph<ECT2,VCT2,VDP2,CFG2> const& x)
 { itested();
 	assign_(x);
-	typedef graph<ECT2, VCT2, VDP2, CFG2> oG;
 	return *this;
 }
 /*--------------------------------------------------------------------------*/
@@ -943,7 +1026,7 @@ VCTtemplate
             class VDP2, \
             template<class G> class CFG2>
 void graph<SGARGS>::assign_(graph<ECT2,VCT2,VDP2,CFG2> const& G)
-{
+{ untested();
 	typedef graph<ECT2, VCT2, VDP2, CFG2> oG;
 	size_t nv = G.num_vertices();
 	size_t ne = G.num_edges();

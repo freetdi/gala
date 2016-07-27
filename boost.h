@@ -199,13 +199,13 @@ namespace boost { //
 			             edge_iterator,
 			             typename gala::graph<SGARGS>::edge_iterator, // value_type
 			             bidirectional_traversal_tag,
-			             const typename gala::graph<SGARGS>::edge, // reference (?)
+			             const typename gala::graph<SGARGS>::edge_type, // reference (?)
 			             const typename gala::graph<SGARGS>::out_vertex_iterator*>
 		{ //
 		public: // types
 			typedef gala::graph<SGARGS> G;
 			typedef typename G::edge_iterator base_type;
-			typedef typename G::edge reference;
+			typedef typename G::edge_type reference;
 			typedef ptrdiff_t difference_type; // is this correct?
 			typedef std::input_iterator_tag iterator_category; // makes sense!?
 		public:
@@ -318,7 +318,7 @@ namespace boost { //
 			             typename gala::graph<SGARGS>::out_vertex_iterator>,
 			   // bidirectional_traversal_tag, // breaks InputIterator (why?)
 				std::input_iterator_tag,
-			   const typename gala::graph<SGARGS>::edge, // <= reference
+			   const typename gala::graph<SGARGS>::edge_type, // <= reference
 			   const typename gala::graph<SGARGS>::out_vertex_iterator* // difference_type
 			>{ //
 		public: // types
@@ -326,7 +326,7 @@ namespace boost { //
 			    typename gala::graph<SGARGS>::vertex_type,
 			    typename gala::graph<SGARGS>::out_vertex_iterator> value_type;
 		   typedef intptr_t difference_type; // why?
-			typedef typename gala::graph<SGARGS>::edge reference;
+			typedef typename gala::graph<SGARGS>::edge_type reference;
 
 		public: // construct
 			out_edge_iterator()
@@ -486,7 +486,7 @@ namespace boost { //
 		if(is_edge){
 			auto e = typename graph_traits<gala::graph<SGARGS> >::edge_descriptor(u,v);
 			return std::make_pair(e, is_edge);
-		}else{itested();
+		}else{
 			auto e = typename graph_traits<gala::graph<SGARGS> >::edge_descriptor();
 			return std::make_pair(e, is_edge);
 		}
@@ -726,7 +726,7 @@ namespace boost { //
 	struct simplegraph_property_map<edge_all_t> {
 		VCTtemplate
 		struct bind_ {
-			typedef typename gala::graph<SGARGS>::edge etype;
+			typedef typename gala::graph<SGARGS>::edge_type etype;
 			typedef simplegraph_graph_data_map<etype, etype&, gala::graph<SGARGS>*> type;
 			typedef simplegraph_graph_data_map<etype, const etype&,
 					  const gala::graph<SGARGS>*> const_type;

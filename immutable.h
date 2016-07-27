@@ -45,6 +45,7 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, V
 }
 #endif
 
+#if 0
 class mybool{ //
 public:
 	mybool() : value_(bool())
@@ -56,6 +57,7 @@ public:
 private:
 	bool value_;
 };
+#endif
 
 // inspired by boost::container::flat_set
 namespace boost_dissect{ //

@@ -25,6 +25,20 @@
 //
 #include <iostream>
 
+#ifndef HP_hp
+#define HP_hp
+class hp{
+	intptr_t p;
+	public:
+	hp(const void* x){
+		p = (intptr_t)x %30011;
+	}
+	operator int(){
+		return static_cast<int>(p);
+	}
+};
+#endif
+
 #ifndef incomplete
 #define incomplete() \
 	std::cout << "incomplete " << __FILE__ << ":" << __LINE__ << ":" << __func__ << "\n"
