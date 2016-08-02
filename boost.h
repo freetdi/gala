@@ -335,7 +335,7 @@ namespace boost { //
 			out_edge_iterator(
 			    typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor v,
 			    typename gala::graph<SGARGS>::out_vertex_iterator w)
-			{ untested();
+			{ itested();
 				base.first = v;
 				base.second = w;
 			}
@@ -349,7 +349,7 @@ namespace boost { //
 				return base.second == other.base.second;
 			}
 			void increment()
-			{ untested();
+			{ itested();
 				++(base.second);
 			}
 			void decrement()

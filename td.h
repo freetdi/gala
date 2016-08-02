@@ -528,10 +528,16 @@ void check(gala::graph<SGARGS> const& g)
 	for(boost::tie(i,e) = boost::vertices(g); i!=e; ++i){ itested();
 		for(boost::tie(aI,aE) = boost::adjacent_vertices(*i,g); aI!=aE; ++aI){ itested();
 			assert(*aI!=*i);
+
+			// incomplete. undirected!
+			assert(boost::edge(*aI,*i,g).second);
+			assert(boost::edge(*i,*aI,g).second);
 		}
+#ifdef DEBUG
 		for(boost::tie(I,E) = boost::vertices(g); I!=E; ++I){ itested();
 			assert(boost::edge(*I,*i,g).second == boost::edge(*i,*I,g).second);
 		}
+#endif
 	}
 }
 
