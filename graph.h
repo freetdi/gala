@@ -168,7 +168,7 @@ struct iter_helper{ //
 };
 /*--------------------------------------------------------------------------*/
 template<class c_iter_tag, class VDP>
-struct iter_helper<c_iter_tag, VDP, directed_tag> { //
+struct iter_helper<c_iter_tag, VDP, boost::mpl::true_> { //
 
 	template<class iter, class VL>
 	static size_t fill_pos(iter first, iter last, size_t nv, VL& _v)
@@ -448,7 +448,7 @@ struct edge_helper : public storage<STARGS> { //
 	static std::pair<edge_type, bool> add_edge(vertex_type a, vertex_type b,
 	                                           N& num_edges, VC& vc)
 	{
-		trace0("undiredted add_edge");
+		// trace0("undiredted add_edge");
 		vertex_type* A=&a;
 		vertex_type* B=&b;
 #ifdef ADDEDGESWAP
@@ -1022,7 +1022,7 @@ graph<SGARGS>::graph(EdgeIterator first, EdgeIterator last,
 	unsigned c;
 	typedef typename iter::vertex_iterator::iterator_category iterator_category;
 	c = bits::iter_helper<iterator_category, VDP, directed_tag>::fill_pos(first, last, nv, _v);
-	trace2("EdgeIterator init", ne, c);
+	trace3("EdgeIterator init", ne, c, is_directed());
 	assert(!ne || ne==c); // unique edges? for now.
 	_num_edges = c;
 
