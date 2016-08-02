@@ -148,8 +148,9 @@ template<class c_iter_tag, class VDP, class directed_t>
 struct iter_helper{ //
 
 	template<class iter, class VL>
-	static size_t fill_pos(iter first, iter last, size_t nv, VL& _v)
+	static size_t fill_pos(iter first, iter last, size_t nv, VL& _v, bool dir=false)
 	{ untested();
+		assert(!dir); (void) dir;
 		(void)nv;
 		size_t c=0;
 		for(;first!=last; ++first){
@@ -171,8 +172,9 @@ template<class c_iter_tag, class VDP>
 struct iter_helper<c_iter_tag, VDP, boost::mpl::true_> { //
 
 	template<class iter, class VL>
-	static size_t fill_pos(iter first, iter last, size_t nv, VL& _v)
+	static size_t fill_pos(iter first, iter last, size_t nv, VL& _v, bool dir=false)
 	{ untested();
+		assert(dir); (void) dir;
 		(void)nv;
 		size_t c=0;
 		for(;first!=last; ++first){
@@ -193,8 +195,10 @@ template<class VDP, class directed_tag>
 struct iter_helper<std::bidirectional_iterator_tag, VDP, directed_tag>{ //
 
 template<class iter, class VL>
-static size_t fill_pos(iter first, iter last, size_t nv, VL& _v)
+static size_t fill_pos(iter first, iter last, size_t nv, VL& _v, bool dir)
 { untested();
+	if(dir){ incomplete();
+	}
 	typedef typename VL::value_type v_t;
 	GALA_DEFAULT_VECTOR<v_t*> vmap(nv);
 	assert(nv==_v.size());
@@ -1020,10 +1024,12 @@ template <class EdgeIterator>
 graph<SGARGS>::graph(EdgeIterator first, EdgeIterator last,
                      vertices_size_type nv, edges_size_type ne)
     : graph(nv, ne)
-{
+{ untested();
 	unsigned c;
 	typedef typename iter::vertex_iterator::iterator_category iterator_category;
-	c = bits::iter_helper<iterator_category, VDP, directed_tag>::fill_pos(first, last, nv, _v);
+	trace1("calling fillpos init", is_directed());
+	c = bits::iter_helper<iterator_category, VDP, is_directed >::
+		fill_pos(first, last, nv, _v, is_directed() );
 	trace3("EdgeIterator init", ne, c, is_directed());
 	assert(!ne || ne==c); // unique edges? for now.
 	_num_edges = c;
@@ -1164,7 +1170,7 @@ void graph<SGARGS>::assign_(graph<ECT2,VCT2,VDP2,CFG2> const& g)
 	_num_edges = 0;
 
 	// not necessary for vector...
-	for(iterator v=begin(); v!=end(); ++v){
+	for(iterator v=begin(); v!=end(); ++v){ itested();
 		// for(auto& v : vertices())
 		map[i] = iter::deref(v);
 		++i;
@@ -1176,7 +1182,7 @@ void graph<SGARGS>::assign_(graph<ECT2,VCT2,VDP2,CFG2> const& g)
 	oG* GG = const_cast<oG*>(&g);
 	i = 0;
 	// FIXME: use const_iter
-	for(typename oG::iterator v=GG->begin(); v!=GG->end(); ++v){
+	for(typename oG::iterator v=GG->begin(); v!=GG->end(); ++v){ itested();
 		reverse_map[oG::iter::deref(v)] = i;
 		++i;
 	}
@@ -1185,9 +1191,9 @@ void graph<SGARGS>::assign_(graph<ECT2,VCT2,VDP2,CFG2> const& g)
 	assert(i==nv);
 
 	assert(_num_edges == 0);
-	for(typename oG::iterator V=GG->begin(); V!=GG->end(); ++V){
+	for(typename oG::iterator V=GG->begin(); V!=GG->end(); ++V){ itested();
 		typename oG::vertex_type v=oG::iter::deref(V);
-		for(typename oG::vertex_type w : g.out_edges(v)){
+		for(typename oG::vertex_type w : g.out_edges(v)){ itested();
 			assert(w!=v);
 			assert(reverse_map[v]<num_vertices());
 			assert(reverse_map[w]<num_vertices());
@@ -1196,9 +1202,9 @@ void graph<SGARGS>::assign_(graph<ECT2,VCT2,VDP2,CFG2> const& g)
 //			++_num_edges;
 		}
 	}
-	if(_num_edges == 2*ne){
-	}else if(_num_edges == ne){
-	}else{
+	if(_num_edges == 2*ne){ untested();
+	}else if(_num_edges == ne){ untested();
+	}else{ untested();
 		std::cerr << "assign_ oops " << _num_edges << ":" << ne << "\n";
 	}
 	assert(_num_edges == ne || _num_edges == 2*ne);
