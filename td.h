@@ -72,12 +72,12 @@ public:
 	{
 //		BUG:: :w
 		if(!_cb){ itested();
-		}else if(_v<w){ untested();
+		}else if(_v<w){ itested();
 			trace2("", _v, w);
 //			assert(boost::edge(_v,w,_g).second); //not necessarily
 			(*_cb)(_v, w);
 #ifdef q_in_cb
-			{ untested();
+			{ itested();
 				(*_cb)(_v);
 				(*_cb)(w);
 			}

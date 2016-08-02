@@ -509,7 +509,9 @@ struct edge_helper<STARGS, boost::mpl::true_>
 	template<class E>
 	static void add_reverse_edges(vertex_container_type& _v, E& e)
 	{ untested();
+#ifndef NDEBUG
 		auto ebefore=e;
+#endif
 		std::vector<vertex_type> howmany(_v.size());
 		vertex_type i=0;
 		auto checksum=0;

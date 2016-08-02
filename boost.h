@@ -217,10 +217,11 @@ namespace boost { //
 					const ::gala::graph<SGARGS>* g)
 				: base(std::make_pair(v,e)), _g(g)
 			{
+				typedef typename ::gala::graph<SGARGS> G;
 				typename gala::graph<SGARGS>::iterator &f = base.first;
 				typename gala::graph<SGARGS>::out_vertex_iterator &s = base.second;
 
-				if(f==_g->end()){
+				if(f==_g->end() || typename G::is_directed() ){
 				}else if(*s > G::iter::deref(f)){
 					increment();
 				}else{untested();
@@ -264,6 +265,8 @@ namespace boost { //
 				if(e==s){
 				}
 
+				typedef typename G::is_directed dir;
+
 				while(true){
 					if(f==_g->end()){
 						break;
@@ -277,13 +280,10 @@ namespace boost { //
 					}else if(*s == G::iter::deref(f)){
 						unreachable(); // self loop
 						assert(false);
-					}else if(*s > G::iter::deref(f)){
+					}else if(!dir() && G::iter::deref(f) < *s){
 						++f;
 						e = storage::out_edges(*f, VC).end();
 						s = storage::out_edges(*f, VC).begin();
-//					}else if(*(base.second) <
-//							G::iter::deref(base.first)){ untested();
-//						++(base.second);
 					}else if(s!=storage::out_edges(*f, VC).end()){
 						break;
 					}else{ untested();
@@ -335,7 +335,7 @@ namespace boost { //
 			out_edge_iterator(
 			    typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor v,
 			    typename gala::graph<SGARGS>::out_vertex_iterator w)
-			{ itested();
+			{ untested();
 				base.first = v;
 				base.second = w;
 			}
@@ -349,11 +349,11 @@ namespace boost { //
 				return base.second == other.base.second;
 			}
 			void increment()
-			{ itested();
+			{ untested();
 				++(base.second);
 			}
 			void decrement()
-			{ itested();
+			{ untested();
 				--(base.second);
 			}
 //			bool operator==(const out_edge_iterator& other) const
