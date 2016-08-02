@@ -67,7 +67,10 @@ class hp{
 #else
 #define untested()
 #endif
+
+#ifndef USE
 #define USE(x) (1)?(void)(0):(void)(x)
+#endif
 
 #undef trace0
 #undef trace1

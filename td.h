@@ -475,7 +475,7 @@ size_t degree(G const& g)
 	auto e = i;
 
 	for(boost::tie(i,e) = boost::vertices(g); i!=e; ++i){untested();
-		size_t d=boost::degree(*i,g);
+		size_t d=boost::out_degree(*i,g);
 		if(ret<d) ret = d;
 	}
 	return ret;

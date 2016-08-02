@@ -24,23 +24,22 @@
 
 #include "trace.h"
 #include <assert.h>
+#include <boost/graph/graph_traits.hpp>
 
 namespace gala{
 
 template<class G>
-struct sgdeg_config{
-//    typedef typename boost::graph_traits<G>::vertex_descriptor vd_type; <= ouch?
-// #if __cplusplus < 201103L
-//     typedef std::set<vd_type> bag_type;
-// #else
-//     typedef std::unordered_set<vd_type> bag_type;
-// #endif
-    // typedef stx::btree_set<vd_type> bag_type;
+struct sgdeg_config {
+    typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
     typedef typename G::EL bag_type;
     static void alloc_init(size_t)
 	 {
     }
     static unsigned num_threads(){return 1;}
+	 template<class container_t>
+    static vertex_descriptor pick(unsigned degree, container_t &c){
+        return *c[degree].begin();
+    }
 };
 
 

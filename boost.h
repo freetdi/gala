@@ -424,6 +424,13 @@ namespace boost { //
 		g.remove_edge(u, v);
 	}
 
+	template< galaPARMS, class PRED >
+	void remove_out_edge_if(
+			typename graph_traits<gala::graph<SGARGS> >::vertex_descriptor u, PRED& p, gala::graph<SGARGS>& g)
+	{
+		g.remove_out_edge_if(u, p);
+	}
+
 	VCTtemplate
 	void clear_vertex(typename graph_traits<::gala::graph<SGARGS>
 			>::vertex_descriptor u, ::gala::graph<SGARGS> &g)
@@ -643,18 +650,25 @@ namespace boost { //
 	        simplegraph_graph_index_map<SGARGS> >
 	{ //
 		public:
+			typedef typename gala::bits::vertex_selector<ECT, VDP>::vertex_index_type vertex_index_type;
 			typedef readable_property_map_tag category;
-			typedef int value_type; // FIXME: vertex_index_type;
-			typedef int reference;
-			typedef unsigned long key_type; // FIXME: vertex_index_type
+			typedef vertex_index_type value_type;
+			typedef vertex_index_type reference;
+			typedef vertex_index_type key_type;
 			simplegraph_graph_index_map(gala::graph<SGARGS>const & g)
 			    : _g(g)
 			{
 			}
 			template <class T>
-			long operator[](T x) const
-			{
+			key_type operator[](T x) const
+			{ itested();
+//				assert(x == _g.position(x));
 				return _g.position(x);
+			}
+			simplegraph_graph_index_map& operator=(const simplegraph_graph_index_map& s)
+			{
+				assert(&s._g==&_g);
+				return *this;
 			}
 		private:
 			gala::graph<SGARGS> const&_g;
@@ -794,10 +808,12 @@ namespace boost { //
 	VCTtemplate
 	inline simplegraph_graph_index_map<SGARGS>
 	get(vertex_index_t, gala::graph<SGARGS> & g)
-	{ incomplete();
-		typedef typename property_map< gala::graph<SGARGS>, vertex_all_t>::type
-			pmap_type;
-		return pmap_type(&g);
+	{ untested();
+		//typedef typename property_map< gala::graph<SGARGS>, vertex_all_t>::type
+	//		pmap_type;
+//		return pmap_type(); // &g); ???
+      return simplegraph_graph_index_map<SGARGS>(g);
+
 	}
 
 	VCTtemplate

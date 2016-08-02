@@ -62,15 +62,34 @@ namespace gala{ //
                      >
 #define SGARGSP ECT,VCT,CFG
 /*--------------------------------------------------------------------------*/
+struct directed_tag { };
+struct undirected_tag { };
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 namespace bits{ //
+/*--------------------------------------------------------------------------*/
+template<class C, class E>
+void edge_insert(C& c, E e)
+{
+	c.insert(e);
+}
+template<class E>
+void edge_insert(std::vector<unsigned>& c, E e)
+{
+	c.push_back(e);
+}
+template<class E>
+void edge_insert(std::vector<short unsigned>& c, E e)
+{
+	c.push_back(e);
+}
 /*--------------------------------------------------------------------------*/
 template<class VDP>
 struct vertex_helper{ //
 	template<class T, class V, class VC>
 	static void insert(T& v, V& w, VC*)
 	{ itested();
-		v.insert(w);
+		edge_insert(v, w);
 	}
 	template<class VL>
 	static bool is_valid(VDP const& v, VL const& _v)
@@ -125,12 +144,12 @@ struct vertex_helper<void*>{ //
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-template<class c_iter_tag, class VDP>
+template<class c_iter_tag, class VDP, class directed_t>
 struct iter_helper{ //
 
 	template<class iter, class VL>
 	static size_t fill_pos(iter first, iter last, size_t nv, VL& _v)
-	{
+	{ untested();
 		(void)nv;
 		size_t c=0;
 		for(;first!=last; ++first){
@@ -138,6 +157,7 @@ struct iter_helper{ //
 			unsigned w=first->second;
 			assert(v<nv);
 			assert(w<nv);
+			// FIXME: use add_edge...
 			vertex_helper<VDP>::insert(_v[v], w, &_v[w]);
 			vertex_helper<VDP>::insert(_v[w], v, &_v[v]);
 			++c;
@@ -147,13 +167,34 @@ struct iter_helper{ //
 
 };
 /*--------------------------------------------------------------------------*/
+template<class c_iter_tag, class VDP>
+struct iter_helper<c_iter_tag, VDP, directed_tag> { //
+
+	template<class iter, class VL>
+	static size_t fill_pos(iter first, iter last, size_t nv, VL& _v)
+	{ untested();
+		(void)nv;
+		size_t c=0;
+		for(;first!=last; ++first){
+			unsigned v=first->first;
+			unsigned w=first->second;
+			assert(v<nv);
+			assert(w<nv);
+			// FIXME: use add_edge...
+			vertex_helper<VDP>::insert(_v[v], w, &_v[w]);
+			++c;
+		}
+		return c;
+	}
+};
 /*--------------------------------------------------------------------------*/
-template<class VDP>
-struct iter_helper<std::bidirectional_iterator_tag, VDP>{ //
+/*--------------------------------------------------------------------------*/
+template<class VDP, class directed_tag>
+struct iter_helper<std::bidirectional_iterator_tag, VDP, directed_tag>{ //
 
 template<class iter, class VL>
 static size_t fill_pos(iter first, iter last, size_t nv, VL& _v)
-{
+{ untested();
 	typedef typename VL::value_type v_t;
 	GALA_DEFAULT_VECTOR<v_t*> vmap(nv);
 	assert(nv==_v.size());
@@ -163,7 +204,7 @@ static size_t fill_pos(iter first, iter last, size_t nv, VL& _v)
 	}
 	assert(index==_v.size());
 	size_t c=0;
-	for(;first!=last; ++first){
+	for(;first!=last; ++first){ untested();
 		unsigned v=first->first;
 		unsigned w=first->second;
 		assert(v<nv);
@@ -396,19 +437,9 @@ public:
 }; //storage<void*>
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-template<class C, class E>
-void edge_insert(C& c, E e)
-{
-	c.insert(e);
-}
-template<class E>
-void edge_insert(std::vector<E>& c, E e)
-{
-	c.push_back(e);
-}
-/*--------------------------------------------------------------------------*/
 template< STPARMS, class directed_tag >
 struct edge_helper : public storage<STARGS> { //
+	// undirected implementation.
 	using typename storage<STARGS>::edge_type;
 	using typename storage<STARGS>::vertex_type;
 	using storage<STARGS>::out_edges;
@@ -416,7 +447,8 @@ struct edge_helper : public storage<STARGS> { //
 	template<class N, class VC>
 	static std::pair<edge_type, bool> add_edge(vertex_type a, vertex_type b,
 	                                           N& num_edges, VC& vc)
-	{ untested();
+	{
+		trace0("undiredted add_edge");
 		vertex_type* A=&a;
 		vertex_type* B=&b;
 #ifdef ADDEDGESWAP
@@ -439,11 +471,19 @@ struct edge_helper : public storage<STARGS> { //
 		}
 		return std::make_pair(edge_type(*A, *B), added);
 	}
+
+	typedef typename storage<STARGS>::container_type vertex_container_type;
+	template<class E>
+	static void add_reverse_edges(vertex_container_type& _v, E& e)
+	{ unreachable();
+	}
 };
 /*--------------------------------------------------------------------------*/
 template<STPARMS>
 struct edge_helper<STARGS, boost::mpl::true_>
+	// directed implementation.
     : public storage<STARGS>{ //
+	typedef typename storage<STARGS>::container_type vertex_container_type;
 	using typename storage<STARGS>::edge_type;
 	using typename storage<STARGS>::vertex_type;
 	using storage<STARGS>::out_edges;
@@ -451,6 +491,7 @@ struct edge_helper<STARGS, boost::mpl::true_>
 	static std::pair<edge_type, bool> add_edge(vertex_type a, vertex_type b,
 															 N& num_edges, VC& vc)
 	{
+		trace0("directed edge helper");
 		vertex_type* A=&a;
 		vertex_type* B=&b;
 		size_t s = out_edges(*A, vc).size();
@@ -464,6 +505,29 @@ struct edge_helper<STARGS, boost::mpl::true_>
 			added = true;
 		}
 		return std::make_pair(edge_type(*A, *B), added);
+	}
+	template<class E>
+	static void add_reverse_edges(vertex_container_type& _v, E& e)
+	{ untested();
+		auto ebefore=e;
+		std::vector<vertex_type> howmany(_v.size());
+		vertex_type i=0;
+		auto checksum=0;
+		for(auto& vertex : _v){
+			howmany[i++] = vertex.size();
+			checksum+= vertex.size();
+		}
+		assert(checksum==e);
+		// ssg only. for now.
+		vertex_type vpos=0;
+		for(unsigned j=0; j<_v.size(); ++j){
+			for(unsigned i=0; i<howmany[j]; ++i ){
+				_v[_v[j][i]].push_back(j);
+				++e;
+			}
+			++vpos;
+		}
+		assert(ebefore*2==e);
 	}
 };
 /*--------------------------------------------------------------------------*/
@@ -563,9 +627,6 @@ void prealloc(C const&, size_t /*howmany*/)
 {
 }
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-struct directed_tag { };
-struct undirected_tag { };
 // typedef void* use_pointers;
 /*--------------------------------------------------------------------------*/
 template<class G>
@@ -582,11 +643,13 @@ template<class CFG, class X=void>
 struct is_directed
 {
 	typedef boost::mpl::false_ value;
+	operator bool() const {return false;}
 };
 template<class CFG>
 struct is_directed<CFG, typename tovoid<typename CFG::is_directed_t>::type >
 {
 	typedef typename CFG::is_directed_t value;
+	operator bool() const {return value::value;}
 };
 }
 /*--------------------------------------------------------------------------*/
@@ -812,12 +875,72 @@ public:
 		return storage::num_edges(_num_edges, _v);
 	}
 public:
+	size_t num_edges_debug(){
+		auto ne=0;
+		for(auto& v:_v){
+			for(auto& w:v){
+				++ne;
+			}
+		}
+		trace3("ned", ne, _num_edges, _v.size());
+		return ne;
+	}
+public:
+	//O(num_edges+num_vertices)
+	void add_reverse_edges()
+	{
+		edge_helper::add_reverse_edges(_v, _num_edges);
+		num_edges_debug();
+	}
 	//O(log max{d_1, d_2}), where d_1 is the degree of a and d_2 is the degree of b
 	std::pair<edge_type, bool> add_edge(vertex_type a, vertex_type b)
 	{
 		assert(is_valid(a));
 		assert(is_valid(b));
 		return edge_helper::add_edge(a, b, _num_edges, _v);
+	}
+	// O(?)
+	template<class PRED>
+	void remove_out_edge_if(vertex_type a, PRED & p)
+	{ // vector only
+		auto& oa=out_edges(a);
+		assert(oa.size()<_num_edges);
+		while(oa.size()){
+			if(p(std::make_pair(a,oa.back()))){
+				--_num_edges;
+				oa.pop_back();
+			}else{
+				break;
+			}
+		}
+		if(oa.size()==0){
+			return;
+		}
+
+		auto ii=oa.begin();
+		auto nn=oa.begin();
+		if(nn!=oa.end())
+		for(++nn; nn!=oa.end();ii=nn++) {
+			if(p(std::make_pair(a,*ii))){ untested();
+				--_num_edges;
+				*ii=oa.back();
+				oa.pop_back();
+
+				while(nn!=oa.end()){
+					if(p(std::make_pair(a,oa.back()))){
+						--_num_edges;
+						oa.pop_back();
+					}else{
+						break;
+					}
+				}
+				if(nn==oa.end()){
+					break;
+				}else{
+				}
+			}else{
+			}
+		}
 	}
 	// O(log max{d_1, d_2}), where d_1 is the degree of a and d_2 is the degree of b
 	void remove_edge(vertex_type a, vertex_type b)
@@ -898,7 +1021,7 @@ graph<SGARGS>::graph(EdgeIterator first, EdgeIterator last,
 {
 	unsigned c;
 	typedef typename iter::vertex_iterator::iterator_category iterator_category;
-	c = bits::iter_helper<iterator_category, VDP>::fill_pos(first, last, nv, _v);
+	c = bits::iter_helper<iterator_category, VDP, directed_tag>::fill_pos(first, last, nv, _v);
 	trace2("EdgeIterator init", ne, c);
 	assert(!ne || ne==c); // unique edges? for now.
 	_num_edges = c;
@@ -908,7 +1031,7 @@ graph<SGARGS>::graph(EdgeIterator first, EdgeIterator last,
 	for(auto& i : _v){
 		c += i.size();
 	}
-	assert(2*num_edges() == c);
+	assert(is_directed() || 2*num_edges() == c);
 #endif
 }
 /*--------------------------------------------------------------------------*/
@@ -1025,11 +1148,11 @@ VCTtemplate
             template<class T, typename... > class VCT2, \
             class VDP2, \
             template<class G> class CFG2>
-void graph<SGARGS>::assign_(graph<ECT2,VCT2,VDP2,CFG2> const& G)
+void graph<SGARGS>::assign_(graph<ECT2,VCT2,VDP2,CFG2> const& g)
 { untested();
 	typedef graph<ECT2, VCT2, VDP2, CFG2> oG;
-	size_t nv = G.num_vertices();
-	size_t ne = G.num_edges();
+	size_t nv = g.num_vertices();
+	size_t ne = g.num_edges();
 	trace4("assign_",nv, ne, num_vertices(), num_edges());
 	_v.resize(nv);
 	assert(_v.size()==nv);
@@ -1048,7 +1171,7 @@ void graph<SGARGS>::assign_(graph<ECT2,VCT2,VDP2,CFG2> const& G)
 	trace2("resize v", i, nv);
 	assert(i==nv);
 
-	oG* GG = const_cast<oG*>(&G);
+	oG* GG = const_cast<oG*>(&g);
 	i = 0;
 	// FIXME: use const_iter
 	for(typename oG::iterator v=GG->begin(); v!=GG->end(); ++v){
@@ -1062,7 +1185,7 @@ void graph<SGARGS>::assign_(graph<ECT2,VCT2,VDP2,CFG2> const& G)
 	assert(_num_edges == 0);
 	for(typename oG::iterator V=GG->begin(); V!=GG->end(); ++V){
 		typename oG::vertex_type v=oG::iter::deref(V);
-		for(typename oG::vertex_type w : G.out_edges(v)){
+		for(typename oG::vertex_type w : g.out_edges(v)){
 			assert(w!=v);
 			assert(reverse_map[v]<num_vertices());
 			assert(reverse_map[w]<num_vertices());
@@ -1090,7 +1213,7 @@ void graph<SGARGS>::assign_(graph<ECT2,VCT2,VDP2,CFG2> const& G)
 		//   		}
 	}
 #endif
-	trace4("assign_ done",nv, ne, num_vertices(), num_edges());
+	trace5("assign_ done",nv, ne, num_vertices(), num_edges(), GG->num_edges());
 }
 /*--------------------------------------------------------------------------*/
 // TODO: runtime info?

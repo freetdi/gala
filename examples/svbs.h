@@ -19,8 +19,10 @@
  *
  */
 
+#include <tdlib/degree_config.hpp>
+
 template<class G>
-struct m_deg_config{
+struct m_deg_config : public misc::detail::deg_config<G> {
 	typedef typename boost::graph_traits<G>::vertex_descriptor vd_type;
 	typedef typename G::EL bag_type;
 	static void alloc_init(size_t)
