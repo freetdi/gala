@@ -595,23 +595,34 @@ namespace boost { //
 		return std::make_pair( Iter(g.begin(),&g), Iter(g.end(),&g) );
 	}
 
-	VCTtemplate
-	inline void copy_graph(const gala::graph<SGARGS>& g, gala::graph<SGARGS>& h)
-	{ untested();
+// internal assignment
+	template<galaPARMS,
+	template<class T, typename... > class ECT2,
+	template<class T, typename... > class VCT2,
+	class VDP2,
+	template<class G> class CFG2>
+   inline void copy_graph(const gala::graph<SGARGS>& g, gala::graph<ECT2, VCT2, VDP2, CFG2>& h)
+	{ itested();
 		h = g;
 	}
 
-   template<galaPARMS,
-	         template<class T, typename... > class ECT2,
-	         template<class T, typename... > class VCT2,
-	         class VDP2,
-	         template<class G> class CFG2>
-	inline void copy_graph(const gala::graph<SGARGS>& g, gala::graph<ECT2, VCT2, VDP2, CFG2>& h)
-	{ untested();
-		h = g;
+}
+
+// TODO: cleanup;
+#include "boost_detail.h"
+
+namespace boost {
+
+// assign boost graph
+// (how to pick properly?
+   template<class G, galaPARMS>
+	inline void copy_graph(const G& g, gala::graph<SGARGS>& h,
+			typename boost::graph_traits<G>::vertex_descriptor=boost::graph_traits<G>::null_vertex() )
+	{ itested();
+		detail::copy_helper<G, SGARGS>::boost_to_gala(g, h);
 	}
 
-//	VCTtemplate
+//	VCTtemplat
 //	typename graph_traits<::gala::graph<SGARGS> >::edges_size_type
 //	num_edges(const gala::graph<SGARGS>& g)
 //	{ untested();
@@ -845,12 +856,11 @@ namespace boost { //
 		return std::make_pair(Iter(v, G->out_edges(v).begin()), Iter(v, G->out_edges(v).end()));
 	}
 
-
-
 } // namespace boost
 
 
 // HERE? requires boost... (bug?)
+// FIX: only use include traits, not adj list!
 #include <boost/graph/adjacency_list.hpp>
 // does not work if vertex_descriptor is not contiguous
 // should be obsolete with boost::copy_graph
