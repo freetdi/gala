@@ -705,6 +705,15 @@ public:
 	typedef std::pair<iterator, out_vertex_iterator> edge_iterator;
 public: // construct
 	graph(const graph& x) : _num_edges(0)
+	{
+		assign_(x); // FIXME op=?
+	}
+   template<template<class T, typename... > class ECT2, \
+            template<class T, typename... > class VCT2, \
+            class VDP2, \
+            template<class G> class CFG2>
+	graph(graph<ECT2,VCT2,VDP2,CFG2> const& x)
+	: _num_edges(0)
 	{ untested();
 		assign_(x);
 		assert(num_vertices()==x.num_vertices());
