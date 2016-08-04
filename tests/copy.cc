@@ -20,7 +20,7 @@ typedef boost::adjacency_list <boost::vecS, boost::vecS, boost::directedS> BALD_
 using namespace std;
 
 int main(int , char* [])
-{ untested();
+{
 	using namespace boost;
 
 	BALD_t G;

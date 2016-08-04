@@ -41,7 +41,7 @@ namespace detail {
 		public:
 			edge_iw(BEI& b, const GG& g ) : BEI(b), _g(g) {}
 			std::pair<size_t, size_t> operator*()
-			{ untested();
+			{
 				typedef typename graph_traits<G>::edge_descriptor edge_descriptor;
 				typedef typename graph_traits<G>::vertex_descriptor vertex_descriptor;
 				edge_descriptor e=BEI::operator*();
@@ -52,13 +52,13 @@ namespace detail {
 		};
 
 		static void boost_to_gala(const G& g, gala::graph<SGARGS>& h)
-		{ untested();
+		{
 			typedef typename graph_traits<G>::edge_iterator BEI;
 			typedef edge_iw<G, BEI> bw_t;
 			h.reshape(num_vertices(g), num_edges(g), is_directed(g));
 			auto E=edges(g);
 
-			if(is_directed(g)){ untested();
+			if(is_directed(g)){
 				h.fill_in_edges(bw_t(E.first, g), bw_t(E.second, g), false);
 			}
 		}
