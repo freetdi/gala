@@ -179,7 +179,7 @@ struct iter_helper{ //
 	template<class iter, class VL>
 	static size_t fill_pos(iter first, iter last, VL& _v, bool dir=false)
 	{ untested();
-		auto nv=_v.size();
+		auto nv=_v.size(); (void)nv;
 		assert(!dir); (void) dir;
 		size_t c=0;
 		for(;first!=last; ++first){
@@ -612,7 +612,7 @@ struct reverse_helper<ECT,VCT,VDP,
 
 	template<class E>
 	static void make_symmetric(vertex_container_type& _v, E& e, bool oriented)
-	{ untested();
+	{ itested();
 		unsigned ii=0;
 		for(auto & i : _v){
 			for(auto & j : i){
@@ -981,8 +981,9 @@ public:
 			// inefficient.
 		}
 		_v.resize(nv);
-		for(auto& i : _v){
-			i.resize(0);
+		for(auto v=_v.begin(); v!=_v.end(); ++v){
+			vertex_type w=iter::deref(v);
+			out_edges(w).clear();
 		}
 		_num_edges = 0;
 	}
@@ -1037,6 +1038,7 @@ public:
 		trace3("ned", ne, _num_edges, _v.size());
 		return ne;
 #endif
+		return 0;
 	}
 public:
 	// for each edge, add a reverse edge,

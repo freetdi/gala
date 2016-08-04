@@ -22,8 +22,10 @@
 #ifndef GALA_SFINAE_H
 #define GALA_SFINAE_H
 
-#include <stx/btree_set.h>
+#include <deque>
 #include <set>
+#include <stx/btree_set.h>
+#include <vector>
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 namespace gala{

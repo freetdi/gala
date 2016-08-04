@@ -58,14 +58,14 @@ namespace detail {
 			}
 		}
 		static void gala_to_boost(const gala::graph<SGARGS>& src, G& tgt)
-		{ untested();
+		{ itested();
 			auto nv=src.num_vertices();
 			if(num_vertices(tgt)==0){ untested();
 				// good idea?
 				tgt=std::move(G(nv));
-			}else{ untested();
+			}else{ itested();
 				tgt.clear(); // HACK, not supported by boost!
-				while(num_vertices(tgt)<nv){ untested();
+				while(num_vertices(tgt)<nv){ itested();
 					add_vertex(tgt);
 				}
 				while(num_vertices(tgt)>nv){ untested();
@@ -75,7 +75,7 @@ namespace detail {
 
 			// uuh, directed vs undirected?
 			auto V=edges(src);
-			for(;V.first!=V.second;++V.first){ untested();
+			for(;V.first!=V.second;++V.first){ itested();
 				auto v=source(*V.first, src);
 				auto w=target(*V.first, src);
 				auto vp=src.position(v);

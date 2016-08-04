@@ -101,6 +101,12 @@ public: // picking
     {
         return *_degs[degree].begin();
     }
+    bag_type const detach_bag(unsigned degree)
+    { itested();
+        bag_type B=std::move(_degs[degree]);
+        _degs[degree].clear();
+        return B;
+    }
     // pick a minimum degree vertex within degree range [lower, upper]
     std::pair<vertex_descriptor,degree_t> pick_min(unsigned lower=0, unsigned upper=-1) const
     {

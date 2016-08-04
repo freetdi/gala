@@ -495,8 +495,10 @@ void check(gala::graph<SGARGS> const& g)
 	unsigned edges=0;
 	auto i = boost::vertices(g).first;
 	auto e = i;
+#ifdef DEBUG
 	auto I = i;
 	auto E = i;
+#endif
 
 #ifdef MORE_DEBUG
 	for(boost::tie(i,e) = boost::vertices(g); i!=e; ++i){untested();
