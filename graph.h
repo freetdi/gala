@@ -25,6 +25,7 @@
 #include <vector>
 #include <map>
 #include <forward_list>
+#include <stx/btree_set.h>
 
 #include <boost/iterator/counting_iterator.hpp>
 #include <boost/mpl/bool.hpp>
@@ -32,6 +33,7 @@
 
 
 #include "degs.h"
+#include "sfinae.h"
 #include "trace.h"
 #include <assert.h>
 #include <boost/mpl/bool.hpp>
@@ -543,8 +545,16 @@ struct edge_helper<STARGS, boost::mpl::true_>
 		trace2("directed edge helper", added, out_edges(*A, vc).size());
 		return std::make_pair(edge_type(*A, *B), added);
 	}
+};
+/*--------------------------------------------------------------------------*/
+template<STPARMS, class X=void>
+struct reverse_helper : public storage<STARGS> { //
+	typedef typename storage<STARGS>::container_type vertex_container_type;
+	using typename storage<STARGS>::edge_type;
+	using typename storage<STARGS>::vertex_type;
+
 	template<class E>
-	static void add_reverse_edges(vertex_container_type& _v, E& e, bool oriented)
+	static void make_symmetric(vertex_container_type& _v, E& e, bool oriented)
 	{ untested();
 #ifndef NDEBUG
 		auto ebefore=e;
@@ -579,13 +589,54 @@ struct edge_helper<STARGS, boost::mpl::true_>
 			}
 
 		}
+
+#ifndef NDEBUG
 		trace3("make_symm", oriented, ebefore, e);
 		if(oriented){ untested();
 			assert(ebefore*2==e);
 		}else{ untested();
 		}
+#endif
 	}
 };
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+template< template<class T, typename... > class ECT,
+          template<class T, typename... > class VCT, class VDP >
+struct reverse_helper<ECT,VCT,VDP,
+	typename sfinae::is_set< ECT<sfinae::any> >::type>
+	: public storage<ECT, VCT, VDP > { //
+	typedef typename storage<ECT,VCT,VDP>::container_type vertex_container_type;
+	using typename storage<ECT,VCT,VDP>::edge_type;
+	using typename storage<ECT,VCT,VDP>::vertex_type;
+
+	template<class E>
+	static void make_symmetric(vertex_container_type& _v, E& e, bool oriented)
+	{ untested();
+		unsigned ii=0;
+		for(auto & i : _v){
+			for(auto & j : i){
+				bool ins=_v[j].insert(ii).second;
+				e+=ins;
+			}
+			++ii;
+		}
+	}
+};
+/*--------------------------------------------------------------------------*/
+template<template<class T, typename... > class ECT,
+         template<class T, typename... > class VCT >
+struct reverse_helper<ECT,VCT,void*> : public storage<ECT, VCT, void* > { //
+	typedef typename storage<ECT,VCT,void*>::container_type vertex_container_type;
+	using typename storage<ECT,VCT,void*>::edge_type;
+	using typename storage<ECT,VCT,void*>::vertex_type;
+
+	template<class E>
+	static void make_symmetric(vertex_container_type& _v, E& e, bool oriented)
+	{ incomplete();
+	}
+};
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 STtemplate
 struct iter{ //
@@ -745,6 +796,7 @@ public: // types
 // private: hmm not yet.
 	typedef typename bits::storage<STARGS> storage;
 	typedef typename bits::edge_helper<STARGS, is_directed_t> edge_helper;
+	typedef typename bits::reverse_helper<STARGS> reverse_helper;
 	typedef typename bits::iter<STARGS> iter;
 	typedef edgecontainer<vertex_type> EL;
 public:
@@ -992,7 +1044,7 @@ public:
 	void make_symmetric(bool oriented=false)
 	{
 		assert(is_directed());
-		edge_helper::add_reverse_edges(_v, _num_edges, oriented);
+		reverse_helper::make_symmetric(_v, _num_edges, oriented);
 		num_edges_debug(); // will notice if you were lying.
 	}
 	void add_reverse_edges(bool oriented=true)
@@ -1407,7 +1459,6 @@ void copy_helper<oG, G, X, Y>::assign(oG const& src, G& tgt)
 //		tgt._num_edges = 1; // HACK
 		// this is dangerous?!
 		if(tgt._num_edges !=  tgt.num_edges()){ untested();
-			incomplete();
 		}else{
 		}
 
