@@ -25,7 +25,11 @@
 #include <boost/functional/hash.hpp> // BUG?!
 #include <boost/graph/adjacency_matrix.hpp>
 
-typedef gala::graph<std::set, std::vector, uint16_t> SSG_16i;
+template<class G>
+struct ssg16i_config : public gala::graph_cfg_default<G> {
+};
+
+typedef gala::graph< std::set, std::vector, uint16_t, ssg16i_config > ssg_16i;
 
 // HACK HACK HACK
 #include <gala/td.h>
@@ -51,31 +55,31 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, V
 
 namespace treedec{
 template<>
-struct graph_traits<SSG_16i>{ //
-	typedef typename treedec_chooser<SSG_16i>::type treedec_type;
-	typedef typename outedge_set<SSG_16i>::type outedge_set_type;
-	typedef idgwel<SSG_16i> directed_overlay;
-	typedef idgwel<SSG_16i> immutable_directed_type;
+struct graph_traits<ssg_16i>{ //
+	typedef typename treedec_chooser<ssg_16i>::type treedec_type;
+	typedef typename outedge_set<ssg_16i>::type outedge_set_type;
+	typedef idgwel<ssg_16i> directed_overlay;
+	typedef idgwel<ssg_16i> immutable_directed_type;
 #if 1
-	typedef immvecgraph<SSG_16i> immutable_type;
-	typedef immvecgraph<SSG_16i> immutable_undirected_type;
+	typedef immvecgraph<ssg_16i> immutable_type;
+	typedef immvecgraph<ssg_16i> immutable_undirected_type;
 #else
 	typedef typename boost::adjacency_matrix<boost::undirectedS> immutable_type;
 #endif
 };
 
-using ssg16i_traits=graph_traits<SSG_16i>;
+using ssg16i_traits=graph_traits<ssg_16i>;
 
 std::pair<typename boost::graph_traits<typename ssg16i_traits::directed_overlay>::vertex_descriptor,
           typename boost::graph_traits<typename ssg16i_traits::directed_overlay>::vertex_descriptor>
-    make_digraph_with_source_and_sink(SSG_16i const &G, std::vector<bool> const &disabled,
+    make_digraph_with_source_and_sink(ssg_16i const &G, std::vector<bool> const &disabled,
                  unsigned num_dis,
-                 typename graph_traits<SSG_16i>::directed_overlay& dg,
-                 std::vector<typename boost::graph_traits<SSG_16i>::vertex_descriptor> &idxMap,
-                 typename std::set<typename boost::graph_traits<SSG_16i>::vertex_descriptor> const &SRC,
-                 typename std::set<typename boost::graph_traits<SSG_16i>::vertex_descriptor> const &SNK)
+                 typename graph_traits<ssg_16i>::directed_overlay& dg,
+                 std::vector<typename boost::graph_traits<ssg_16i>::vertex_descriptor> &idxMap,
+                 typename std::set<typename boost::graph_traits<ssg_16i>::vertex_descriptor> const &SRC,
+                 typename std::set<typename boost::graph_traits<ssg_16i>::vertex_descriptor> const &SNK)
 { untested();
-	dg = std::move(idgwel<SSG_16i>(G, disabled, num_dis, idxMap, SRC, SNK));
+	dg = std::move(idgwel<ssg_16i>(G, disabled, num_dis, idxMap, SRC, SNK));
 	return std::make_pair(dg.source(), dg.sink());
 }
 

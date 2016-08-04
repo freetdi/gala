@@ -58,7 +58,7 @@ namespace detail {
 			}
 		}
 		static void gala_to_boost(const gala::graph<SGARGS>& src, G& tgt)
-		{ itested();
+		{ untested();
 			auto nv=src.num_vertices();
 			if(num_vertices(tgt)==0){ untested();
 				// good idea?

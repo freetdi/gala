@@ -542,7 +542,6 @@ struct edge_helper<STARGS, boost::mpl::true_>
 			++num_edges; // BUG, multiplier?
 			added = true;
 		}
-		trace2("directed edge helper", added, out_edges(*A, vc).size());
 		return std::make_pair(edge_type(*A, *B), added);
 	}
 };
@@ -945,6 +944,14 @@ public: // iterators
 	{
 		return iter::vend(_v);
 	}
+	const_iterator cbegin() const
+	{
+		return iter::vbegin(_v);
+	}
+	const_iterator cend() const
+	{
+		return iter::vend(_v);
+	}
 	const_iterator begin() const
 	{
 		return iter::vbegin(_v);
@@ -981,7 +988,7 @@ public:
 			// inefficient.
 		}
 		_v.resize(nv);
-		for(auto v=_v.begin(); v!=_v.end(); ++v){
+		for(iterator v=begin(); v!=end(); ++v){
 			vertex_type w=iter::deref(v);
 			out_edges(w).clear();
 		}
@@ -1088,7 +1095,7 @@ public:
 		auto nn=oa.begin();
 		if(nn!=oa.end())
 		for(++nn; nn!=oa.end();ii=nn++) {
-			if(p(std::make_pair(a,*ii))){ untested();
+			if(p(std::make_pair(a,*ii))){ itested();
 				--_num_edges;
 				*ii=oa.back();
 				oa.pop_back();

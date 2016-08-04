@@ -1,13 +1,20 @@
 
-CPPFLAGS=-I../.. -DTRACE_UNTESTED $(LOCAL_CPPFLAGS)
-CXXFLAGS=-std=c++11 -O0 -g
+CPPFLAGS=-I. -DTRACE_UNTESTED $(LOCAL_CPPFLAGS)
+CXXFLAGS=-std=c++11 -O0 -g $(LOCAL_CXXFLAGS)
 
-LOGS=copy.log view.log copy2.log
+TESTS=copy view copy2 bmd
+LOGS=${TESTS:%=%.log}
 
 all: $(LOGS)
 
+TESTS: gala
+
+
 $(LOGS): %.log: %
 	./$< |& tee $@
+
+gala:
+	-ln -sf ../ gala
 
 $(LOGS): .P
 

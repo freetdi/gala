@@ -24,7 +24,7 @@
 
 #include <tdlib/degree.hpp>
 #include <tdlib/graph.hpp>
-// #include <tdlib/platform.hpp>
+#include <tdlib/platform.hpp>
 
 #include <boost/graph/iteration_macros.hpp>
 //hack
@@ -103,7 +103,8 @@ struct sghelp_hack{ //
 static size_t mcah(
 		typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor c,
 		gala::graph<SGARGS>& g,
-		typename outedge_set< gala::graph<SGARGS> >::type& bag,
+// 		typename treedec::graph_traits< gala::graph<SGARGS> >::bag_type& bag,
+		 typename treedec_traits<typename treedec_chooser<  gala::graph<SGARGS>  >::type>::bag_type& bag,
 		CB* cb)
 {
 	typedef gala::graph<SGARGS> G;
