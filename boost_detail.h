@@ -18,30 +18,23 @@
  *------------------------------------------------------------------
  */
 
-#if 0
-namespace std{
- 	template<class E>
- 	size_t source(E const& e )
-	{
-		incomplete();
-	}
- }
+#ifndef GALA_BOOST_H
+this is an intentional error. do not use like this.
 #endif
+
 namespace boost{
 
 namespace detail {
-	using boost::source;
 	template<class G, galaPARMS, class X=void>
 	struct copy_helper{ //
 		template<class GG, class BEI=typename graph_traits<G>::edge_iterator >
 		class edge_iw : public BEI{ //
-//			BEI& _b;
 			GG const& _g;
 
 		public:
 			edge_iw(BEI& b, const GG& g ) : BEI(b), _g(g) {}
 			std::pair<size_t, size_t> operator*()
-			{
+			{ untested();
 				typedef typename graph_traits<G>::edge_descriptor edge_descriptor;
 				typedef typename graph_traits<G>::vertex_descriptor vertex_descriptor;
 				edge_descriptor e=BEI::operator*();
@@ -60,11 +53,35 @@ namespace detail {
 
 			if(is_directed(g)){
 				h.fill_in_edges(bw_t(E.first, g), bw_t(E.second, g), false);
+			}else{untested();
+				incomplete();
 			}
 		}
-		static void copy_from_gg(const gala::graph<SGARGS>& h, G& g)
+		static void gala_to_boost(const gala::graph<SGARGS>& src, G& tgt)
 		{ untested();
-			incomplete();
+			auto nv=src.num_vertices();
+			if(num_vertices(tgt)==0){ untested();
+				// good idea?
+				tgt=std::move(G(nv));
+			}else{ untested();
+				tgt.clear(); // HACK, not supported by boost!
+				while(num_vertices(tgt)<nv){ untested();
+					add_vertex(tgt);
+				}
+				while(num_vertices(tgt)>nv){ untested();
+					remove_vertex(num_vertices(tgt)-1,tgt);
+				}
+			}
+
+			// uuh, directed vs undirected?
+			auto V=edges(src);
+			for(;V.first!=V.second;++V.first){ untested();
+				auto v=source(*V.first, src);
+				auto w=target(*V.first, src);
+				auto vp=src.position(v);
+				auto wp=src.position(w);
+				add_edge(vp,wp,tgt);
+			}
 		}
 	};
 

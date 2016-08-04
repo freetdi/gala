@@ -221,7 +221,7 @@ namespace boost { //
 				typename gala::graph<SGARGS>::iterator &f = base.first;
 				typename gala::graph<SGARGS>::out_vertex_iterator &s = base.second;
 
-				if(f==_g->end() || typename G::is_directed() ){
+				if(f==_g->end() || _g->is_directed() ){
 				}else if(*s > G::iter::deref(f)){
 					increment();
 				}else{untested();
@@ -265,7 +265,7 @@ namespace boost { //
 				if(e==s){
 				}
 
-				typedef typename G::is_directed dir;
+				bool dir=_g->is_directed();
 
 				while(true){
 					if(f==_g->end()){
@@ -280,7 +280,7 @@ namespace boost { //
 					}else if(*s == G::iter::deref(f)){
 						unreachable(); // self loop
 						assert(false);
-					}else if(!dir() && G::iter::deref(f) < *s){
+					}else if(!dir && G::iter::deref(f) < *s){
 						++f;
 						e = storage::out_edges(*f, VC).end();
 						s = storage::out_edges(*f, VC).begin();
@@ -622,12 +622,14 @@ namespace boost {
 		detail::copy_helper<G, SGARGS>::boost_to_gala(g, h);
 	}
 
-//	VCTtemplat
-//	typename graph_traits<::gala::graph<SGARGS> >::edges_size_type
-//	num_edges(const gala::graph<SGARGS>& g)
-//	{ untested();
-//		return g.num_edges();
-//	}
+   template<class G, galaPARMS>
+	inline 	typename
+	std::enable_if<is_convertible< typename
+	  graph_traits<G>::traversal_category , edge_list_graph_tag>::value, void >::type
+	 copy_graph(const gala::graph<SGARGS>& g, G& h)
+	{
+		detail::copy_helper<G, SGARGS>::gala_to_boost(g, h);
+	}
 
 	/// collides with...
 	VCTtemplate
