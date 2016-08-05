@@ -56,10 +56,10 @@ namespace boost { //
 			auto &s=base.second;
 			auto vend=iter::vend(vc);
 
-			if(f==vend){ untested();
-			}else if( is_directed ){ untested();
-			}else if( !is_ordered ){ untested();
-			}else if(*s > iter::deref(f)){ untested();
+			if(f==vend){
+			}else if( is_directed ){
+			}else if( !is_ordered ){
+			}else if(*s > iter::deref(f)){
 				increment_edge(base, vc);
 			}else{untested();
 			}
@@ -67,7 +67,7 @@ namespace boost { //
 
 		template<class B, class VC>
 		static void increment_edge(B& base, VC& vc)
-		{ untested();
+		{
 			auto &f=base.first;
 			auto &s=base.second;
 			auto e = storage::out_edges(*f, vc).end();
@@ -284,7 +284,7 @@ namespace boost { //
 			}
 		private: // reference
 			reference dereference() const
-			{ untested();
+			{
 				return *_base;
 			}
 
@@ -362,7 +362,7 @@ namespace boost { //
 				}
 			}
 			void increment()
-			{ untested();
+			{
 				G& gg = *const_cast<gala::graph<SGARGS>*>(_g); // HACK
 				typename G::vertex_container_type& VC=gg._v;
 
@@ -896,7 +896,7 @@ namespace boost {
 	VCTtemplate
 	inline simplegraph_graph_index_map<SGARGS>
 	get(vertex_index_t, gala::graph<SGARGS> & g)
-	{ untested();
+	{
 		//typedef typename property_map< gala::graph<SGARGS>, vertex_all_t>::type
 	//		pmap_type;
 //		return pmap_type(); // &g); ???
@@ -934,7 +934,7 @@ namespace boost {
 	}
 	VCTtemplate
 	bool is_directed(gala::graph<SGARGS> const& g)
-	{untested();
+	{
 		return g.is_directed();
 	}
 
