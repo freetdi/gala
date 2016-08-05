@@ -751,6 +751,15 @@ struct is_directed_select
 	typedef boost::mpl::false_ value;
 	operator bool() const {return false;}
 };
+
+template<class CFG>
+struct is_directed_select<CFG,
+	typename tovoid < typename std::enable_if< CFG::is_directed >::type >::type >
+{
+	typedef boost::mpl::true_ value;
+	typedef typename std::enable_if< CFG::is_directed >::type type;
+};
+// old approach. will go.
 template<class CFG>
 struct is_directed_select<CFG, typename tovoid<typename CFG::is_directed_t>::type >
 {

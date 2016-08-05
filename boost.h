@@ -857,6 +857,11 @@ namespace boost {
 		::gala::graph<SGARGS>* G = const_cast<::gala::graph<SGARGS>*>(&g); // HACK
 		return std::make_pair(Iter(v, G->out_edges(v).begin()), Iter(v, G->out_edges(v).end()));
 	}
+	VCTtemplate
+	bool is_directed(gala::graph<SGARGS> const& g)
+	{untested();
+		return g.is_directed();
+	}
 
 } // namespace boost
 
@@ -868,7 +873,7 @@ namespace boost {
 // should be obsolete with boost::copy_graph
 VCTtemplate template<class H>
 void gala::graph<SGARGS>::assign(H const& g)
-{ // untested();
+{ untested();
 //	size_t nv = boost::graph_traits<H>::num_vertices(g);
 	typedef gala::graph<SGARGS> G;
 	size_t nv = boost::num_vertices(g);

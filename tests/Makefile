@@ -2,7 +2,7 @@
 CPPFLAGS=-I. -DTRACE_UNTESTED $(LOCAL_CPPFLAGS)
 CXXFLAGS=-std=c++11 -O0 -g $(LOCAL_CXXFLAGS)
 
-TESTS=copy view copy2 bmd
+TESTS=copy view copy2 bmd dir
 LOGS=${TESTS:%=%.log}
 
 all: $(LOGS)
