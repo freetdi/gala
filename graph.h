@@ -317,7 +317,7 @@ struct storage : storage_base<STARGS>{ //
 	typedef typename vs::vertex_index_type vertex_index_type;
 	typedef typename vs::const_type const_vertex_type;
 	typedef std::pair<vertex_type, vertex_type> edge_type;
-	typedef ECT<vertex_type> edge_container_type;
+	typedef ECT<vertex_type> edge_container_type; // -> storage base?
 	typedef VCT<vertex_> VL;
 	static bool need_rewire()
 	{
@@ -406,7 +406,7 @@ struct storage<ECT, VCT, void*> : public storage_base<ECT, VCT, void*>{ //
 		return true;
 	}
 	static vertex_type new_node(container_type& _v)
-	{ incomplete();
+	{ itested();
 		unsigned int s = _v.size();
 		auto old_begin=_v.begin();
 		_v.resize(s+1);
@@ -416,7 +416,6 @@ struct storage<ECT, VCT, void*> : public storage_base<ECT, VCT, void*>{ //
 			std::cerr << "hmm " << _v.size() << "\n";
 			rewire_nodes(_v, offset);
 		}
-		incomplete();
 		return &_v.back();
 	}
 	static vertex_index_type degree(const vertex_type& v, container_type const&){ // ??
@@ -792,9 +791,14 @@ public: // types
 
 	typedef CFG<this_type> myCFG;
 	typedef typename detail::is_directed_select<myCFG>::value is_directed_t;
-	static bool is_directed()
+	static constexpr bool is_directed()
 	{
 		return is_directed_t();
+	}
+	static constexpr bool is_ordered()
+	{
+		// for now.
+		return sfinae::is_set< ECT<sfinae::any> >::value;
 	}
 
 	typedef typename vs::type vertex_type;
@@ -814,11 +818,15 @@ public:
 	typedef typename storage::container_type VL;
 	typedef typename storage::container_type vertex_container_type;
 
-	typedef typename iter::vertex_iterator iterator;
-	typedef typename iter::const_vertex_iterator const_iterator;
-
 	typedef typename EL::iterator out_vertex_iterator;
 	typedef typename EL::const_iterator out_vertex_const_iterator;
+
+	typedef typename iter::vertex_iterator vertex_iterator_type;
+	typedef typename iter::const_vertex_iterator const_vertex_iterator_type;
+
+public: // range-based loops support aliases
+	typedef vertex_iterator_type iterator;
+	typedef const_vertex_iterator_type const_iterator;
 
 	//typedef std::pair<vertex_type, vertex_type> edge; // FIXME: remove.
 	typedef typename storage::edge_type edge_type;
@@ -991,6 +999,7 @@ public:
 		_v.resize(0);
 		_num_edges = 0;
 	}
+	// "reserve" maybe?!
 	void reshape(size_t nv, size_t ne=0, bool directed_edges=false)
 	{
 		if(ne) {

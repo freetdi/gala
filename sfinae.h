@@ -35,7 +35,7 @@ struct any{int dummy;};
 /*--------------------------------------------------------------------------*/
 template<class A, class B=any, class T=void>
 struct is_set{
-	static constexpr bool value = true;
+	static constexpr bool value = false;
 };
 /*--------------------------------------------------------------------------*/
 
@@ -45,6 +45,7 @@ std::set<any, typename S::key_compare, typename S::allocator_type >, S
 >::value, any >::type , T>{
 
 	typedef T type;
+	static constexpr bool value = true;
 };
 template<class S, class T>
 struct is_set<S, typename std::enable_if < std::is_same<
@@ -52,11 +53,12 @@ stx::btree_set<any, typename S::key_compare, typename S::allocator_type >, S
 >::value, any >::type , T>{
 
 	typedef T type;
+	static constexpr bool value = true;
 };
 /*--------------------------------------------------------------------------*/
 template<class A, class B=any, class T=void>
 struct is_seq{
-	static constexpr bool value = true;
+	static constexpr bool value = false;
 };
 template<class S, class T>
 struct is_seq<S, typename std::enable_if < std::is_same<
@@ -64,6 +66,7 @@ std::vector<any, typename S::allocator_type >, S
 >::value, any >::type , T>{
 
 	typedef T type;
+	static constexpr bool value = true;
 };
 template<class S, class T>
 struct is_seq<S, typename std::enable_if < std::is_same<
@@ -71,6 +74,7 @@ std::deque<any, typename S::allocator_type >, S
 >::value, any >::type , T>{
 
 	typedef T type;
+	static constexpr bool value = true;
 };
 
 }//sfinae

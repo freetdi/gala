@@ -1,1 +1,3 @@
-- replace DEG by CFG in 4th template arg of gala::graph
+- all types should end with _type
+- get rid of immature mpl directed bool (constexr instead)
+- introduce better name for "void*"

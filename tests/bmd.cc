@@ -56,12 +56,6 @@ int main(int argc, char** argv)
 	size_t e=boost::num_edges(g);
 	size_t n=boost::num_vertices(g);
 	std::cout << "generated " << e << " edges, " << n << " vertices\n";
-	auto EE=boost::edges(g);
- 	for(;EE.first!=EE.second; ++EE.first){
- 		auto s=boost::source(*EE.first, g);
- 		auto t=boost::target(*EE.first, g);
- 		boost::add_edge(t,s,g);
- 	}
 #else
 	sg_dvv g(size);
 	g.reshape(0);
@@ -72,6 +66,13 @@ int main(int argc, char** argv)
 	g.make_symmetric(false);
 	e = boost::num_edges(g);
 #endif
+
+	auto EE=boost::edges(g);
+ 	for(;EE.first!=EE.second; ++EE.first){
+ 		auto s=boost::source(*EE.first, g);
+ 		auto t=boost::target(*EE.first, g);
+ 		boost::add_edge(t,s,g);
+ 	}
 
   // boost::add_edge(0,1,g);
 	e=boost::num_edges(g);
@@ -98,7 +99,7 @@ int main(int argc, char** argv)
     if((n*(n-1u)) == boost::num_edges(g)){ untested();
 			 exit(0);
     }else{
-        untested();
+        itested();
     }
 
     std::vector<int> inverse_perm(n, 0);
@@ -121,7 +122,7 @@ int main(int argc, char** argv)
     int w =
 #ifndef HAVE_MINDEGREE_FORK
         0;
-    untested();
+    itested();
 #endif
     boost::minimum_degree_ordering
              (g,

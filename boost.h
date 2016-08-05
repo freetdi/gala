@@ -42,6 +42,119 @@ namespace boost { //
 		typedef uintptr_t type;
 	};
 
+	// => boost/detail?
+	template< STPARMS, bool is_directed , bool is_ordered, bool is_loopless=true>
+	struct edge_helper{ //
+		// needed?
+		using storage=gala::bits::storage<STARGS>;
+		using iter=gala::bits::iter<STARGS>;
+
+		template<class B, class VC>
+		static void skip_edge(B& base, VC& vc)
+		{
+			auto &f=base.first;
+			auto &s=base.second;
+			auto vend=iter::vend(vc);
+
+			if(f==vend){ untested();
+			}else if( is_directed ){ untested();
+			}else if( !is_ordered ){ untested();
+			}else if(*s > iter::deref(f)){ untested();
+				increment_edge(base, vc);
+			}else{untested();
+			}
+		}
+
+		template<class B, class VC>
+		static void increment_edge(B& base, VC& vc)
+		{ untested();
+			auto &f=base.first;
+			auto &s=base.second;
+			auto e = storage::out_edges(*f, vc).end();
+			++s;
+
+			auto vend=iter::vend(vc);
+
+			while(true){
+				if(f==vend){
+					break;
+				}else if(s==storage::out_edges(*f, vc).end()) {
+					++f;
+					if(f==vend){
+						break;
+					}
+					e = storage::out_edges(*f, vc).end();
+					s = storage::out_edges(*f, vc).begin();
+				}else if(!is_loopless && *s == iter::deref(f)){
+					incomplete();
+				}else if( is_ordered && !is_directed && iter::deref(f) < *s){
+					++f;
+					e = storage::out_edges(*f, vc).end();
+					s = storage::out_edges(*f, vc).begin();
+				}else if( !is_ordered && !is_directed && iter::deref(f) > *s){
+					++s;
+					continue;
+				}else if(s!=storage::out_edges(*f, vc).end()){
+					break;
+				}else{ untested();
+					// next row.
+					++f;
+					e = storage::out_edges(*f, vc).end();
+					s = storage::out_edges(*f, vc).begin();
+				}
+			}
+		}
+	}; // edge_helper
+
+#if 0 // use constexpr bool for diversion
+	template< STPARMS, bool is_ordered >
+	struct edge_helper<STARGS,/*directed*/ true, is_ordered >{ //
+		using storage=gala::bits::storage<STARGS>;
+		using iter=gala::bits::iter<STARGS>;
+
+		template<class B, class VC>
+		static void increment_edge(B& base, VC& vc)
+		{ untested();
+			auto &f=base.first;
+			auto &s=base.second;
+			auto e = storage::out_edges(*f, vc).end();
+			++s;
+
+			if(e==s){
+			}
+
+			auto vend=iter::vend(vc);
+
+			while(true){ untested();
+				if(f==vend){ untested();
+					break;
+				}else if(s==storage::out_edges(*f, vc).end()) { untested();
+					++f;
+					if(f==vend){ untested();
+						break;
+					}
+					e = storage::out_edges(*f, vc).end();
+					s = storage::out_edges(*f, vc).begin();
+				}else if(*s == iter::deref(f)){
+					unreachable(); // self loop
+					assert(false);
+				}else if(!is_directed && iter::deref(f) < *s){
+					++f;
+					e = storage::out_edges(*f, vc).end();
+					s = storage::out_edges(*f, vc).begin();
+				}else if(s!=storage::out_edges(*f, vc).end()){
+					break;
+				}else{ untested();
+					// next row.
+					++f;
+					e = storage::out_edges(*f, vc).end();
+					s = storage::out_edges(*f, vc).begin();
+				}
+			}
+		}
+	}; // edge_helper
+#endif
+
 	VCTtemplate
 	struct graph_traits<gala::graph<SGARGS> > { //
 		typedef typename myVDP<VDP>::type vertices_size_type;
@@ -171,7 +284,7 @@ namespace boost { //
 			}
 		private: // reference
 			reference dereference() const
-			{
+			{ untested();
 				return *_base;
 			}
 
@@ -221,11 +334,12 @@ namespace boost { //
 				typename gala::graph<SGARGS>::iterator &f = base.first;
 				typename gala::graph<SGARGS>::out_vertex_iterator &s = base.second;
 
-				if(f==_g->end() || _g->is_directed() ){
-				}else if(*s > G::iter::deref(f)){
-					increment();
-				}else{untested();
-				}
+				G& gg = *const_cast<gala::graph<SGARGS>*>(_g); // HACK
+				typename G::vertex_container_type& VC=gg._v;
+
+				edge_helper< STARGS, G::is_directed(), G::is_ordered() >::skip_edge
+					(base, VC);
+
 			}
 
 		private:
@@ -247,52 +361,13 @@ namespace boost { //
 					    && base.second == other.base.second;
 				}
 			}
-			// fixme: more efficient for ordered edgelist
 			void increment()
-			{
-				typedef gala::graph<SGARGS> G;
-				typedef typename G::storage storage;
-				typedef typename G::iterator vertex_iterator_type;
-				typedef typename G::out_vertex_iterator out_vertex_iterator;
-
+			{ untested();
 				G& gg = *const_cast<gala::graph<SGARGS>*>(_g); // HACK
 				typename G::vertex_container_type& VC=gg._v;
-				vertex_iterator_type &f=base.first;
-				out_vertex_iterator &s=base.second;
-				out_vertex_iterator e = storage::out_edges(*f, VC).end();
-				++s;
 
-				if(e==s){
-				}
-
-				bool dir=_g->is_directed();
-
-				while(true){
-					if(f==_g->end()){
-						break;
-					}else if(s==storage::out_edges(*f, VC).end()) {
-						++f;
-						if(f==_g->end()){
-							break;
-						}
-						e = storage::out_edges(*f, VC).end();
-						s = storage::out_edges(*f, VC).begin();
-					}else if(*s == G::iter::deref(f)){
-						unreachable(); // self loop
-						assert(false);
-					}else if(!dir && G::iter::deref(f) < *s){
-						++f;
-						e = storage::out_edges(*f, VC).end();
-						s = storage::out_edges(*f, VC).begin();
-					}else if(s!=storage::out_edges(*f, VC).end()){
-						break;
-					}else{ untested();
-						// next row.
-						++f;
-						e = storage::out_edges(*f, VC).end();
-						s = storage::out_edges(*f, VC).begin();
-					}
-				}
+				edge_helper< STARGS, G::is_directed(), G::is_ordered() >::increment_edge
+					(base, VC);
 			}
 
 			void decrement() { untested();
