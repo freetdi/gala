@@ -126,7 +126,7 @@ struct vertex_helper{ //
 		return v<_v.size();
 	}
 	template<class E, class S>
-	static void rebase(E& e, S const& s, intptr_t delta)
+	static void rebase(E& e, S const& s, intptr_t /*delta*/)
 	{ itested();
 		e=s;
 	}
@@ -367,7 +367,7 @@ struct storage : storage_base<STARGS>{ //
 		_v[w].insert(v);
 	}
 	template<class E, class S>
-	static void rebase(E& e, S const& s, intptr_t delta)
+	static void rebase(E& e, S const& s, intptr_t /*delta*/)
 	{ incomplete();
 		e = s;
 	}
@@ -486,7 +486,7 @@ struct edge_helper : public storage<STARGS> { //
 	template<class N, class VC>
 	static std::pair<edge_type, bool> add_edge(vertex_type a, vertex_type b,
 	                                           N& num_edges, VC& vc)
-	{
+	{ untested();
 		// trace0("undiredted add_edge");
 		vertex_type* A=&a;
 		vertex_type* B=&b;
@@ -513,7 +513,7 @@ struct edge_helper : public storage<STARGS> { //
 
 	typedef typename storage<STARGS>::container_type vertex_container_type;
 	template<class E>
-	static void add_reverse_edges(vertex_container_type& _v, E& e)
+	static void add_reverse_edges(vertex_container_type& /*_v*/, E& )
 	{ unreachable();
 	}
 };
@@ -609,7 +609,7 @@ struct reverse_helper<ECT,VCT,VDP,
 	using typename storage<ECT,VCT,VDP>::vertex_type;
 
 	template<class E>
-	static void make_symmetric(vertex_container_type& _v, E& e, bool oriented)
+	static void make_symmetric(vertex_container_type& _v, E& e, bool /*oriented*/)
 	{ itested();
 		unsigned ii=0;
 		for(auto & i : _v){
@@ -630,7 +630,7 @@ struct reverse_helper<ECT,VCT,void*> : public storage<ECT, VCT, void* > { //
 	using typename storage<ECT,VCT,void*>::vertex_type;
 
 	template<class E>
-	static void make_symmetric(vertex_container_type& _v, E& e, bool oriented)
+	static void make_symmetric(vertex_container_type& /*_v*/, E& , bool /*oriented*/)
 	{ incomplete();
 	}
 };
@@ -869,7 +869,8 @@ public: // move
 	    : _v(std::move(x._v)),
 	      _num_edges(x._num_edges)
 	{
-		assert(num_vertices()==x.num_vertices());
+//		assert(nonvoid)
+		// assert(num_vertices()==x.num_vertices()); no. _v has gone ...
 		for(auto i = begin(); i!=end(); ++i){
 			assert(is_valid(iter::deref(i)));
 #ifdef MORE_DEBUG
@@ -1002,6 +1003,7 @@ public:
 	// "reserve" maybe?!
 	void reshape(size_t nv, size_t ne=0, bool directed_edges=false)
 	{
+		(void)directed_edges;
 		if(ne) {
 			// inefficient.
 		}
@@ -1086,7 +1088,7 @@ public:
 	}
 	//O(log max{d_1, d_2}), where d_1 is the degree of a and d_2 is the degree of b
 	std::pair<edge_type, bool> add_edge(vertex_type a, vertex_type b)
-	{
+	{ untested();
 		assert(is_valid(a));
 		assert(is_valid(b));
 		return edge_helper::add_edge(a, b, _num_edges, _v);

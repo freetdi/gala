@@ -24,6 +24,7 @@
 
 #include <tdlib/degree.hpp>
 #include <tdlib/graph.hpp>
+#include <tdlib/graph_traits.hpp>
 #include <tdlib/platform.hpp>
 
 #include <boost/graph/iteration_macros.hpp>
@@ -56,7 +57,7 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, V
 #endif
 #endif
 
-namespace noboost{ // here??
+namespace treedec{ // here??
 
 template<class CB, class G>
 class callback_proxy{ //
@@ -104,7 +105,8 @@ static size_t mcah(
 		typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor c,
 		gala::graph<SGARGS>& g,
 // 		typename treedec::graph_traits< gala::graph<SGARGS> >::bag_type& bag,
-		 typename treedec_traits<typename treedec_chooser<  gala::graph<SGARGS>  >::type>::bag_type& bag,
+		 typename treedec::treedec_traits<
+		   typename treedec::treedec_chooser<  gala::graph<SGARGS>  >::type>::bag_type& bag,
 		CB* cb)
 {
 	typedef gala::graph<SGARGS> G;
@@ -112,7 +114,7 @@ static size_t mcah(
 	typedef typename boost::graph_traits<G>::adjacency_iterator Iter;
 	typedef typename boost::graph_traits<G>::vertex_descriptor VD;
 #ifndef NDEBUG
-	noboost::check(g);
+	treedec::check(g);
 #endif
 	VD x; (void) x;
 	Iter I, J, K, E;
@@ -166,7 +168,7 @@ typedef typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor ve
 	static void ce(vertex_descriptor vd, vertex_descriptor into,
 	                   gala::graph<SGARGS> &g,
 							 bool erase=true,
-	                   vertex_callback<typename gala::graph<SGARGS>::vertex_type >* cb=NULL)
+	                   treedec::vertex_callback<typename gala::graph<SGARGS>::vertex_type >* cb=NULL)
 	{ itested();
 		typedef gala::graph<SGARGS> G;
 		(void) erase;
@@ -224,9 +226,9 @@ typedef typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor ve
 			g.out_edges(vd).clear();
 		}
 	}
-}; // noboost:sghelp_hack
+}; // ghelp_hack
 
-} //noboost
+} //treedec
 
 namespace treedec { //
 	template<typename G>
@@ -269,7 +271,7 @@ namespace treedec { //
 //		typedef gala::graph<SGARGS> G;
 		(void) erase;
 		assert(vd!=into);
-		noboost::sghelp_hack<ECT, VCT, VDP, CFG, CB>::ce(vd, into, g, erase, cb);
+		treedec::sghelp_hack<ECT, VCT, VDP, CFG, CB>::ce(vd, into, g, erase, cb);
 	}
 
 	// weird wrapper. maybe irrelevant.
@@ -296,7 +298,7 @@ namespace treedec { //
 	}
 } // treedec
 
-namespace noboost { // BUG in graphviz?
+namespace treedec { // BUG in graphviz?
 	// required for _new algo...?
 	VCTtemplate
 	static inline void add_edge(typename gala::graph<SGARGS>::vertex v,
@@ -349,7 +351,7 @@ namespace treedec{
 	}
 
 // FIXME: always hijack like this, if
-// noboost::outedge_set<gala::graph<SGARGS> >::type is treedec_chooser::bag_type?
+// :outedge_set<gala::graph<SGARGS> >::type is treedec_chooser::bag_type?
 	VCTtemplate
 	typename outedge_set<gala::graph<SGARGS> >::type detach_neighborhood(
 			  typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor& c,
@@ -358,12 +360,12 @@ namespace treedec{
 	{ untested();
 		assert(N==nullptr); // for now..
 		incomplete(); //	unreachable...
-		 typename noboost::outedge_set<gala::graph<SGARGS> >::type bag;
+		 typename treedec::outedge_set<gala::graph<SGARGS> >::type bag;
 		 typename boost::graph_traits<gala::graph<SGARGS> >::adjacency_iterator nIt1, nIt2, nEnd;
 		 // inefficient.
 		 for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g);
 					nIt1 != nEnd; nIt1++){ // untested();
-			  bag.insert(noboost::get_vd(g, *nIt1));
+			  bag.insert(treedec::get_vd(g, *nIt1));
 		 }
 		 return bag;
 	}
@@ -376,7 +378,7 @@ namespace treedec{
 			typename treedec::graph_callback<gala::graph<SGARGS> >* cb=NULL)
 	{
 		typedef typename treedec::graph_callback<gala::graph<SGARGS> > CB;
-		return noboost::sghelp_hack<ECT, VCT, VDP, CFG, CB>::mcah(c, g, bag, cb);
+		return treedec::sghelp_hack<ECT, VCT, VDP, CFG, CB>::mcah(c, g, bag, cb);
 	}
 
 	// theres no Vertex. use the position instead
@@ -503,12 +505,12 @@ void check(gala::graph<SGARGS> const& g)
 
 #ifdef MORE_DEBUG
 	for(boost::tie(i,e) = boost::vertices(g); i!=e; ++i){untested();
-//		assert(noboost::is_valid(iter::deref(i),g));
+//		assert(treedec::is_valid(iter::deref(i),g));
 	}
 #endif
 
 	for(boost::tie(i,e) = boost::vertices(g); i!=e; ++i){
-	//	assert(noboost::is_valid(*i,g));
+	//	assert(treedec::is_valid(*i,g));
 		auto j = boost::out_edges(*i,g).first;
 		auto f = j;
 		for(boost::tie(j,f) = boost::out_edges(*i,g); j!=f; ++j){
@@ -631,26 +633,6 @@ inline typename boost::graph_traits<gala::graph<SGARGS> >::vertices_size_type
 
 } // treedec
 
-// transition?
-namespace noboost{
-    using treedec::bag;
-    using treedec::check;
-    using treedec::deg_chooser;
-    using treedec::contract_edge;
-    using treedec::edge_callback;
-//    using treedec::eliminate_vertex;
-//    using treedec::fetch_neighbourhood; // obsolete?
-    using treedec::get_min_degree_vertex;
-    using treedec::get_pos;
-    using treedec::get_vd;
-    using treedec::make_clique;
-    using treedec::make_degree_sequence;
-    using treedec::outedge_set;
-    using treedec::remove_vertex;
-    using treedec::treedec_traits;
-    using treedec::treedec_chooser;
-    using treedec::vertex_callback;
-} // noboost
 
 // should not be necessary.
 // remove. and remove Vertex_NF/Edge_NF declarations.

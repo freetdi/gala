@@ -143,7 +143,7 @@ struct sethack_<stx::btree_set<size_t> >{ //
 };
 
 template<class S>
-typename S::iterator reverse(typename S::reverse_iterator& x, S const& s)
+typename S::iterator reverse(typename S::reverse_iterator& x, S const& )
 {untested();
 	return sethack_<S>::reverse(x);
 }
