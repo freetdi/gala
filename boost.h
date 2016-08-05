@@ -841,7 +841,7 @@ namespace boost {
 
 	VCTtemplate
 	typename boost::graph_traits<gala::graph<SGARGS > >::vertices_size_type
-	get(boost::vertex_index_t t, const gala::graph<SGARGS>& g,
+	get(vertex_index_t t, const gala::graph<SGARGS>& g,
 			typename boost::graph_traits< gala::graph<SGARGS> >::vertex_descriptor v)
 	{
 		return get(get(t, g), v);
