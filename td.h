@@ -517,7 +517,7 @@ void check(gala::graph<SGARGS> const& g)
 			++edges;
 		}
 	}
-	assert(!(edges%2));
+	assert(g.is_directed() || !(edges%2));
 
 	if(g.is_directed()){ untested();
 	}else{ untested();

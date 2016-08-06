@@ -16,7 +16,7 @@ struct dvv_config : public gala::graph_cfg_default<G>
 	typedef boost::mpl::true_ is_directed_t;
 };
 
-typedef uint32_t unsignedType;
+typedef uint16_t unsignedType;
 
 #if 1
 typedef gala::graph<std::vector, std::vector, unsignedType, dvv_config> sg_dvv;
@@ -56,7 +56,15 @@ int main(int argc, char** argv)
 	size_t e=boost::num_edges(g);
 	size_t n=boost::num_vertices(g);
 	std::cout << "generated " << e << " edges, " << n << " vertices\n";
-#else
+	auto EE=boost::edges(g);
+ 	for(;EE.first!=EE.second; ++EE.first){
+ 		auto s=boost::source(*EE.first, g);
+ 		auto t=boost::target(*EE.first, g);
+ 		if(!boost::edge(t,s,g).second){
+			boost::add_edge(t,s,g);
+		}
+ 	}
+#else//  gala
 	sg_dvv g(size);
 	g.reshape(0);
 	boost::generate_random_graph(g, size, ne, rng);
@@ -67,12 +75,6 @@ int main(int argc, char** argv)
 	e = boost::num_edges(g);
 #endif
 
-	auto EE=boost::edges(g);
- 	for(;EE.first!=EE.second; ++EE.first){
- 		auto s=boost::source(*EE.first, g);
- 		auto t=boost::target(*EE.first, g);
- 		boost::add_edge(t,s,g);
- 	}
 
   // boost::add_edge(0,1,g);
 	e=boost::num_edges(g);
@@ -97,6 +99,7 @@ int main(int argc, char** argv)
     // boost md does not like cliques.
     trace2("clique check", n, e);
     if((n*(n-1u)) == boost::num_edges(g)){ untested();
+		 std::cerr << "clique";
 			 exit(0);
     }else{
         itested();
@@ -136,6 +139,8 @@ int main(int argc, char** argv)
               , ub
 #endif
               );
+
+	 std::cout << "done\n";
 
 
 }

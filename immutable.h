@@ -500,7 +500,7 @@ template<class G>
 	void immvecgraph<G>::assign(const G& g, std::vector<bool> const & disabled,
 			vertex_index_t num_dis,
 			std::vector<typename boost::graph_traits<G>::vertex_descriptor> &idxMap,
-			S const& SRC, S const& SNK)
+			S const& SRC, S const& /*SNK*/)
 	{
 		unsigned nv=boost::num_vertices(g)-num_dis;
 		_vertices.resize(nv+1); // one extra for end.

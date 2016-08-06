@@ -26,6 +26,8 @@
 #include <map>
 #include <forward_list>
 #include <stx/btree_set.h>
+#include <type_traits>
+		
 
 #include <boost/iterator/counting_iterator.hpp>
 #include <boost/mpl/bool.hpp>
@@ -545,7 +547,7 @@ struct edge_helper<STARGS, boost::mpl::true_>
 	}
 };
 /*--------------------------------------------------------------------------*/
-template<STPARMS, class X=void>
+template<STPARMS, class X=void, class...>
 struct reverse_helper : public storage<STARGS> { //
 	typedef typename storage<STARGS>::container_type vertex_container_type;
 	using typename storage<STARGS>::edge_type;
@@ -602,6 +604,7 @@ struct reverse_helper : public storage<STARGS> { //
 template< template<class T, typename... > class ECT,
           template<class T, typename... > class VCT, class VDP >
 struct reverse_helper<ECT,VCT,VDP,
+	typename std::enable_if< std::is_unsigned< VDP >::value, VDP>::type   ,
 	typename sfinae::is_set< ECT<sfinae::any> >::type>
 	: public storage<ECT, VCT, VDP > { //
 	typedef typename storage<ECT,VCT,VDP>::container_type vertex_container_type;
@@ -619,6 +622,23 @@ struct reverse_helper<ECT,VCT,VDP,
 			}
 			++ii;
 		}
+	}
+};
+/*--------------------------------------------------------------------------*/
+template<template<class T, typename... > class ECT,
+         template<class T, typename... > class VCT >
+struct reverse_helper<ECT, VCT, void*
+ , typename sfinae::is_set< ECT<sfinae::any> >::type
+>
+	: public storage<ECT, VCT, void* > { //
+		typedef typename sfinae::is_set< ECT<sfinae::any> >::type hmm;
+	typedef typename storage<ECT,VCT,void*>::container_type vertex_container_type;
+	using typename storage<ECT,VCT,void*>::edge_type;
+	using typename storage<ECT,VCT,void*>::vertex_type;
+
+	template<class E>
+	static void make_symmetric(vertex_container_type& /*_v*/, E& , bool /*oriented*/)
+	{ incomplete();
 	}
 };
 /*--------------------------------------------------------------------------*/
@@ -1088,7 +1108,7 @@ public:
 	}
 	//O(log max{d_1, d_2}), where d_1 is the degree of a and d_2 is the degree of b
 	std::pair<edge_type, bool> add_edge(vertex_type a, vertex_type b)
-	{ untested();
+	{
 		assert(is_valid(a));
 		assert(is_valid(b));
 		return edge_helper::add_edge(a, b, _num_edges, _v);
@@ -1427,7 +1447,6 @@ void copy_helper<oG, G, X, Y>::assign(oG const& src, G& tgt)
 	size_t nv = g.num_vertices();
 	size_t ne = g.num_edges();
 	trace4("assign_",nv, ne, tgt.num_vertices(), tgt.num_edges());
-	trace2("", tgt.is_directed(), g.is_directed()); // use other helper
 	assert(!tgt.is_directed() || g.is_directed()); // use other helper
 	auto psize=tgt._v.size();
 	tgt._v.resize(nv);
@@ -1451,7 +1470,7 @@ void copy_helper<oG, G, X, Y>::assign(oG const& src, G& tgt)
 		++i;
 		assert(i<=nv);
 	}
-	trace2("resize v", i, nv);
+//	trace2("resize v", i, nv);
 	assert(i==nv);
 
 	oG* GG = const_cast<oG*>(&g);
@@ -1479,7 +1498,7 @@ void copy_helper<oG, G, X, Y>::assign(oG const& src, G& tgt)
 			++num_og_edges;
 		}
 	}
-	trace3("debug", tgt.is_directed, src.is_directed, num_og_edges);
+//	trace3("debug", tgt.is_directed, src.is_directed, num_og_edges);
 	if(tgt._num_edges == 2*ne){ untested();
 	}else if(tgt.num_edges() == ne){
 	}else if(tgt.is_directed() && !g.is_directed() ){
@@ -1489,8 +1508,8 @@ void copy_helper<oG, G, X, Y>::assign(oG const& src, G& tgt)
 		incomplete();
 	}else if(tgt.is_directed() && g.is_directed() ){
 
-		trace5("assign..1 1",nv, ne, tgt.num_vertices(), tgt.num_edges(), GG->num_edges());
-		trace2("assign...",GG->_num_edges, tgt._num_edges);
+//		trace5("assign..1 1",nv, ne, tgt.num_vertices(), tgt.num_edges(), GG->num_edges());
+//		trace2("assign...",GG->_num_edges, tgt._num_edges);
 //		tgt._num_edges = 1; // HACK
 		// this is dangerous?!
 		if(tgt._num_edges !=  tgt.num_edges()){
@@ -1506,8 +1525,6 @@ void copy_helper<oG, G, X, Y>::assign(oG const& src, G& tgt)
 		unreachable();
 		std::cerr << "assign_ oops " << tgt._num_edges << ":" << ne << "\n";
 	}
-	trace5("assign...",nv, ne, tgt.num_vertices(), tgt.num_edges(), GG->num_edges());
-	trace4("??", tgt.num_edges(), num_og_edges, tgt._num_edges ,ne );
 //	assert(tgt._num_edges == ne || tgt._num_edges == 2*ne);
 	assert(tgt.num_vertices() == nv);
 
