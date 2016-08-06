@@ -488,7 +488,7 @@ struct edge_helper : public storage<STARGS> { //
 	template<class N, class VC>
 	static std::pair<edge_type, bool> add_edge(vertex_type a, vertex_type b,
 	                                           N& num_edges, VC& vc)
-	{ untested();
+	{
 		// trace0("undiredted add_edge");
 		vertex_type* A=&a;
 		vertex_type* B=&b;
@@ -556,6 +556,26 @@ struct reverse_helper : public storage<STARGS> { //
 	template<class E>
 	static void make_symmetric(vertex_container_type& _v, E& e, bool oriented)
 	{
+		incomplete();
+	}
+};
+/*--------------------------------------------------------------------------*/
+template<STPARMS>
+struct reverse_helper<ECT, VCT, VDP,
+//	typename std::enable_if< std::is_unsigned< VDP >::value, ECT<VDP> >::type,
+	typename sfinae::is_seq< ECT<sfinae::any> >::type >
+	: public storage<ECT, VCT, VDP > { //
+
+	typedef typename sfinae::is_seq< ECT<sfinae::any> >::type hmm;
+	typedef typename std::enable_if< std::is_unsigned< VDP >::value, VDP>::type hmm2;
+
+	typedef typename storage<ECT,VCT,VDP>::container_type vertex_container_type;
+	using typename storage<ECT,VCT,VDP>::edge_type;
+	using typename storage<ECT,VCT,VDP>::vertex_type;
+
+	template<class E>
+	static void make_symmetric(vertex_container_type& _v, E& e, bool oriented)
+	{ untested();
 #ifndef NDEBUG
 		auto ebefore=e;
 #endif
@@ -569,21 +589,25 @@ struct reverse_helper : public storage<STARGS> { //
 		}
 		assert(checksum==e);
 		// ssg only. for now.
-		if(oriented){
+		if(oriented){ untested();
 			vertex_type vpos=0;
-			for(unsigned j=0; j<_v.size(); ++j){
-				for(unsigned i=0; i<howmany[j]; ++i ){
-					my_push_back(_v[_v[j][i]],(j));
+			for(unsigned j=0; j<_v.size(); ++j){ untested();
+				auto K = _v[j].begin();
+				for(unsigned i=0; i<howmany[j]; ++i ){ untested();
+					my_push_back(_v[*K],(j));
+					++K;
 					++e;
 				}
 				++vpos;
 			}
-		}else{
+		}else{ untested();
 //		BUG: this is inefficient if
 			vertex_type vpos=0;
 			for(unsigned j=0; j<_v.size(); ++j){
+				auto K = _v[j].begin();
 				for(unsigned i=0; i<howmany[j]; ++i ){
-					e += edge_insert(_v[_v[j][i]], j);
+					e += edge_insert(_v[*K], j);
+					++K;
 				}
 				++vpos;
 			}
@@ -594,13 +618,17 @@ struct reverse_helper : public storage<STARGS> { //
 		trace3("make_symm", oriented, ebefore, e);
 		if(oriented){ untested();
 			assert(ebefore*2==e);
-		}else{
+		}else{ untested();
 		}
 #endif
 	}
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+/// hmm better constexpr flags for
+// - directed
+// - oriented
+// - loopless?
 template< template<class T, typename... > class ECT,
           template<class T, typename... > class VCT, class VDP >
 struct reverse_helper<ECT,VCT,VDP,
@@ -615,8 +643,8 @@ struct reverse_helper<ECT,VCT,VDP,
 	static void make_symmetric(vertex_container_type& _v, E& e, bool /*oriented*/)
 	{ itested();
 		unsigned ii=0;
-		for(auto & i : _v){
-			for(auto & j : i){
+		for(auto & i : _v){ untested();
+			for(auto & j : i){ untested();
 				bool ins=_v[j].insert(ii).second;
 				e+=ins;
 			}
@@ -627,8 +655,8 @@ struct reverse_helper<ECT,VCT,VDP,
 /*--------------------------------------------------------------------------*/
 template<template<class T, typename... > class ECT,
          template<class T, typename... > class VCT >
-struct reverse_helper<ECT, VCT, void*
- , typename sfinae::is_set< ECT<sfinae::any> >::type
+struct reverse_helper<ECT, VCT, void*,
+  typename sfinae::is_set< ECT<sfinae::any> >::type
 >
 	: public storage<ECT, VCT, void* > { //
 		typedef typename sfinae::is_set< ECT<sfinae::any> >::type hmm;
@@ -637,21 +665,38 @@ struct reverse_helper<ECT, VCT, void*
 	using typename storage<ECT,VCT,void*>::vertex_type;
 
 	template<class E>
-	static void make_symmetric(vertex_container_type& /*_v*/, E& , bool /*oriented*/)
-	{ incomplete();
+	static void make_symmetric(vertex_container_type& _v, E& e, bool /*oriented*/)
+	{ untested();
+
+		// concept check?
+		auto B=_v[0];
+		auto I=B.n.begin();
+
+		for(auto & i : _v){ untested();
+			for(auto & j : i.n){ itested();
+				bool ins=j->n.insert(&i).second;
+				e+=ins;
+			}
+		}
 	}
 };
 /*--------------------------------------------------------------------------*/
+// vector outedge set ...?
 template<template<class T, typename... > class ECT,
-         template<class T, typename... > class VCT >
-struct reverse_helper<ECT,VCT,void*> : public storage<ECT, VCT, void* > { //
-	typedef typename storage<ECT,VCT,void*>::container_type vertex_container_type;
-	using typename storage<ECT,VCT,void*>::edge_type;
-	using typename storage<ECT,VCT,void*>::vertex_type;
+         template<class T, typename... > class VCT>
+struct reverse_helper<ECT,VCT,void*,
+  typename sfinae::is_seq< ECT<sfinae::any> >::type
+	> : public storage<ECT, VCT, void* > { //
+	typedef void* VDP;
+	typedef typename storage<ECT,VCT,VDP>::container_type vertex_container_type;
+	using typename storage<ECT,VCT,VDP>::edge_type;
+	using typename storage<ECT,VCT,VDP>::vertex_type;
 
 	template<class E>
 	static void make_symmetric(vertex_container_type& /*_v*/, E& , bool /*oriented*/)
 	{ incomplete();
+//		typename VDP::dbg foo;
+///		typedef typename
 	}
 };
 /*--------------------------------------------------------------------------*/
@@ -854,7 +899,7 @@ public: // range-based loops support aliases
 	typedef std::pair<iterator, out_vertex_iterator> edge_iterator;
 public: // construct
 	graph(const graph& x) : _num_edges(0)
-	{ untested();
+	{
 		assign_same(x); // FIXME op=?
 	}
    template<template<class T, typename... > class ECT2, \

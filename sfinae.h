@@ -33,7 +33,7 @@ namespace sfinae{
 /*--------------------------------------------------------------------------*/
 struct any{int dummy;};
 /*--------------------------------------------------------------------------*/
-template<class A, class B=any, class T=void>
+template<class A, class B=any, class T=void, class...>
 struct is_set{
 	static constexpr bool value = false;
 };
@@ -46,6 +46,11 @@ std::set<any, typename S::key_compare, typename S::allocator_type >, S
 
 	typedef T type;
 	static constexpr bool value = true;
+
+	typedef
+		typename std::enable_if < std::is_same<
+		std::set<any, typename S::key_compare, typename S::allocator_type >, S>::value, any >::type
+		hmm;
 };
 template<class S, class T>
 struct is_set<S, typename std::enable_if < std::is_same<

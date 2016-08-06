@@ -524,7 +524,7 @@ void check(gala::graph<SGARGS> const& g)
 		edges/=2;
 	}
 
-	trace2("check edgecount", edges, boost::num_edges(g));
+	trace3("check edgecount", edges, boost::num_edges(g), g.is_directed() );
 	if (edges > boost::num_edges(g)){untested();
 		assert(false);
 	}else if (edges < boost::num_edges(g)){untested();
