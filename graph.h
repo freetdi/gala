@@ -52,6 +52,8 @@
 namespace gala{ //
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+struct vertex_ptr_tag {}; // not in use yet.
+/*--------------------------------------------------------------------------*/
 #define galaPARMS    template<class T, typename... > class ECT, \
                      template<class T, typename... > class VCT, \
                      class VDP, \
@@ -547,16 +549,50 @@ struct edge_helper<STARGS, boost::mpl::true_>
 	}
 };
 /*--------------------------------------------------------------------------*/
-template<STPARMS, class X=void, class...>
+template<STPARMS, class X=void, class Y=void, class Z=void>
 struct reverse_helper : public storage<STARGS> { //
 	typedef typename storage<STARGS>::container_type vertex_container_type;
 	using typename storage<STARGS>::edge_type;
 	using typename storage<STARGS>::vertex_type;
 
+//	typedef foo incomplete;
+
 	template<class E>
 	static void make_symmetric(vertex_container_type& _v, E& e, bool oriented)
 	{
+		// base case. hmm better don't use yet.
+
 		incomplete();
+	}
+};
+/*--------------------------------------------------------------------------*/
+/// hmm better constexpr flags for
+// - directed
+// - oriented
+// - loopless?
+template< template<class T, typename... > class ECT,
+          template<class T, typename... > class VCT /*, class VDP*/, class VDP>
+struct reverse_helper<ECT, VCT, VDP,
+//	typename std::enable_if< std::is_unsigned< uint16_t >::value, uint16_t >::type,
+	typename sfinae::is_set< ECT<sfinae::any> >::type>
+	: public storage<ECT, VCT,
+	typename std::enable_if< std::is_unsigned< VDP >::value, VDP >::type > { //
+	typedef typename storage<ECT,VCT,VDP>::container_type vertex_container_type;
+	using typename storage<ECT,VCT,VDP>::edge_type;
+	using typename storage<ECT,VCT,VDP>::vertex_type;
+
+	template<class E>
+	static void make_symmetric(vertex_container_type& _v, E& e, bool /*oriented*/)
+	{ itested();
+		unsigned ii=0;
+		for(auto & i : _v){ untested();
+			for(auto & j : i){ untested();
+				bool ins=_v[j].insert(ii).second;
+				trace2("",e,ins);
+				e+=ins;
+			}
+			++ii;
+		}
 	}
 };
 /*--------------------------------------------------------------------------*/
@@ -575,7 +611,7 @@ struct reverse_helper<ECT, VCT, VDP,
 
 	template<class E>
 	static void make_symmetric(vertex_container_type& _v, E& e, bool oriented)
-	{ untested();
+	{
 #ifndef NDEBUG
 		auto ebefore=e;
 #endif
@@ -600,7 +636,7 @@ struct reverse_helper<ECT, VCT, VDP,
 				}
 				++vpos;
 			}
-		}else{ untested();
+		}else{
 //		BUG: this is inefficient if
 			vertex_type vpos=0;
 			for(unsigned j=0; j<_v.size(); ++j){
@@ -618,40 +654,12 @@ struct reverse_helper<ECT, VCT, VDP,
 		trace3("make_symm", oriented, ebefore, e);
 		if(oriented){ untested();
 			assert(ebefore*2==e);
-		}else{ untested();
+		}else{
 		}
 #endif
 	}
 };
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-/// hmm better constexpr flags for
-// - directed
-// - oriented
-// - loopless?
-template< template<class T, typename... > class ECT,
-          template<class T, typename... > class VCT, class VDP >
-struct reverse_helper<ECT,VCT,VDP,
-	typename std::enable_if< std::is_unsigned< VDP >::value, VDP>::type   ,
-	typename sfinae::is_set< ECT<sfinae::any> >::type>
-	: public storage<ECT, VCT, VDP > { //
-	typedef typename storage<ECT,VCT,VDP>::container_type vertex_container_type;
-	using typename storage<ECT,VCT,VDP>::edge_type;
-	using typename storage<ECT,VCT,VDP>::vertex_type;
-
-	template<class E>
-	static void make_symmetric(vertex_container_type& _v, E& e, bool /*oriented*/)
-	{ itested();
-		unsigned ii=0;
-		for(auto & i : _v){ untested();
-			for(auto & j : i){ untested();
-				bool ins=_v[j].insert(ii).second;
-				e+=ins;
-			}
-			++ii;
-		}
-	}
-};
 /*--------------------------------------------------------------------------*/
 template<template<class T, typename... > class ECT,
          template<class T, typename... > class VCT >

@@ -22,6 +22,7 @@
 
 #include <gala/boost.h>
 
+// HACK
 #include <tdlib/degree.hpp>
 #include <tdlib/graph.hpp>
 #include <tdlib/graph_traits.hpp>
@@ -520,7 +521,7 @@ void check(gala::graph<SGARGS> const& g)
 	assert(g.is_directed() || !(edges%2));
 
 	if(g.is_directed()){ untested();
-	}else{ untested();
+	}else{
 		edges/=2;
 	}
 

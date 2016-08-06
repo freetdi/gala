@@ -895,21 +895,8 @@ namespace boost {
 
 	VCTtemplate
 	inline simplegraph_graph_index_map<SGARGS>
-	get(vertex_index_t, gala::graph<SGARGS> & g)
-	{
-		//typedef typename property_map< gala::graph<SGARGS>, vertex_all_t>::type
-	//		pmap_type;
-//		return pmap_type(); // &g); ???
-      return simplegraph_graph_index_map<SGARGS>(g);
-
-	}
-
-	VCTtemplate
-	inline simplegraph_graph_index_map<SGARGS>
 	get(vertex_index_t, const gala::graph<SGARGS> &g)
 	{
-//		typedef typename property_map< ::gala::graph<SGARGS>, vertex_all_t>::const_type
-//			pmap_type;
 //		return pmap_type(&g);
 		return simplegraph_graph_index_map<SGARGS>(g);
 	}
