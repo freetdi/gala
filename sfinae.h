@@ -33,12 +33,12 @@ namespace sfinae{
 /*--------------------------------------------------------------------------*/
 struct any{int dummy;};
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 template<class A, class B=any, class T=void, class...>
 struct is_set{
 	static constexpr bool value = false;
 };
 /*--------------------------------------------------------------------------*/
-
 template<class S, class T>
 struct is_set<S, typename std::enable_if < std::is_same<
 std::set<any, typename S::key_compare, typename S::allocator_type >, S
@@ -61,10 +61,12 @@ stx::btree_set<any, typename S::key_compare, typename S::allocator_type >, S
 	static constexpr bool value = true;
 };
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 template<class A, class B=any, class T=void>
 struct is_seq{
 	static constexpr bool value = false;
 };
+/*--------------------------------------------------------------------------*/
 template<class S, class T>
 struct is_seq<S, typename std::enable_if < std::is_same<
 std::vector<any, typename S::allocator_type >, S
@@ -81,6 +83,33 @@ std::deque<any, typename S::allocator_type >, S
 	typedef T type;
 	static constexpr bool value = true;
 };
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+template<class A, class B=any, class T=void>
+struct is_vec{
+	static constexpr bool value = false;
+};
+/*--------------------------------------------------------------------------*/
+template<class S, class T>
+struct is_vec<S, typename std::enable_if < std::is_same<
+std::vector<any, typename S::allocator_type >, S
+>::value, any >::type , T>{
+
+	typedef T type;
+	static constexpr bool value = true;
+};
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+// uuh, name clash
+// template<template<class T, typename... > class C>
+// struct is_set : is_vec<C<any> > {};
+/*--------------------------------------------------------------------------*/
+template<template<class T, typename... > class C>
+struct is_sequence : is_seq<C<any> > {};
+/*--------------------------------------------------------------------------*/
+template<template<class T, typename... > class C>
+struct is_vector : is_vec<C<any> > {};
+/*--------------------------------------------------------------------------*/
 
 }//sfinae
 } // namespace gala

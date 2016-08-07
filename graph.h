@@ -299,6 +299,26 @@ struct vertex_selector<ECT, void*>{ //
 #define STtemplate template< STPARMS >
 #define STARGS ECT, VCT, VDP
 /*--------------------------------------------------------------------------*/
+// part of storage? not sure yet.
+STtemplate
+struct rewire_helper{ //
+	template<class A, class B>
+	static void rewire_nodes(A& new_vl, B offset)
+	{
+		// specialize... (will be expensive)
+		assert( sfinae::is_vector< VCT >::value );
+		trace1("rewire", offset);
+		for(auto& node : new_vl){
+	//		node.n.insert(NULL); ??
+			auto& N = node.n;
+			for(auto& neigh : N) {
+				*(const_cast<typename A::value_type**>(&neigh)) =
+						(typename A::value_type*) ( uintptr_t(neigh) + uintptr_t(offset));
+			}
+		}
+	}
+};
+/*--------------------------------------------------------------------------*/
 STtemplate
 struct storage_base{ //
 	typedef vertex_selector<ECT,VDP> vs;
@@ -379,19 +399,6 @@ struct storage : storage_base<STARGS>{ //
 }; // storage<VDP>
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-template<class A, class B>
-static void rewire_nodes(A& new_vl, B offset)
-{ untested();
-	for(auto& node : new_vl){ incomplete();
-		node.n.insert(NULL);
-		auto& N = node.n;
-		for(auto& neigh : N) {
-			*(const_cast<typename A::value_type**>(&neigh)) =
-			      (typename A::value_type*) ( uintptr_t(neigh) + uintptr_t(offset));
-		}
-	}
-}
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 template<template<class T, typename... > class ECT,
          template<class T, typename... > class VCT>
@@ -416,9 +423,9 @@ struct storage<ECT, VCT, void*> : public storage_base<ECT, VCT, void*>{ //
 		_v.resize(s+1);
 		vertex_type offset = (vertex_type) (uintptr_t(&*_v.begin()) - uintptr_t(&*old_begin));
 		if(!offset){
-		}else{ incomplete();
-			std::cerr << "hmm " << _v.size() << "\n";
-			rewire_nodes(_v, offset);
+		}else{
+			std::cerr << "add rewire " << _v.size() << "\n";
+			rewire_helper<STARGS>::rewire_nodes(_v, offset);
 		}
 		return &_v.back();
 	}
@@ -585,8 +592,8 @@ struct reverse_helper<ECT, VCT, VDP,
 	static void make_symmetric(vertex_container_type& _v, E& e, bool /*oriented*/)
 	{ itested();
 		unsigned ii=0;
-		for(auto & i : _v){ untested();
-			for(auto & j : i){ untested();
+		for(auto & i : _v){ itested();
+			for(auto & j : i){ itested();
 				bool ins=_v[j].insert(ii).second;
 				trace2("",e,ins);
 				e+=ins;
@@ -627,9 +634,9 @@ struct reverse_helper<ECT, VCT, VDP,
 		// ssg only. for now.
 		if(oriented){ untested();
 			vertex_type vpos=0;
-			for(unsigned j=0; j<_v.size(); ++j){ untested();
+			for(unsigned j=0; j<_v.size(); ++j){ itested();
 				auto K = _v[j].begin();
-				for(unsigned i=0; i<howmany[j]; ++i ){ untested();
+				for(unsigned i=0; i<howmany[j]; ++i ){ itested();
 					my_push_back(_v[*K],(j));
 					++K;
 					++e;
@@ -1278,7 +1285,7 @@ public:
 			*/
 	bool graphviz_parse() const;
 private:
-	void rewire_nodes(vertex_container_type& new_vl, vertex_type offset);
+//	void rewire_nodes(vertex_container_type& new_vl, vertex_type offset);
 public: // BUG: private. use "friend"...
 	vertex_container_type _v;
 	size_t _num_edges;

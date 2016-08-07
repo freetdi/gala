@@ -11,6 +11,8 @@ TESTS = \
 	count_adj \
 	dir \
 	iter \
+	move \
+	rewire \
 	view
 
 LOGS = ${TESTS:%=%.log}

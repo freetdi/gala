@@ -484,7 +484,8 @@ namespace boost { //
          typename graph_traits<gala::graph<SGARGS> >::vertex_descriptor v,
          gala::graph<SGARGS>& g)
 	{
-		assert(v!=u);
+		// if loopless ...
+		assert(v!=u); // for now
 
 		return g.add_edge(u, v);
 //		return std::make_pair(n, /*FIXME*/ true);
