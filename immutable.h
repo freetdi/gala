@@ -601,7 +601,7 @@ inline immvecgraph<G_t> const& immutable_clone(
      M_t* vdMap, /*=NULL*/
      CB_t* cb
      )
-{
+{ untested();
 	typedef typename graph_traits<G_t>::immutable_type IG_t;
 	typedef typename boost::graph_traits<IG_t>::vertex_descriptor vertex_descriptor_ig;
 

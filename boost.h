@@ -331,9 +331,6 @@ namespace boost { //
 				: base(std::make_pair(v,e)), _g(g)
 			{
 				typedef typename ::gala::graph<SGARGS> G;
-				typename gala::graph<SGARGS>::iterator &f = base.first;
-				typename gala::graph<SGARGS>::out_vertex_iterator &s = base.second;
-
 				G& gg = *const_cast<gala::graph<SGARGS>*>(_g); // HACK
 				typename G::vertex_container_type& VC=gg._v;
 
@@ -756,7 +753,7 @@ namespace boost {
 			}
 			simplegraph_graph_index_map& operator=(const simplegraph_graph_index_map& s)
 			{
-				assert(&s._g==&_g);
+				assert(&s._g==&_g); (void)s;
 				return *this;
 			}
 		private:

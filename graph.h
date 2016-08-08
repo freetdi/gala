@@ -565,7 +565,7 @@ struct reverse_helper : public storage<STARGS> { //
 //	typedef foo incomplete;
 
 	template<class E>
-	static void make_symmetric(vertex_container_type& _v, E& e, bool oriented)
+	static void make_symmetric(vertex_container_type& , E& , bool /*oriented*/)
 	{
 		// base case. hmm better don't use yet.
 
@@ -625,7 +625,7 @@ struct reverse_helper<ECT, VCT, VDP,
 
 		std::vector<vertex_type> howmany(_v.size());
 		vertex_type i=0;
-		auto checksum=0;
+		unsigned checksum=0;
 		for(auto& vertex : _v){
 			howmany[i++] = vertex.size();
 			checksum+= vertex.size();
@@ -1508,7 +1508,7 @@ void copy_helper<oG, G, X, Y>::assign(oG const& src, G& tgt)
 	size_t ne = g.num_edges();
 	trace4("assign_",nv, ne, tgt.num_vertices(), tgt.num_edges());
 	assert(!tgt.is_directed() || g.is_directed()); // use other helper
-	auto psize=tgt._v.size();
+//	auto psize=tgt._v.size();
 	tgt._v.resize(nv);
 
 	// BUG. inefficient.

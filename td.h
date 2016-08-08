@@ -495,6 +495,8 @@ VCTtemplate
 void check(gala::graph<SGARGS> const& g)
 {itested();
 	typedef gala::graph<SGARGS> G;
+	typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
+	using adjacency_iterator = typename boost::graph_traits<G>::adjacency_iterator;
 
 	unsigned edges=0;
 	auto i = boost::vertices(g).first;
@@ -532,22 +534,29 @@ void check(gala::graph<SGARGS> const& g)
 		assert(false);
 	}
 
-	using adjacency_iterator = typename boost::graph_traits<G>::adjacency_iterator;
 	adjacency_iterator aI, aE;
 
+	std::set<vertex_descriptor> X;
 	for(boost::tie(i,e) = boost::vertices(g); i!=e; ++i){ itested();
+		X.clear();
 		for(boost::tie(aI,aE) = boost::adjacent_vertices(*i,g); aI!=aE; ++aI){ itested();
 			assert(*aI!=*i);
+			X.insert(*aI);
 
-			// incomplete. undirected!
-#ifdef DEBUG // not working with vectors. just skip
-			assert(boost::edge(*aI,*i,g).second);
+#ifdef DEBUG
 			assert(boost::edge(*i,*aI,g).second);
+			if(g.is_directed()){
+				assert(boost::edge(*aI,*i,g).second);
+			}
 #endif
 		}
+		// if !multiedge
+		assert(X.size() == boost::out_degree(*i, g));
 #ifdef DEBUG
-		for(boost::tie(I,E) = boost::vertices(g); I!=E; ++I){ itested();
-			assert(boost::edge(*I,*i,g).second == boost::edge(*i,*I,g).second);
+		if(g.is_directed()){
+			for(boost::tie(I,E) = boost::vertices(g); I!=E; ++I){ itested();
+				assert(boost::edge(*I,*i,g).second == boost::edge(*i,*I,g).second);
+			}
 		}
 #endif
 	}
