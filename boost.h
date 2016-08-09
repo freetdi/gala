@@ -154,6 +154,20 @@ namespace boost { //
 		}
 	}; // edge_helper
 #endif
+	namespace util{
+		template<class C>
+		bool is_in_edgeset(C const& c, typename C::value_type v)
+		{ untested();
+			return std::find(c.begin(), c.end(), v)!=c.end();
+		}
+
+		// incomplete: other sets? use sfinae.h...
+		template<class E>
+		bool is_in_edgeset(std::set<E> const& c, E v)
+		{ untested();
+			return c.find(v)!=c.end();
+		}
+	}
 	namespace detail{
 	template<bool X>
 	struct galaboost_dir
@@ -566,8 +580,7 @@ namespace boost { //
 			is_edge = (i!=g.out_edges(v).end());
 		}
 #else
-		auto i = g.out_edges(u).find(v);
-		is_edge = (i!=g.out_edges(u).end());
+		is_edge = util::is_in_edgeset(g.out_edges(u),v);
 #endif
 
 

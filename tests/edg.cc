@@ -12,7 +12,6 @@
 template<class G>
 struct dvv_config : public gala::graph_cfg_default<G>
 {
-//	typedef gala::default_DEGS<G> degs_type;
 	static constexpr bool is_directed=true;
 };
 
@@ -27,48 +26,40 @@ typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> balu
 
 // typedef bald_t parsegr_t;
 
-template<class T>
-void countcheck(size_t size)
+int main(int , char**)
 {
+	using namespace boost;
+	sg_dvv G(5);
 
-	size_t ne=size*size/4;
+	add_edge(0, 1, G);
+	add_edge(1, 0, G);
+	add_edge(1, 2, G);
+	add_edge(2, 0, G);
 
-	boost::mt19937 rng;
-	T g(size);
-	g.reshape(0);
-	boost::generate_random_graph(g, size, ne, rng);
-	size_t e=boost::num_edges(g);
-	size_t n=boost::num_vertices(g);
-	std::cout << "generated " << e << " edges, " << n << " vertices\n";
-	//g.make_symmetric(false);
-	e = boost::num_edges(g);
-
-	e=boost::num_edges(g);
-
-
+	auto E=boost::edges(G);
 
 	unsigned i=0;
-	auto E=boost::edges(g);
-	for(;E.first!=E.second; ++E.first){
-
-		if(i++<10){
-		std::cout << boost::source(*E.first, g) << " -- " <<
-			          boost::target(*E.first, g) << "\n";
-		}
-
+	for(;E.first!=E.second;++E.first){
+		++i;
+		std::cout << boost::source(*E.first,G) << "\n";
 	}
-	std::cout << "found " << i << " edges\n";
 
-	assert(i==e);
+	assert(i==4);
+
+	assert(edge(0,1,G).second);
+	assert(edge(1,0,G).second);
+	assert(edge(1,2,G).second);
+	assert(edge(2,0,G).second);
+	assert(!edge(2,1,G).second);
+	assert(!edge(0,2,G).second);
+
+	assert(!edge(0,3,G).second);
+	assert(!edge(1,3,G).second);
+	assert(!edge(2,3,G).second);
+	assert(!edge(3,0,G).second);
+	assert(!edge(3,1,G).second);
+	assert(!edge(3,2,G).second);
+
 
 }
 
-
-int main(int argc, char** argv)
-{
-	size_t size=16;
-	if(argc>1) size=1<<atoi(argv[1]);
-
-	countcheck<sg_dvv>(size);
-	countcheck<sg_dvu>(size);
-}

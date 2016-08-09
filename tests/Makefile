@@ -10,6 +10,7 @@ TESTS = \
 	count \
 	count_adj \
 	dir \
+	edg \
 	iter \
 	move \
 	rewire \
