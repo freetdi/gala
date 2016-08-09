@@ -13,7 +13,7 @@ template<class G>
 struct dvv_config : public gala::graph_cfg_default<G>
 {
 //	typedef gala::default_DEGS<G> degs_type;
-	typedef boost::mpl::true_ is_directed_t;
+	static constexpr bool is_directed=true;
 };
 
 typedef uint16_t unsignedType;

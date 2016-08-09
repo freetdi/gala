@@ -17,6 +17,8 @@ TESTS = \
 
 LOGS = ${TESTS:%=%.log}
 
+CLEANFILES = ${TESTS} ${LOGS}
+
 all: $(LOGS)
 
 TESTS: gala
@@ -30,4 +32,7 @@ gala:
 
 $(LOGS): .P
 
-.PHONY: .P
+clean:
+	rm -f $(CLEANFILES)
+
+.PHONY: .P clean

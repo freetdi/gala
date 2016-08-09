@@ -154,9 +154,22 @@ namespace boost { //
 		}
 	}; // edge_helper
 #endif
+	namespace detail{
+	template<bool X>
+	struct galaboost_dir
+	{
+		typedef undirected_tag type;
+	};
+	template<>
+	struct galaboost_dir<true>
+	{
+		typedef directed_tag type;
+	};
+	}
 
 	VCTtemplate
 	struct graph_traits<gala::graph<SGARGS> > { //
+		using G=gala::graph<SGARGS>;
 		typedef typename myVDP<VDP>::type vertices_size_type;
 		typedef size_t edges_size_type; // FIXME: use v^2
 		typedef typename myVDP<VDP>::type degree_size_type;
@@ -164,7 +177,7 @@ namespace boost { //
 		typedef typename gala::graph<SGARGS>::vertex_type vertex_descriptor;
 		typedef typename gala::graph<SGARGS>::edge_type edge_descriptor;
 
-		typedef undirected_tag directed_category;
+		typedef typename detail::galaboost_dir<G::is_directed()>::type directed_category;
 		typedef simplegraph_traversal_category traversal_category;
 		typedef disallow_parallel_edge_tag edge_parallel_category;
 

@@ -12,9 +12,7 @@
 template<class G>
 struct dir_conf : public gala::graph_cfg_default<G>
 {
-//	typedef gala::default_DEGS<G> degs_type;
-	typedef boost::mpl::true_ is_directed_t;
-//	static constexpr bool is_directed=true;
+	static constexpr bool is_directed=true;
 };
 
 typedef uint32_t unsignedType;

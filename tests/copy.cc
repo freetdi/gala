@@ -8,7 +8,7 @@
 template<class G>
 struct dvv_config : public gala::graph_cfg_default<G>
 {
-	 typedef boost::mpl::true_ is_directed_t;
+	static constexpr bool is_directed=true;
 };
 
 typedef gala::graph<std::vector, std::vector, uint16_t, dvv_config> sg_dvv16;

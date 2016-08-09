@@ -39,7 +39,7 @@
 
 #define q_in_cb
 
-#if 1
+#if 0 // now in tdlib/graph_traits.hpp
 // HACK HACK HACK
 #ifndef TD_DEFS_NETWORK_FLOW
 #define TD_DEFS_NETWORK_FLOW

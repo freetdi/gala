@@ -30,7 +30,6 @@
 		
 
 #include <boost/iterator/counting_iterator.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/tuple/tuple.hpp>
 
 
@@ -177,7 +176,7 @@ struct vertex_helper<void*>{ //
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-template<class c_iter_tag, class VDP, class directed_t>
+template<class c_iter_tag, class VDP, bool is_directed>
 struct iter_helper{ //
 
 	template<class iter, class VL>
@@ -209,7 +208,7 @@ inline size_t target(std::pair<size_t, size_t> const& p){
 }
 /*--------------------------------------------------------------------------*/
 template<class c_iter_tag, class VDP>
-struct iter_helper<c_iter_tag, VDP, boost::mpl::true_> { //
+struct iter_helper<c_iter_tag, VDP, true> { //
 
 	template<class iter, class VL>
 	static size_t fill_pos(iter first, iter last, VL& _v, bool dir=false)
@@ -231,8 +230,8 @@ struct iter_helper<c_iter_tag, VDP, boost::mpl::true_> { //
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-template<class VDP, class directed_tag>
-struct iter_helper<std::bidirectional_iterator_tag, VDP, directed_tag>{ //
+template<class VDP, bool is_directed>
+struct iter_helper<std::bidirectional_iterator_tag, VDP, is_directed>{ //
 
 template<class iter, class VL>
 static size_t fill_pos(iter first, iter last, size_t nv, VL& _v, bool dir)
@@ -487,7 +486,7 @@ public:
 }; //storage<void*>
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-template< STPARMS, class directed_tag >
+template< STPARMS, bool is_directed >
 struct edge_helper : public storage<STARGS> { //
 	// undirected implementation.
 	using typename storage<STARGS>::edge_type;
@@ -530,7 +529,7 @@ struct edge_helper : public storage<STARGS> { //
 };
 /*--------------------------------------------------------------------------*/
 template<STPARMS>
-struct edge_helper<STARGS, boost::mpl::true_>
+struct edge_helper<STARGS, true>
 	// directed implementation.
     : public storage<STARGS>{ //
 	typedef typename storage<STARGS>::container_type vertex_container_type;
@@ -827,7 +826,8 @@ namespace detail{
 template<class CFG, class X=void>
 struct is_directed_select
 {
-	typedef boost::mpl::false_ value;
+	typedef boost::mpl::false_ type; // uuh, obsolete?
+	static constexpr bool value=false;
 	operator bool() const {return false;}
 };
 
@@ -835,18 +835,25 @@ template<class CFG>
 struct is_directed_select<CFG,
 	typename tovoid < typename std::enable_if< CFG::is_directed >::type >::type >
 {
-	typedef boost::mpl::true_ value;
-	typedef typename std::enable_if< CFG::is_directed >::type type;
+//	typedef boost::mpl::true_ type;
+	static constexpr bool value=CFG::is_directed;
+// 	typedef typename std::enable_if< CFG::is_directed >::type type;
 };
-// old approach. will go.
+#if 0
+// old approach. will go, does no longer work!
 template<class CFG>
 struct is_directed_select<CFG, typename tovoid<typename CFG::is_directed_t>::type >
 {
-	typedef typename CFG::is_directed_t value;
-	operator bool() const {return value::value;}
+	typedef typename CFG::is_directed_t type;
+
+	static constexpr bool value=type();
+	operator bool() const {
+		unreachable();
+		return type();}
 };
+#endif
 /*--------------------------------------------------------------------------*/
-template<class Gsrc, class Gtgt, class srcDir, class tgtDir>
+template<class Gsrc, class Gtgt, bool srcDir, bool tgtDir>
 struct copy_helper{
 	static void assign(Gsrc const&, Gtgt&);
 };
@@ -870,10 +877,12 @@ public: // types
 	using vs = bits::vertex_selector<ECT,VDP>;
 
 	typedef CFG<this_type> myCFG;
-	typedef typename detail::is_directed_select<myCFG>::value is_directed_t;
-	static constexpr bool is_directed()
+//	typedef typename detail::is_directed_select<myCFG>::type is_directed_t;
+//	typedef typename detail::is_directed_select<myCFG>::value is_directed;
+	static constexpr bool is_directed_v=detail::is_directed_select<myCFG>::value;
+	static constexpr bool is_directed() // humm
 	{
-		return is_directed_t();
+		return is_directed_v;
 	}
 	static constexpr bool is_ordered()
 	{
@@ -890,7 +899,7 @@ public: // types
 	typedef typename vs::vertex_index_type vertex_index_type;
 // private: hmm not yet.
 	typedef typename bits::storage<STARGS> storage;
-	typedef typename bits::edge_helper<STARGS, is_directed_t> edge_helper;
+	typedef typename bits::edge_helper<STARGS, is_directed_v> edge_helper;
 	typedef typename bits::reverse_helper<STARGS> reverse_helper;
 	typedef typename bits::iter<STARGS> iter;
 	typedef edgecontainer<vertex_type> EL;
@@ -926,7 +935,7 @@ public: // construct
 	{
 
 		detail::copy_helper<graph<ECT2,VCT2,VDP2,CFG2>, graph,
-			typename graph<ECT2,VCT2,VDP2,CFG2>::is_directed_t, is_directed_t
+			  graph<ECT2,VCT2,VDP2,CFG2>::is_directed_v, is_directed_v
 			>::assign(x, *this);
 		assert(num_vertices()==x.num_vertices());
 
@@ -1291,10 +1300,13 @@ public: // BUG: private. use "friend"...
 	size_t _num_edges;
 
 public: // experimental...?
+	// does this have to be public?!
 	template<class GG>
-	struct directed_config : public CFG<GG> { //
+	struct my_directed_config : public CFG<GG> { //
 		// hmm, this must proxy all supported types
-		typedef boost::mpl::true_ is_directed_t;
+//		typedef boost::mpl::true_ is_directed_t;
+		static constexpr bool is_directed=true;
+
 		typedef graph base_type;
 //		typedef typename GG::edges_size_type edges_size_type;
 		typedef size_t edges_size_type;
@@ -1304,17 +1316,30 @@ public: // experimental...?
 			return 2*reinterpret_cast<base_type const&>(g).num_edges();
 		}
 	};
-	typedef graph<ECT,VCT,VDP,directed_config> directed_type;
+	template<template<class G> class new_config>
+	struct reconfig{
+		typedef graph<ECT, VCT, VDP, new_config> type;
+	};
 
-	directed_type const& directed_view() const
+	template<class self, bool dir>
+	struct directed_self{
+		typedef typename reconfig<my_directed_config>::type type;
+	};
+	template<class self>
+	struct directed_self<self, true>{
+		typedef self type;
+	};
+	typedef typename directed_self<this_type, is_directed_v>::type directed_self_type;
+
+	directed_self_type const& directed_view() const
 	{
-		return reinterpret_cast<directed_type const&>(*this);
+		return reinterpret_cast<directed_self_type const&>(*this);
 	}
 	// more dangerous...
 	// private & friends?
-	directed_type& directed_view()
+	directed_self_type& directed_view()
 	{
-		return reinterpret_cast<directed_type&>(*this);
+		return reinterpret_cast<directed_self_type&>(*this);
 	}
 }; // class graph
 /*--------------------------------------------------------------------------*/
@@ -1346,7 +1371,7 @@ void graph<SGARGS>::fill_in_edges(EI1 first, EI2 last, bool possible_duplicates)
 	}else{
 		typedef typename iter::vertex_iterator::iterator_category iterator_category;
 		trace1("calling fillpos", is_directed());
-		_num_edges = bits::iter_helper<iterator_category, VDP, is_directed_t >::
+		_num_edges = bits::iter_helper<iterator_category, VDP, is_directed_v >::
 			fill_pos(first, last, _v, is_directed() );
 		trace1("fillpos done", _num_edges);
 	}
@@ -1424,7 +1449,7 @@ graph<SGARGS>& graph<SGARGS>::operator=(graph<ECT2,VCT2,VDP2,CFG2> const& x)
 
 	// assign_(x);
 	detail::copy_helper<graph<ECT2,VCT2,VDP2,CFG2>, graph,
-		typename graph<ECT2,VCT2,VDP2,CFG2>::is_directed_t, is_directed_t>::assign(x, *this);
+		 graph<ECT2,VCT2,VDP2,CFG2>::is_directed_v, is_directed_v>::assign(x, *this);
 	return *this;
 }
 /*--------------------------------------------------------------------------*/
@@ -1447,7 +1472,7 @@ graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
 	if (intptr_t(&x) == intptr_t(this)) {
 	}else if (num_vertices()==0){ itested();
 //		assign_(x);
-		detail::copy_helper<graph, graph, is_directed_t, is_directed_t>::assign(x, *this);
+		detail::copy_helper<graph, graph, is_directed_v, is_directed_v>::assign(x, *this);
 	}else if (num_vertices()!=x.num_vertices()){ incomplete();
 	// }else if( .. incomplete){
 	}else{
@@ -1499,7 +1524,7 @@ graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
 /*--------------------------------------------------------------------------*/
 namespace detail{
 /*--------------------------------------------------------------------------*/
-template<class oG, class G, class X, class Y>
+template<class oG, class G, bool X, bool Y>
 void copy_helper<oG, G, X, Y>::assign(oG const& src, G& tgt)
 {
 	auto& g=src;
@@ -1609,7 +1634,7 @@ struct copy_helper<Gsrc, Gtgt,  boost::mpl::true_,  boost::mpl::false_ >
 }; // copy_helper
 #endif
 template<class Gsrc, class Gtgt>
-struct copy_helper<Gsrc, Gtgt, boost::mpl::false_, boost::mpl::true_ >
+struct copy_helper<Gsrc, Gtgt, false, true >
 {
 	static void assign(Gsrc const& src, Gtgt& tgt)
 	{
@@ -1628,7 +1653,7 @@ struct copy_helper<Gsrc, Gtgt, boost::mpl::false_, boost::mpl::true_ >
 }; // copy_helper
 
 template<class Gsrc, class Gtgt>
-struct copy_helper<Gsrc, Gtgt, boost::mpl::true_, boost::mpl::false_ >
+struct copy_helper<Gsrc, Gtgt, true, false >
 {
 	static void assign(Gsrc const& src, Gtgt& tgt)
 	{
