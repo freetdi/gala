@@ -25,6 +25,7 @@
 #define unlikely(x)     __builtin_expect((x),0)
 #include <stx/btree_set.h>
 #include <set>
+#include <unordered_set>
 #include <assert.h>
 
 template <class S>

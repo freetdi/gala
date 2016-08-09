@@ -31,6 +31,7 @@
 #include <boost/graph/iteration_macros.hpp>
 //hack
 #include <stx/btree_set.h>
+#include <unordered_set>
 
 #include "sethack.h"
 //#include "parallel.h"
@@ -522,7 +523,7 @@ void check(gala::graph<SGARGS> const& g)
 	}
 	assert(g.is_directed() || !(edges%2));
 
-	if(g.is_directed()){ untested();
+	if(g.is_directed()){
 	}else{
 		edges/=2;
 	}

@@ -1456,7 +1456,7 @@ graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
 		const_iterator b = begin();
 		other_const_iterator s = x.begin();
 		intptr_t delta = intptr_t(&*b) - intptr_t(&*s);
-		trace1("op=", delta);
+//		trace1("op=", delta);
 		iterator v = begin();
 		iterator e = end();
 		_num_edges = x._num_edges;
