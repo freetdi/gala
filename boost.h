@@ -61,7 +61,7 @@ namespace boost { //
 			}else if( !is_ordered ){
 			}else if(*s > iter::deref(f)){
 				increment_edge(base, vc);
-			}else{untested();
+			}else{
 			}
 		}
 
@@ -96,7 +96,7 @@ namespace boost { //
 					continue;
 				}else if(s!=storage::out_edges(*f, vc).end()){
 					break;
-				}else{ untested();
+				}else{
 					// next row.
 					++f;
 					e = storage::out_edges(*f, vc).end();
@@ -114,7 +114,7 @@ namespace boost { //
 
 		template<class B, class VC>
 		static void increment_edge(B& base, VC& vc)
-		{ untested();
+		{
 			auto &f=base.first;
 			auto &s=base.second;
 			auto e = storage::out_edges(*f, vc).end();
@@ -125,12 +125,12 @@ namespace boost { //
 
 			auto vend=iter::vend(vc);
 
-			while(true){ untested();
-				if(f==vend){ untested();
+			while(true){
+				if(f==vend){
 					break;
-				}else if(s==storage::out_edges(*f, vc).end()) { untested();
+				}else if(s==storage::out_edges(*f, vc).end()) {
 					++f;
-					if(f==vend){ untested();
+					if(f==vend){
 						break;
 					}
 					e = storage::out_edges(*f, vc).end();
@@ -144,7 +144,7 @@ namespace boost { //
 					s = storage::out_edges(*f, vc).begin();
 				}else if(s!=storage::out_edges(*f, vc).end()){
 					break;
-				}else{ untested();
+				}else{
 					// next row.
 					++f;
 					e = storage::out_edges(*f, vc).end();
@@ -157,14 +157,14 @@ namespace boost { //
 	namespace util{
 		template<class C>
 		bool is_in_edgeset(C const& c, typename C::value_type v)
-		{ untested();
+		{
 			return std::find(c.begin(), c.end(), v)!=c.end();
 		}
 
 		// incomplete: other sets? use sfinae.h...
 		template<class E>
 		bool is_in_edgeset(std::set<E> const& c, E v)
-		{ untested();
+		{
 			return c.find(v)!=c.end();
 		}
 	}
@@ -230,7 +230,7 @@ namespace boost { //
 
 #if 0 // ?!
 				vertex_iterator&& operator+(size_t n)
-				{ untested();
+				{
 					vertex_iterator a=*this;
 					a.advance(n);
 					return std::move(a);
@@ -247,7 +247,7 @@ namespace boost { //
 		private:
 			// reference
 			reference dereference()
-			{ untested();
+			{
 				return &*base;
 			}
 			const reference dereference() const
@@ -324,7 +324,7 @@ namespace boost { //
 				++_base;
 			}
 			void decrement()
-			{ untested();
+			{
 				--_base;
 			}
 		public: // bug? use friends...
@@ -394,8 +394,8 @@ namespace boost { //
 					(base, VC);
 			}
 
-			void decrement() { untested();
-				if(base.second == base.first.begin()) {untested();
+			void decrement() {
+				if(base.second == base.first.begin()) {
 					--(base.first);
 					incomplete();
 					base.second = base.first.begin();
@@ -434,7 +434,7 @@ namespace boost { //
 			out_edge_iterator(
 			    typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor v,
 			    typename gala::graph<SGARGS>::out_vertex_iterator w)
-			{ itested();
+			{
 				base.first = v;
 				base.second = w;
 			}
@@ -448,11 +448,11 @@ namespace boost { //
 				return base.second == other.base.second;
 			}
 			void increment()
-			{ itested();
+			{
 				++(base.second);
 			}
 			void decrement()
-			{ untested();
+			{
 				--(base.second);
 			}
 //			bool operator==(const out_edge_iterator& other) const
@@ -520,7 +520,7 @@ namespace boost { //
     typename graph_traits<gala::graph<SGARGS> >::vertex_descriptor u,
     typename graph_traits<gala::graph<SGARGS> >::vertex_descriptor v,
     gala::graph<SGARGS>& g)
-	{ untested();
+	{
 		g.remove_edge(u, v);
 	}
 
@@ -534,14 +534,14 @@ namespace boost { //
 	VCTtemplate
 	void clear_vertex(typename graph_traits<::gala::graph<SGARGS>
 			>::vertex_descriptor u, ::gala::graph<SGARGS> &g)
-	{ itested();
+	{
 		g.clear_vertex(u);
 	}
 
 	VCTtemplate
 	void remove_vertex(typename graph_traits< ::gala::graph<SGARGS>
 			>::vertex_descriptor u, ::gala::graph<SGARGS> &g)
-	{ untested();
+	{
 		g.remove_vertex(u);
 	}
 
@@ -571,7 +571,7 @@ namespace boost { //
 
 		bool is_edge;
 #if 0
-		if(g.degree(u)<g.degree(v)){ itested();
+		if(g.degree(u)<g.degree(v)){
 		//	std::swap(u,v); // does it really help?
 			auto i = g.out_edges(u).find(v);
 			is_edge = (i!=g.out_edges(u).end());
@@ -580,7 +580,6 @@ namespace boost { //
 			is_edge = (i!=g.out_edges(v).end());
 		}
 #else
-		is_edge = util::is_in_edgeset(g.out_edges(u),v);
 #endif
 
 
@@ -602,7 +601,7 @@ namespace boost { //
 	typename graph_traits<::gala::graph<SGARGS> >::degree_size_type
 	out_degree(typename graph_traits< ::gala::graph<SGARGS> >::vertex_descriptor u,
 			const ::gala::graph<SGARGS>&g)
-	{ itested();
+	{
 	   return g.degree(u);
 	}
 
@@ -610,7 +609,7 @@ namespace boost { //
 	typename graph_traits<::gala::graph<SGARGS> >::degree_size_type
 	degree(typename graph_traits< ::gala::graph<SGARGS> >::vertex_descriptor u,
 			const ::gala::graph<SGARGS>&g)
-	{ itested();
+	{
 		return boost::out_degree(u,g);
 	}
 
@@ -653,7 +652,7 @@ namespace boost { //
 			vertex_type U=G::iter::deref(u);
 			if(!gg->out_edges(U).empty()){
 				break;
-			}else if(u==e){ untested();
+			}else if(u==e){
 				break;
 			}
 			++u;
@@ -661,7 +660,7 @@ namespace boost { //
 		auto deref=G::iter::deref(u);
 
 		if(u!=e){
-		}else{untested();
+		}else{
 			// mpty
 			ovi E;
 			return std::make_pair(Iter(e, E, &g),
@@ -679,7 +678,7 @@ namespace boost { //
 	inline std::pair<typename graph_traits<gala::graph<SGARGS> >::vertex_iterator,
 	                 typename graph_traits<gala::graph<SGARGS> >::vertex_iterator>
 	             vertices(gala::graph<SGARGS> const& g)
-	{ itested();
+	{
 		typedef typename graph_traits<gala::graph<SGARGS> >::vertex_iterator Iter;
 		::gala::graph<SGARGS>* G = const_cast<::gala::graph<SGARGS>*>(&g); // HACK
 		return std::make_pair( Iter(G->begin()), Iter(G->end()));
@@ -701,7 +700,7 @@ namespace boost { //
 	class VDP2,
 	template<class G> class CFG2>
    inline void copy_graph(const gala::graph<SGARGS>& g, gala::graph<ECT2, VCT2, VDP2, CFG2>& h)
-	{ itested();
+	{
 		h = g;
 	}
 
@@ -717,7 +716,7 @@ namespace boost {
    template<class G, galaPARMS>
 	inline void copy_graph(const G& g, gala::graph<SGARGS>& h,
 			typename boost::graph_traits<G>::vertex_descriptor=boost::graph_traits<G>::null_vertex() )
-	{ itested();
+	{
 		detail::copy_helper<G, SGARGS>::boost_to_gala(g, h);
 	}
 
@@ -773,7 +772,7 @@ namespace boost {
 			}
 			template <class T>
 			key_type operator[](T x) const
-			{ itested();
+			{
 //				assert(x == _g.position(x));
 				return _g.position(x);
 			}
@@ -938,7 +937,7 @@ namespace boost {
 						  typename boost::graph_traits< gala::graph<SGARGS> >::out_edge_iterator >
 						out_edges(typename boost::graph_traits< gala::graph<SGARGS> >::vertex_descriptor v,
 								gala::graph<SGARGS> const& g)
-	{ itested();
+	{
 		typedef typename boost::graph_traits<gala::graph<SGARGS> >::out_edge_iterator Iter;
 		::gala::graph<SGARGS>* G = const_cast<::gala::graph<SGARGS>*>(&g); // HACK
 		return std::make_pair(Iter(v, G->out_edges(v).begin()), Iter(v, G->out_edges(v).end()));
@@ -959,7 +958,7 @@ namespace boost {
 // should be obsolete with boost::copy_graph
 VCTtemplate template<class H>
 void gala::graph<SGARGS>::assign(H const& g)
-{ untested();
+{
 //	size_t nv = boost::graph_traits<H>::num_vertices(g);
 	typedef gala::graph<SGARGS> G;
 	size_t nv = boost::num_vertices(g);
@@ -969,7 +968,7 @@ void gala::graph<SGARGS>::assign(H const& g)
 	size_t L = std::numeric_limits<st>::max();
 	assert(boost::num_vertices(g) <= L); (void) L;
 
-	if(_v.size()){ untested();
+	if(_v.size()){
 		_v.resize(0);
 	}else{
 	}
@@ -1010,7 +1009,7 @@ void gala::graph<SGARGS>::assign(H const& g)
 	}
 	if(_num_edges == 2*ne){
 		_num_edges = ne; // ??1
-	}else if(_num_edges < ne){ untested();
+	}else if(_num_edges < ne){
 //		possibly assigning directed graph.
 //		getting fewer edges
 		assert(_num_edges<ne);

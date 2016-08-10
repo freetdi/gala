@@ -594,7 +594,7 @@ struct reverse_helper<ECT, VCT, VDP,
 		for(auto & i : _v){ itested();
 			for(auto & j : i){ itested();
 				bool ins=_v[j].insert(ii).second;
-				trace2("",e,ins);
+//				trace2("",e,ins);
 				e+=ins;
 			}
 			++ii;
@@ -631,7 +631,7 @@ struct reverse_helper<ECT, VCT, VDP,
 		}
 		assert(checksum==e);
 		// ssg only. for now.
-		if(oriented){ untested();
+		if(oriented){
 			vertex_type vpos=0;
 			for(unsigned j=0; j<_v.size(); ++j){ itested();
 				auto K = _v[j].begin();
@@ -1382,7 +1382,7 @@ template <class EdgeIterator>
 graph<SGARGS>::graph(EdgeIterator first, EdgeIterator last,
                      vertices_size_type nv, edges_size_type ne)
     : graph(nv, ne)
-{ untested();
+{
 	_num_edges=0;
 	fill_in_edges(first, last, false);
 	assert(!ne || ne==_num_edges); // unique edges? for now.
@@ -1559,15 +1559,18 @@ void copy_helper<oG, G, X, Y>::assign(oG const& src, G& tgt)
 	assert(i==nv);
 
 	oG* GG = const_cast<oG*>(&g);
-	i = 0;
+	i=0;
 	// FIXME: use const_iter
-	for(typename oG::iterator v=GG->begin(); v!=GG->end(); ++v){ itested();
+	for(typename oG::iterator v=GG->cbegin(); v!=GG->cend(); ++v){ itested();
 		reverse_map[oG::iter::deref(v)] = i;
 		++i;
 	}
 
 	assert(tgt._num_edges == 0);
-	assert(i==nv);
+	if(i!=nv){
+		std::cerr << i << " " << nv << "\n";
+		assert(false);
+	}
 
 	assert(tgt._num_edges == 0);
 	auto num_og_edges=0;
