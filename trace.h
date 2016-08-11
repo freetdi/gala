@@ -78,6 +78,7 @@ class hp{
 #undef trace3
 #undef trace4
 #undef trace5
+#undef trace6
 
 #ifdef DO_TRACE
 #define trace0(s) ( std::cerr << "@#@" << (s) << "\n")
@@ -106,6 +107,14 @@ class hp{
 		     << "  " << #w << "=" << (w)  \
 		     << "  " << #u << "=" << (u)  \
 		     << std::endl )
+#define trace6(s,x,y,z,w,u,t) ( \
+		std::cerr <<  "@#@" << (s) << "  " << #x << "=" << (x)  \
+		     << "  " << #y << "=" << (y)  \
+		     << "  " << #z << "=" << (z)  \
+		     << "  " << #w << "=" << (w)  \
+		     << "  " << #u << "=" << (u)  \
+		     << "  " << #t << "=" << (t)  \
+		     << std::endl )
 #else
 #define trace0(s) (USE(s))
 #define trace1(s,x) (USE(s),USE(x))
@@ -113,6 +122,7 @@ class hp{
 #define trace3(s,x,y,z) USE(s);USE(x);USE(y);USE(z)
 #define trace4(s,x,y,z,w) USE(s);USE(x);USE(y);USE(z);USE(w)
 #define trace5(s,x,y,z,w,u) USE(s);USE(x);USE(y);USE(z);USE(w);USE(u)
+#define trace6(s,x,y,z,w,u,t) USE(s);USE(x);USE(y);USE(z);USE(w);USE(u);USE(t)
 #endif
 
 #ifndef TRACE_H

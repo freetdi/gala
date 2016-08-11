@@ -41,15 +41,16 @@ int main(int , char* [])
 	add_edge(1, 0, G2);
 	add_edge(1, 2, G2);
 	add_edge(2, 0, G2);
+	add_edge(4, 0, G2);
 	assert(boost::num_vertices(G2)==5);
-	assert(boost::num_edges(G2)==4);
+	assert(boost::num_edges(G2)==5);
 
 	sg_dvv16 G2b;
 	assert(G2.is_directed());
 
 	sg_dvu G3(G2);
 	assert(!G3.is_directed());
-	assert(boost::num_edges(G3)==3);
+	assert(boost::num_edges(G3)==4);
 	assert(boost::num_vertices(G3)==5);
 
 	boost::copy_graph(G, G2);
@@ -59,17 +60,19 @@ int main(int , char* [])
 //	boost::copy_graph(std::move(G2), G2b); // does not "work"
 //
 //
-	assert(boost::num_edges(G3)==3);
-	boost::copy_graph(G3, G2);
+	assert(boost::num_edges(G3)==4);
+	{untested();
+		boost::copy_graph(G3, G2);
 
-	assert(boost::num_vertices(G3)==boost::num_vertices(G2));
-	assert(boost::num_edges(G3)*2==boost::num_edges(G2));
+		assert(boost::num_vertices(G3)==boost::num_vertices(G2));
+		assert(boost::num_edges(G3)*2==boost::num_edges(G2));
 
-	assert(boost::num_edges(G3)==3);
-	assert(boost::num_vertices(G3)==5);
-	boost::copy_graph(G3,G2);
-	assert(boost::num_edges(G2)==6);
-	assert(boost::num_vertices(G3)==boost::num_vertices(G2));
-
+		assert(boost::num_vertices(G3)==5);
+	}
+	{untested();
+		boost::copy_graph(G3,G2);
+		assert(boost::num_edges(G2)==8);
+		assert(boost::num_vertices(G3)==boost::num_vertices(G2));
+	}
 }
 

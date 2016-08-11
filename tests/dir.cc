@@ -8,16 +8,9 @@
 template<class G>
 struct dvv_config : public gala::graph_cfg_default<G>
 {
-	static constexpr bool is_directed = true;
+	static constexpr bool is_directed=true;
 };
 typedef gala::graph<std::vector, std::vector, uint16_t, dvv_config> sg_dvv16;
-
-template<class G>
-struct dvv_config_stupid : public gala::graph_cfg_default<G>
-{
-	 typedef boost::mpl::true_ is_directed_t;
-};
-typedef gala::graph<std::vector, std::vector, uint16_t, dvv_config_stupid> sg_dvv16_s;
 
 typedef gala::graph<> svbs;
 typedef gala::graph<std::vector, std::vector, uint16_t> sg_dvu;
@@ -37,6 +30,4 @@ int main(int , char* [])
 
 	assert(sg_dvv16().is_directed());
 	assert(boost::is_directed(sg_dvv16()));
-	assert(sg_dvv16_s().is_directed());
-	assert(boost::is_directed(sg_dvv16_s()));
 }

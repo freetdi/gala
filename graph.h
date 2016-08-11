@@ -58,18 +58,27 @@ struct vertex_ptr_tag {}; // not in use yet.
                      class VDP, \
                      template<class GG> class CFG
 #define VCTtemplate template< galaPARMS >
-#define SGARGS ECT,VCT,VDP,CFG
+#define SGARGS ECT, VCT, VDP, CFG
 /*--------------------------------------------------------------------------*/
 #define VCTtemplateP template< \
                      template<class T, typename... > class ECT, \
                      template<class T, typename... > class VCT \
                      template<class G> class CFG \
                      >
-#define SGARGSP ECT,VCT,CFG
+#define SGARGSP ECT, VCT, CFG
+/*--------------------------------------------------------------------------*/
+#define STPARMS    template<class T, typename... > class ECT, \
+                   template<class T, typename... > class VCT, \
+                   class VDP
+#define STtemplate template< STPARMS >
+#define STARGS ECT, VCT, VDP
 /*--------------------------------------------------------------------------*/
 struct directed_tag { };
 struct undirected_tag { };
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+template<typename T>
+struct tovoid { typedef void type; };
 /*--------------------------------------------------------------------------*/
 namespace bits{ //
 /*--------------------------------------------------------------------------*/
@@ -291,12 +300,6 @@ struct vertex_selector<ECT, vertex_ptr_tag>{ //
 	typedef unsigned vertex_index_type; // INCOMPLETE
 };
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-#define STPARMS    template<class T, typename... > class ECT, \
-                   template<class T, typename... > class VCT, \
-                   class VDP
-#define STtemplate template< STPARMS >
-#define STARGS ECT, VCT, VDP
 /*--------------------------------------------------------------------------*/
 // part of storage? not sure yet.
 STtemplate
@@ -555,37 +558,49 @@ struct edge_helper<STARGS, true>
 	}
 };
 /*--------------------------------------------------------------------------*/
-template<STPARMS, class X=void, class Y=void, class Z=void>
+template<STPARMS, class X=void>
 struct reverse_helper : public storage<STARGS> { //
-	typedef typename storage<STARGS>::container_type vertex_container_type;
-	using typename storage<STARGS>::edge_type;
-	using typename storage<STARGS>::vertex_type;
 
-//	typedef foo incomplete;
+// 	typedef typename storage<STARGS>::container_type vertex_container_type;
+// 	using typename storage<STARGS>::edge_type;
+// 	using typename storage<STARGS>::vertex_type;
 
-	template<class E>
-	static void make_symmetric(vertex_container_type& , E& , bool /*oriented*/)
-	{
-		// base case. hmm better don't use yet.
+	//typedef foo incomplete;
 
-		incomplete();
-	}
+//	template<class E>
+//	static void make_symmetric(vertex_container_type& , E& , bool /*oriented*/)
+//	{
+//		// base case. hmm better don't use yet.
+//
+//		assert(false);
+//		incomplete();
+//	}
 };
 /*--------------------------------------------------------------------------*/
+#if 0 // see below
+template< template<class T, typename... > class ECT,
+          template<class T, typename... > class VCT>
+struct reverse_helper<ECT, VCT, vertex_ptr_tag,
+	typename sfinae::is_set_tpl<ECT>::type >
+	: public storage<ECT, VCT, vertex_ptr_tag> { //
+};
+#endif
 /// hmm better constexpr flags for
 // - directed
 // - oriented
 // - loopless?
 template< template<class T, typename... > class ECT,
-          template<class T, typename... > class VCT /*, class VDP*/, class VDP>
-struct reverse_helper<ECT, VCT, VDP,
-//	typename std::enable_if< std::is_unsigned< uint16_t >::value, uint16_t >::type,
-	typename sfinae::is_set< ECT<sfinae::any> >::type>
-	: public storage<ECT, VCT,
-	typename std::enable_if< std::is_unsigned< VDP >::value, VDP >::type > { //
+          template<class T, typename... > class VCT, class VDP>
+struct reverse_helper<ECT, VCT, VDP, typename tovoid < typename sfinae::is_set_tpl<ECT>::type > :: type  >
+	: public storage<ECT, VCT, VDP
+//	typename std::enable_if< std::is_unsigned< VDP >::value, VDP >::type 
+	> { //
 	typedef typename storage<ECT,VCT,VDP>::container_type vertex_container_type;
 	using typename storage<ECT,VCT,VDP>::edge_type;
 	using typename storage<ECT,VCT,VDP>::vertex_type;
+
+//	typename sfinae::is_set_tpl<ECT>::type BLA;
+	typedef typename sfinae::is_set< ECT<sfinae::any> >::type hmm;
 
 	template<class E>
 	static void make_symmetric(vertex_container_type& _v, E& e, bool /*oriented*/)
@@ -605,7 +620,7 @@ struct reverse_helper<ECT, VCT, VDP,
 template<STPARMS>
 struct reverse_helper<ECT, VCT, VDP,
 //	typename std::enable_if< std::is_unsigned< VDP >::value, ECT<VDP> >::type,
-	typename sfinae::is_seq< ECT<sfinae::any> >::type >
+	typename sfinae::is_seq_tpl< ECT >::type >
 	: public storage<ECT, VCT, VDP > { //
 
 	typedef typename sfinae::is_seq< ECT<sfinae::any> >::type hmm;
@@ -618,6 +633,7 @@ struct reverse_helper<ECT, VCT, VDP,
 	template<class E>
 	static void make_symmetric(vertex_container_type& _v, E& e, bool oriented)
 	{
+		trace3("make_symmetric", oriented, e, _v.size());
 #ifndef NDEBUG
 		auto ebefore=e;
 #endif
@@ -629,9 +645,10 @@ struct reverse_helper<ECT, VCT, VDP,
 			howmany[i++] = vertex.size();
 			checksum+= vertex.size();
 		}
-		assert(checksum==e);
+		trace3("make_symmetric", oriented, e, checksum);
+		assert(checksum==e || !oriented);
 		// ssg only. for now.
-		if(oriented){
+		if(oriented){ untested();
 			vertex_type vpos=0;
 			for(unsigned j=0; j<_v.size(); ++j){ itested();
 				auto K = _v[j].begin();
@@ -670,7 +687,7 @@ struct reverse_helper<ECT, VCT, VDP,
 template<template<class T, typename... > class ECT,
          template<class T, typename... > class VCT >
 struct reverse_helper<ECT, VCT, vertex_ptr_tag,
-  typename sfinae::is_set< ECT<sfinae::any> >::type
+  typename sfinae::is_set_tpl< ECT >::type
 >
 	: public storage<ECT, VCT, vertex_ptr_tag > { //
 		typedef typename sfinae::is_set< ECT<sfinae::any> >::type hmm;
@@ -819,9 +836,6 @@ void prealloc(C const&, size_t /*howmany*/)
 template<class G>
 struct graph_cfg_default;
 /*--------------------------------------------------------------------------*/
-template<typename T>
-struct tovoid { typedef void type; };
-/*--------------------------------------------------------------------------*/
 namespace detail{
 template<class CFG, class X=void>
 struct is_directed_select
@@ -839,6 +853,26 @@ struct is_directed_select<CFG,
 	static constexpr bool value=CFG::is_directed;
 // 	typedef typename std::enable_if< CFG::is_directed >::type type;
 };
+
+// temporary hack. use proper maps later
+template<STPARMS, class X=void>
+struct is_nn
+{
+	static constexpr bool value=false;
+};
+template<template<class T, typename... > class ECT,
+         template<class T, typename... > class VCT>
+struct is_nn<ECT, VCT, vertex_ptr_tag>
+{
+	// incomplete: this is not what it is meant to be...
+	static constexpr bool value=false;
+};
+template<STPARMS>
+struct is_nn<STARGS,
+	typename std::enable_if<sfinae::is_vec_tpl<VCT>::value >::type >
+{
+	static constexpr bool value=true;
+};
 #if 0
 // old approach. will go, does no longer work!
 template<class CFG>
@@ -853,7 +887,8 @@ struct is_directed_select<CFG, typename tovoid<typename CFG::is_directed_t>::typ
 };
 #endif
 /*--------------------------------------------------------------------------*/
-template<class Gsrc, class Gtgt, bool srcDir, bool tgtDir>
+template<class Gsrc, class Gtgt, bool srcDir, bool tgtDir,
+	bool srcCont=false, bool tgtCont=false>
 struct copy_helper{
 	static void assign(Gsrc const&, Gtgt&);
 };
@@ -889,6 +924,7 @@ public: // types
 		// for now.
 		return sfinae::is_set< ECT<sfinae::any> >::value;
 	}
+	static constexpr bool is_nn_v=detail::is_nn<ECT, VCT, VDP>::value;
 
 	typedef typename vs::type vertex_type;
 	typedef typename vs::const_type const_vertex_type;
@@ -906,6 +942,7 @@ public: // types
 public:
 	typedef typename storage::container_type VL;
 	typedef typename storage::container_type vertex_container_type;
+	typedef typename storage::edge_container_type edge_container_type;
 
 	typedef typename EL::iterator out_vertex_iterator;
 	typedef typename EL::const_iterator out_vertex_const_iterator;
@@ -1144,6 +1181,8 @@ public:
 	}
 	//O(1)
 	edges_size_type num_edges() const;
+// private: ... friends
+	void set_num_edges(edges_size_type);
 public:
 	size_t num_edges_debug(){
 #ifdef DEBUG
@@ -1167,7 +1206,7 @@ public:
 	//
 	//O(num_edges+num_vertices)
 	void make_symmetric(bool oriented=false)
-	{
+	{ untested();
 		assert(is_directed());
 		reverse_helper::make_symmetric(_v, _num_edges, oriented);
 		num_edges_debug(); // will notice if you were lying.
@@ -1317,6 +1356,12 @@ public: // experimental...?
 			return 2*g._num_edges; // BUG
 			return 2*reinterpret_cast<base_type const&>(g).num_edges();
 		}
+		static void set_num_edges(edges_size_type e, GG &g)
+		{ untested();
+			assert(! (e%2) );
+			g._num_edges = e/2; // BUG/incomplete
+//			reinterpret_cast<base_type const&>(g).set_num_edges();
+		}
 	};
 	template<template<class G> class new_config>
 	struct reconfig{
@@ -1349,11 +1394,12 @@ template<class G>
 struct graph_cfg_default
 {
 	typedef default_DEGS<G> degs_type;
-//	typedef typename G::edges_size_type edges_size_type;
-	typedef size_t edges_size_type; // uuh
+	typedef typename G::edges_size_type edges_size_type;
+//	typedef size_t edges_size_type; // uuh
 	static edges_size_type num_edges(G const& g);
 
-	// typedef boost::mpl::true_ is_directed_t;
+	// private&friends...
+	static void set_num_edges(edges_size_type, G& g);
 };
 /*--------------------------------------------------------------------------*/
 VCTtemplate
@@ -1361,7 +1407,13 @@ typename graph<SGARGS>::edges_size_type
 graph<SGARGS>::num_edges() const
 {
 	return CFG<graph<SGARGS> >::num_edges(*this);
-	// return storage::num_edges(_num_edges, _v); why?
+}
+/*--------------------------------------------------------------------------*/
+VCTtemplate
+void
+graph<SGARGS>::set_num_edges(typename graph<SGARGS>::edges_size_type e)
+{
+	return CFG<graph<SGARGS> >::set_num_edges(e, *this);
 }
 /*--------------------------------------------------------------------------*/
 // construct from iterator...
@@ -1444,13 +1496,19 @@ VCTtemplate
             template<class G> class CFG2>
 graph<SGARGS>& graph<SGARGS>::operator=(graph<ECT2,VCT2,VDP2,CFG2> const& x)
 { untested();
+	typedef graph<ECT2,VCT2,VDP2,CFG2> Gsrc;
 	if((void*)&x==(void*)this){ untested();
 		return *this;
 	}else{
 	}
 
-	detail::copy_helper<graph<ECT2,VCT2,VDP2,CFG2>, graph,
-		 graph<ECT2,VCT2,VDP2,CFG2>::is_directed_v, is_directed_v>::assign(x, *this);
+	trace2("op=", Gsrc::is_directed_v, is_directed_v);
+
+	detail::copy_helper<Gsrc, graph,
+		 Gsrc::is_directed_v,
+		 is_directed_v,
+		 Gsrc::is_nn_v,
+		 is_nn_v>::assign(x, *this);
 	return *this;
 }
 /*--------------------------------------------------------------------------*/
@@ -1525,15 +1583,15 @@ graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
 /*--------------------------------------------------------------------------*/
 namespace detail{
 /*--------------------------------------------------------------------------*/
-template<class oG, class G, bool X, bool Y>
-void copy_helper<oG, G, X, Y>::assign(oG const& src, G& tgt)
+template<class oG, class G, bool X, bool Y, bool srcCont, bool tgtCont>
+void copy_helper<oG, G, X, Y, srcCont, tgtCont>::assign(oG const& src, G& tgt)
 { untested();
 	auto& g=src;
 //	typedef graph<ECT2, VCT2, VDP2, CFG2> oG; // source graph
 	size_t nv = g.num_vertices();
 	size_t ne = g.num_edges();
-	trace4("assign_",nv, ne, tgt.num_vertices(), tgt.num_edges());
-	assert(!tgt.is_directed() || g.is_directed()); // use other helper
+	trace6("assign_",nv, ne, tgt.num_vertices(), tgt.num_edges(), srcCont, tgtCont);
+	assert(!tgt.is_directed() || src.is_directed()); // use other helper
 //	auto psize=tgt._v.size();
 	tgt._v.resize(nv);
 
@@ -1657,6 +1715,51 @@ struct copy_helper<Gsrc, Gtgt, false, true >
 }; // copy_helper
 
 template<class Gsrc, class Gtgt>
+struct copy_helper<Gsrc, Gtgt, false, true, true, true>
+{
+	static void assign(Gsrc const& src, Gtgt& tgt)
+	{ untested();
+		// for now
+		return copy_helper<Gsrc, Gtgt, false, true, false, false>::assign(src, tgt);
+	}
+};
+/*--------------------------------------------------------------------------*/
+
+namespace detail{
+	template<class S, class T, class X=void>
+	struct set_hlp{
+		static void copy_set(S const& src, T& tgt)
+		{ untested();
+			for(auto w : src){ itested();
+				tgt.push_back(w);
+			}
+		}
+	};
+	template<class S, class T>
+	struct set_hlp<S, T, typename tovoid<typename sfinae::is_set<T>::type>::type> {
+
+		typedef typename sfinae::is_set<T>::type hmm;
+
+		typedef T hmm2;
+
+		static void copy_set(S const& src, T& tgt)
+		{ untested();
+			for(auto w : src){ itested();
+				tgt.insert(w); // FIXME: hint, if ordered.
+			}
+		}
+	};
+	template<class S>
+	struct set_hlp<S, S> {
+		static void copy_set(S const& src, S& tgt)
+		{ untested();
+			tgt = src;
+			// applymap...?
+		}
+	};
+}//detail
+
+template<class Gsrc, class Gtgt>
 struct copy_helper<Gsrc, Gtgt, true, false >
 {
 	static void assign(Gsrc const& src, Gtgt& tgt)
@@ -1664,10 +1767,48 @@ struct copy_helper<Gsrc, Gtgt, true, false >
 //		must weed out double edges?
 		trace2("assigning directed to undirected", src.num_edges(), tgt.num_edges());
 		tgt.directed_view() = src;
+		assert( bool(tgt._num_edges) == bool(src._num_edges));
 		trace1("assigned directed to undirected", src.num_edges());
-		trace1("assigned directed to undirected", tgt.num_edges());
+		trace3("assigned directed to undirected", tgt._num_edges, tgt.num_edges(), tgt.directed_view().num_edges());
+		// HACK tgt.directed_view() is inconsistent...
 		tgt.directed_view().make_symmetric();
+		trace2("symmetrified", tgt._num_edges, tgt.num_edges());
 		tgt._num_edges /= 2;
+	}
+}; // copy_helper
+
+template<class Gsrc, class Gtgt>
+struct copy_helper<Gsrc, Gtgt, true, true, true, true >
+{
+	static void assign(Gsrc const& src, Gtgt& tgt)
+	{ untested();
+		auto& g=src;
+	//	typedef graph<ECT2, VCT2, VDP2, CFG2> oG; // source graph
+		size_t nv = g.num_vertices();
+		size_t ne = g.num_edges();
+		trace4("assign_",nv, ne, tgt.num_vertices(), tgt.num_edges());
+		assert(!tgt.is_directed() || g.is_directed()); // use other helper
+	//	auto psize=tgt._v.size();
+		tgt._v.resize(nv);
+
+		if(tgt.num_edges()){
+			// BUG. inefficient.
+			for(auto vi = tgt.begin(); vi!=tgt.end(); ++vi){
+				typename Gtgt::vertex_type v=Gtgt::iter::deref(vi);
+				tgt.out_edges(v).clear();
+			}
+		}
+		typename Gtgt::edges_size_type new_edges=0;
+		for(typename Gsrc::iterator V=src.begin(); V!=src.end(); ++V){ itested();
+			typename Gsrc::vertex_type v=Gsrc::iter::deref(V);
+
+			detail::set_hlp<typename Gsrc::edge_container_type,
+				             typename Gtgt::edge_container_type>
+				::copy_set(g.out_edges(v), tgt.out_edges(v) /*, map...*/ );
+			new_edges += g.out_edges(v).size();
+		}
+		tgt._num_edges = new_edges; // HACK!
+		// tgt.set_num_edges(new_edges);
 	}
 }; // copy_helper
 
@@ -1822,10 +1963,14 @@ inline void storage<GALA_DEFAULT_SET, GALA_DEFAULT_VECTOR, vertex_ptr_tag>::add_
 } // bits
 /*--------------------------------------------------------------------------*/
 template<class G>
-//typename G::edges_size_type
-size_t graph_cfg_default<G>::num_edges(G const& g)
+typename G::edges_size_type graph_cfg_default<G>::num_edges(G const& g)
 { itested();
 	return g._num_edges;
+}
+template<class G>
+void graph_cfg_default<G>::set_num_edges(typename G::edges_size_type x, G& g)
+{ untested();
+	g._num_edges = x;
 }
 /*--------------------------------------------------------------------------*/
 } // gala

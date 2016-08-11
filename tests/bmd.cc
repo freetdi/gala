@@ -122,10 +122,8 @@ int main(int argc, char** argv)
      *  VertexIndexMap vertex_index_map)
      */
 
+#ifdef HAVE_MINDEGREE_FORK
     int w =
-#ifndef HAVE_MINDEGREE_FORK
-        0;
-    itested();
 #endif
     boost::minimum_degree_ordering
              (g,
@@ -140,7 +138,9 @@ int main(int argc, char** argv)
 #endif
               );
 
-	 std::cout << "done\n";
+#ifdef HAVE_MINDEGREE_FORK
+	 std::cout << "done, " << w << "\n";
+#endif
 
 
 }
