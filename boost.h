@@ -580,6 +580,7 @@ namespace boost { //
 			is_edge = (i!=g.out_edges(v).end());
 		}
 #else
+		is_edge = util::is_in_edgeset(g.out_edges(u),v);
 #endif
 
 
