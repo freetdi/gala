@@ -38,7 +38,7 @@ namespace boost { //
 	};
 
 	template<>
-	struct myVDP<void*>{
+	struct myVDP<gala::vertex_ptr_tag>{
 		typedef uintptr_t type;
 	};
 

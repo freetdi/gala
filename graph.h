@@ -137,7 +137,7 @@ struct vertex_helper{ //
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 template<>
-struct vertex_helper<void*>{ //
+struct vertex_helper<vertex_ptr_tag>{ //
 	template<class T, class V, class VC>
 	static void insert(T& v, V&, VC* wp)
 	{ itested();
@@ -278,7 +278,7 @@ struct vertex_selector{ //
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 template< template<class T, typename... > class ECT >
-struct vertex_selector<ECT, void*>{ //
+struct vertex_selector<ECT, vertex_ptr_tag>{ //
 	typedef struct vertex_{ //
 		ECT<vertex_*> n;
 		size_t size() const { return n.size(); }
@@ -401,8 +401,8 @@ struct storage : storage_base<STARGS>{ //
 /*--------------------------------------------------------------------------*/
 template<template<class T, typename... > class ECT,
          template<class T, typename... > class VCT>
-struct storage<ECT, VCT, void*> : public storage_base<ECT, VCT, void*>{ //
-	typedef void* VDP;
+struct storage<ECT, VCT, vertex_ptr_tag> : public storage_base<ECT, VCT, vertex_ptr_tag>{ //
+	typedef vertex_ptr_tag VDP;
 	typedef typename bits::vertex_selector<ECT,VDP>::stype vertex_;
 	typedef typename bits::vertex_selector<ECT,VDP>::type vertex_type;
 	typedef typename bits::vertex_selector<ECT,VDP>::vertex_index_type vertex_index_type;
@@ -483,7 +483,7 @@ public:
 			tgt.insert( (vertex_*) (intptr_t(i)+delta), e);
 		}
 	}
-}; //storage<void*>
+}; //storage<vertex_ptr_tag>
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 template< STPARMS, bool is_directed >
@@ -669,14 +669,14 @@ struct reverse_helper<ECT, VCT, VDP,
 /*--------------------------------------------------------------------------*/
 template<template<class T, typename... > class ECT,
          template<class T, typename... > class VCT >
-struct reverse_helper<ECT, VCT, void*,
+struct reverse_helper<ECT, VCT, vertex_ptr_tag,
   typename sfinae::is_set< ECT<sfinae::any> >::type
 >
-	: public storage<ECT, VCT, void* > { //
+	: public storage<ECT, VCT, vertex_ptr_tag > { //
 		typedef typename sfinae::is_set< ECT<sfinae::any> >::type hmm;
-	typedef typename storage<ECT,VCT,void*>::container_type vertex_container_type;
-	using typename storage<ECT,VCT,void*>::edge_type;
-	using typename storage<ECT,VCT,void*>::vertex_type;
+	typedef typename storage<ECT, VCT, vertex_ptr_tag>::container_type vertex_container_type;
+	using typename storage<ECT, VCT, vertex_ptr_tag>::edge_type;
+	using typename storage<ECT, VCT, vertex_ptr_tag>::vertex_type;
 
 	template<class E>
 	static void make_symmetric(vertex_container_type& _v, E& e, bool /*oriented*/)
@@ -698,10 +698,10 @@ struct reverse_helper<ECT, VCT, void*,
 // vector outedge set ...?
 template<template<class T, typename... > class ECT,
          template<class T, typename... > class VCT>
-struct reverse_helper<ECT,VCT,void*,
+struct reverse_helper<ECT, VCT, vertex_ptr_tag,
   typename sfinae::is_seq< ECT<sfinae::any> >::type
-	> : public storage<ECT, VCT, void* > { //
-	typedef void* VDP;
+	> : public storage<ECT, VCT, vertex_ptr_tag > { //
+	typedef vertex_ptr_tag VDP;
 	typedef typename storage<ECT,VCT,VDP>::container_type vertex_container_type;
 	using typename storage<ECT,VCT,VDP>::edge_type;
 	using typename storage<ECT,VCT,VDP>::vertex_type;
@@ -752,8 +752,8 @@ struct iter{ //
 /*--------------------------------------------------------------------------*/
 template<template<class T, typename... > class ECT,
          template<class T, typename... > class VCT>
-struct iter<ECT, VCT, void*>{ //
-	typedef void* VDP;
+struct iter<ECT, VCT, vertex_ptr_tag>{ //
+	typedef vertex_ptr_tag VDP;
 	typedef typename storage<STARGS>::VL::iterator vertex_iterator;
 	typedef typename storage<STARGS>::VL::const_iterator const_vertex_iterator;
 	typedef typename vertex_selector<ECT,VDP>::type vertex_type;
@@ -805,7 +805,7 @@ struct iter<ECT, VCT, void*>{ //
 		assert(r<_v.size());
 		return r;
 	}
-}; // iter<void*>
+}; // iter<vertex_ptr_tag>
 }// bits
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -814,7 +814,7 @@ void prealloc(C const&, size_t /*howmany*/)
 {
 }
 /*--------------------------------------------------------------------------*/
-// typedef void* use_pointers;
+// typedef vertex_ptr_tag use_pointers;
 /*--------------------------------------------------------------------------*/
 template<class G>
 struct graph_cfg_default;
@@ -862,7 +862,7 @@ struct copy_helper{
 /*--------------------------------------------------------------------------*/
 template< template<class T, typename... > class ECT=GALA_DEFAULT_SET,
           template<class T, typename... > class VCT=GALA_DEFAULT_VECTOR,
-          typename VDP=void*, // use_pointers,
+          typename VDP=vertex_ptr_tag, // use_pointers,
           template<class G> class CFG=graph_cfg_default>
 class graph{ //
 public: // types
@@ -923,7 +923,7 @@ public: // range-based loops support aliases
 	typedef std::pair<iterator, out_vertex_iterator> edge_iterator;
 public: // construct
 	graph(const graph& x) : _num_edges(0)
-	{
+	{ untested();
 		assign_same(x); // FIXME op=?
 	}
    template<template<class T, typename... > class ECT2, \
@@ -932,7 +932,7 @@ public: // construct
             template<class G> class CFG2>
 	graph(graph<ECT2,VCT2,VDP2,CFG2> const& x)
 	: _num_edges(0)
-	{
+	{ untested();
 
 		detail::copy_helper<graph<ECT2,VCT2,VDP2,CFG2>, graph,
 			  graph<ECT2,VCT2,VDP2,CFG2>::is_directed_v, is_directed_v
@@ -999,6 +999,8 @@ public: //assign
 
 	// somehow... required.
 	graph& operator=(graph<SGARGS> const& x);
+
+	// does not work. same structure often sufficient...
 	graph& assign_same(graph<SGARGS> const& x);
 
 	graph& operator=(graph&& x)
@@ -1441,13 +1443,12 @@ VCTtemplate
             class VDP2, \
             template<class G> class CFG2>
 graph<SGARGS>& graph<SGARGS>::operator=(graph<ECT2,VCT2,VDP2,CFG2> const& x)
-{
+{ untested();
 	if((void*)&x==(void*)this){ untested();
 		return *this;
 	}else{
 	}
 
-	// assign_(x);
 	detail::copy_helper<graph<ECT2,VCT2,VDP2,CFG2>, graph,
 		 graph<ECT2,VCT2,VDP2,CFG2>::is_directed_v, is_directed_v>::assign(x, *this);
 	return *this;
@@ -1455,7 +1456,7 @@ graph<SGARGS>& graph<SGARGS>::operator=(graph<ECT2,VCT2,VDP2,CFG2> const& x)
 /*--------------------------------------------------------------------------*/
 VCTtemplate
 graph<SGARGS>& graph<SGARGS>::operator=(graph<SGARGS> const& x)
-{
+{ untested();
 // 
 // detail::copy_helper<graph<SGARGS>, graph<SGARGS> >::merge(x, *this, IGNOREDUPS)
 // return *this
@@ -1464,7 +1465,7 @@ graph<SGARGS>& graph<SGARGS>::operator=(graph<SGARGS> const& x)
 /*--------------------------------------------------------------------------*/
 VCTtemplate
 graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
-{
+{ untested();
 	typedef graph<ECT, VCT, VDP, CFG> oG;
 	typedef typename oG::const_iterator other_const_iterator;
 	typedef typename oG::const_vertex_type other_const_vertex_type;
@@ -1526,7 +1527,7 @@ namespace detail{
 /*--------------------------------------------------------------------------*/
 template<class oG, class G, bool X, bool Y>
 void copy_helper<oG, G, X, Y>::assign(oG const& src, G& tgt)
-{
+{ untested();
 	auto& g=src;
 //	typedef graph<ECT2, VCT2, VDP2, CFG2> oG; // source graph
 	size_t nv = g.num_vertices();
@@ -1796,10 +1797,10 @@ static inline std::pair<bool, bool> edge(typename graph<SGARGS>::vertex v,
 /*--------------------------------------------------------------------------*/
 namespace bits{
 template<>
-inline void storage<GALA_DEFAULT_SET, GALA_DEFAULT_VECTOR, void*>::add_pos_edge(
-      typename storage<GALA_DEFAULT_SET, GALA_DEFAULT_VECTOR, void*>::vertex_index_type v,
-      typename storage<GALA_DEFAULT_SET, GALA_DEFAULT_VECTOR, void*>::vertex_index_type w,
-      typename storage<GALA_DEFAULT_SET, GALA_DEFAULT_VECTOR, void*>::container_type& _v)
+inline void storage<GALA_DEFAULT_SET, GALA_DEFAULT_VECTOR, vertex_ptr_tag>::add_pos_edge(
+      typename storage<GALA_DEFAULT_SET, GALA_DEFAULT_VECTOR, vertex_ptr_tag>::vertex_index_type v,
+      typename storage<GALA_DEFAULT_SET, GALA_DEFAULT_VECTOR, vertex_ptr_tag>::vertex_index_type w,
+      typename storage<GALA_DEFAULT_SET, GALA_DEFAULT_VECTOR, vertex_ptr_tag>::container_type& _v)
 {
 	trace2("pos edge", v, w);
 	assert(v<w); // for now
@@ -1809,10 +1810,10 @@ inline void storage<GALA_DEFAULT_SET, GALA_DEFAULT_VECTOR, void*>::add_pos_edge(
 /*--------------------------------------------------------------------------*/
 // FIXME: implement for all ECTs...
 // template< template<class T, class... > class ECT >
-// inline void storage<ECT, std::vector, void*>::add_pos_edge(
-//       typename storage<ECT, std::vector, void*>::vertex_index_type v,
-//       typename storage<ECT, std::vector, void*>::vertex_index_type w,
-//       typename storage<ECT, std::vector, void*>::container_type& _v)
+// inline void storage<ECT, std::vector, vertex_ptr_tag>::add_pos_edge(
+//       typename storage<ECT, std::vector, vertex_ptr_tag>::vertex_index_type v,
+//       typename storage<ECT, std::vector, vertex_ptr_tag>::vertex_index_type w,
+//       typename storage<ECT, std::vector, vertex_ptr_tag>::container_type& _v)
 // {
 // 	_v[v].insert(&_v[w]);
 // 	_v[w].insert(&_v[v]);

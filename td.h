@@ -385,8 +385,8 @@ namespace treedec{
 
 	// theres no Vertex. use the position instead
 	template< template<class T, class... > class ECT, class VDP >
-	unsigned get_id(const gala::graph<ECT,std::vector, void*>& g,
-			const vertex_descriptor<gala::graph<ECT,std::vector, void*> >& v )
+	unsigned get_id(const gala::graph<ECT,std::vector, gala::vertex_ptr_tag>& g,
+			const vertex_descriptor<gala::graph<ECT,std::vector, gala::vertex_ptr_tag> >& v )
 	{ untested();
 		unsigned p=g.position(v);
 		assert(p<g.num_vertices());
@@ -426,9 +426,9 @@ struct treedec_traits< treedec_chooser<gala::graph<SGARGS> > >{ //
 // FIXME: more sgs.
 template<>
 struct treedec_traits< boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS,
-	std::set<gala::graph<std::set, std::vector, void*>::vertex_*> > >{ //
-	typedef typename gala::graph<std::set, std::vector, void*>::vertex_* vd_type;
- 	typedef typename outedge_set< gala::graph<std::set, std::vector, void*> >::type bag_type;
+	std::set<gala::graph<std::set, std::vector, gala::vertex_ptr_tag>::vertex_*> > >{ //
+	typedef typename gala::graph<std::set, std::vector, gala::vertex_ptr_tag>::vertex_* vd_type;
+ 	typedef typename outedge_set< gala::graph<std::set, std::vector, gala::vertex_ptr_tag> >::type bag_type;
 };
 
 #if 0
@@ -462,7 +462,7 @@ using boost::vecS;
 using boost::undirectedS;
 
 typedef  boost::adjacency_list<setS, vecS, undirectedS, \
-	 std::set< gala::graph<std::set, std::vector, void*>::vertex_*> > TDT;
+	 std::set< gala::graph<std::set, std::vector, gala::vertex_ptr_tag>::vertex_*> > TDT;
 
 //VCTtemplate //not yet.
 inline typename treedec_traits<TDT>::bag_type&
