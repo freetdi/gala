@@ -41,20 +41,16 @@ struct is_set{
 /*--------------------------------------------------------------------------*/
 template<class S, class T>
 struct is_set<S, typename std::enable_if < std::is_same<
-std::set<any, typename S::key_compare, typename S::allocator_type >, S
+std::set<typename S::value_type, typename S::key_compare, typename S::allocator_type >, S
 >::value, any >::type , T>{
 
 	typedef T type;
 	static constexpr bool value = true;
 
-	typedef
-		typename std::enable_if < std::is_same<
-		std::set<any, typename S::key_compare, typename S::allocator_type >, S>::value, any >::type
-		hmm;
 };
 template<class S, class T>
 struct is_set<S, typename std::enable_if < std::is_same<
-stx::btree_set<any, typename S::key_compare, typename S::allocator_type >, S
+stx::btree_set<typename S::value_type, typename S::key_compare, typename S::allocator_type >, S
 >::value, any >::type , T>{
 
 	typedef T type;
@@ -86,13 +82,13 @@ std::deque<any, typename S::allocator_type >, S
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 template<class A, class B=any, class T=void>
-struct is_vec{
+struct is_vector{
 	static constexpr bool value = false;
 };
 /*--------------------------------------------------------------------------*/
 template<class S, class T>
-struct is_vec<S, typename std::enable_if < std::is_same<
-std::vector<any, typename S::allocator_type >, S
+struct is_vector<S, typename std::enable_if < std::is_same<
+std::vector<typename S::value_type, typename S::allocator_type >, S
 >::value, any >::type , T>{
 
 	typedef T type;
@@ -100,15 +96,16 @@ std::vector<any, typename S::allocator_type >, S
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-// uuh, name clash
-// template<template<class T, typename... > class C>
-// struct is_set : is_vec<C<any> > {};
+// convenience wrappers for non-determined types
 /*--------------------------------------------------------------------------*/
 template<template<class T, typename... > class C>
-struct is_sequence : is_seq<C<any> > {};
+struct is_set_tpl : is_set<C<any> > {};
 /*--------------------------------------------------------------------------*/
 template<template<class T, typename... > class C>
-struct is_vector : is_vec<C<any> > {};
+struct is_seq_tpl : is_seq<C<any> > {};
+/*--------------------------------------------------------------------------*/
+template<template<class T, typename... > class C>
+struct is_vec_tpl : is_vector<C<any> > {};
 /*--------------------------------------------------------------------------*/
 
 }//sfinae

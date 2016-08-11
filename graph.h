@@ -305,7 +305,7 @@ struct rewire_helper{ //
 	static void rewire_nodes(A& new_vl, B offset)
 	{
 		// specialize... (will be expensive)
-		assert( sfinae::is_vector< VCT >::value );
+		assert( sfinae::is_vec_tpl< VCT >::value );
 		trace1("rewire", offset);
 		for(auto& node : new_vl){
 	//		node.n.insert(NULL); ??

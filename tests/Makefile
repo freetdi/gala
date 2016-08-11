@@ -14,6 +14,7 @@ TESTS = \
 	iter \
 	move \
 	rewire \
+	sfinae \
 	view
 
 LOGS = ${TESTS:%=%.log}
