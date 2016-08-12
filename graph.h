@@ -1530,8 +1530,9 @@ graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
 
 	if (intptr_t(&x) == intptr_t(this)) {
 	}else if (num_vertices()==0){ itested();
-//		assign_(x);
-		detail::copy_helper<graph, graph, is_directed_v, is_directed_v>::assign(x, *this);
+		detail::copy_helper<graph, graph,
+			is_directed_v, is_directed_v,
+			is_nn_v, is_nn_v>::assign(x, *this);
 	}else if (num_vertices()!=x.num_vertices()){ incomplete();
 	// }else if( .. incomplete){
 	}else{

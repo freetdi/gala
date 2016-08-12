@@ -12,6 +12,7 @@ struct dvv_config : public gala::graph_cfg_default<G>
 };
 
 typedef gala::graph<std::vector, std::vector, uint16_t, dvv_config> sg_dvv16;
+typedef gala::graph<std::vector, std::vector, uint32_t, dvv_config> sg_dvv32;
 typedef gala::graph<std::vector, std::vector, uint16_t> sg_dvu;
 typedef gala::graph<std::set, std::vector, uint16_t> SSG_16i;
 typedef boost::adjacency_list <boost::vecS, boost::vecS, boost::directedS> BALD_t;
@@ -54,14 +55,27 @@ int main(int , char* [])
 	assert(boost::num_vertices(GU2)==5);
 	assert(boost::num_edges(GU2)==3);
 
-	BALUVEC_t GU3;
-	boost::copy_graph(G2, GU3);
+	{
+		BALUVEC_t GU3;
+		boost::copy_graph(G2, GU3);
 
-	add_edge(2, 0, G2);
-	add_edge(2, 0, G2);
-	add_edge(2, 0, G2);
-	add_edge(2, 0, G2);
-	assert(boost::num_vertices(GU3)==5);
-	assert(boost::num_edges(GU3)==4); // double edge 1-0 and 0-1. no multiple 2-0...
+		add_edge(2, 0, G2);
+		add_edge(2, 0, G2);
+		add_edge(2, 0, G2);
+		add_edge(2, 0, G2);
+		assert(boost::num_vertices(GU3)==5);
+		assert(boost::num_edges(GU3)==4); // double edge 1-0 and 0-1. no multiple 2-0...
+
+	}
+	{
+		sg_dvv16 Gsame(G2);
+		assert(boost::num_vertices(Gsame)==5);
+		assert(boost::num_edges(Gsame)==4);
+	}
+	{
+		sg_dvv32 Gsimilar(G2);
+		assert(boost::num_vertices(Gsimilar)==5);
+		assert(boost::num_edges(Gsimilar)==4);
+	}
 
 }
