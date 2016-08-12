@@ -52,18 +52,18 @@ int main(int , char* [])
 		assert(boost::num_edges(Gtest)==4);
 	}
 
-// 	{untested();
-// 		sg_dvv32 Gtest(G);
-// 		assert(boost::num_vertices(Gtest)==5);
-// 		trace1("",boost::num_edges(Gtest));
-// 		assert(boost::num_edges(Gtest)==4);
-// 
-// 		Gtest.clear();
-// 
-// 		boost::copy_graph(G, Gtest);
-// 		assert(boost::num_vertices(Gtest)==5);
-// 		trace1("",boost::num_edges(Gtest));
-// 		assert(boost::num_edges(Gtest)==4);
-// 	}
+	{untested();
+		sg_dvv32 Gtest(G);
+		assert(boost::num_vertices(Gtest)==5);
+		trace1("",boost::num_edges(Gtest));
+		assert(boost::num_edges(Gtest)==5);
+
+		Gtest.clear();
+
+		boost::copy_graph(G, Gtest);
+		assert(boost::num_vertices(Gtest)==5);
+		trace1("",boost::num_edges(Gtest));
+		assert(boost::num_edges(Gtest)==5);
+	}
 
 }
