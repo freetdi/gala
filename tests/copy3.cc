@@ -36,7 +36,7 @@ int main(int , char* [])
 	assert(boost::num_vertices(G)==5);
 	assert(boost::num_edges(G)==5);
 
-	{untested();
+	{
 		ssg16 Gtest(G);
 
 		assert(boost::num_vertices(Gtest)==5);
@@ -44,7 +44,7 @@ int main(int , char* [])
 		assert(boost::num_edges(Gtest)==4);
 	}
 
-	{untested();
+	{
 		sg_dvu Gtest(G);
 
 		assert(boost::num_vertices(Gtest)==5);
@@ -52,7 +52,7 @@ int main(int , char* [])
 		assert(boost::num_edges(Gtest)==4);
 	}
 
-	{untested();
+	{
 		sg_dvv32 Gtest(G);
 		assert(boost::num_vertices(Gtest)==5);
 		trace1("",boost::num_edges(Gtest));

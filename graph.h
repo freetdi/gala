@@ -960,7 +960,7 @@ public: // range-based loops support aliases
 	typedef std::pair<iterator, out_vertex_iterator> edge_iterator;
 public: // construct
 	graph(const graph& x) : _num_edges(0)
-	{ untested();
+	{
 		assign_same(x); // FIXME op=?
 	}
    template<template<class T, typename... > class ECT2, \
@@ -969,7 +969,7 @@ public: // construct
             template<class G> class CFG2>
 	graph(graph<ECT2,VCT2,VDP2,CFG2> const& x)
 	: _num_edges(0)
-	{ untested();
+	{
 
 		detail::copy_helper<graph<ECT2,VCT2,VDP2,CFG2>, graph,
 			  graph<ECT2,VCT2,VDP2,CFG2>::is_directed_v, is_directed_v
@@ -1123,7 +1123,7 @@ public: // BUG: should not expose this...?
 	}
 public:
 	void clear()
-	{ untested();
+	{
 		// inefficient (maybe not, with proper allocator...)
 		_v.resize(0);
 		_num_edges = 0;
@@ -1206,7 +1206,7 @@ public:
 	//
 	//O(num_edges+num_vertices)
 	void make_symmetric(bool oriented=false)
-	{ untested();
+	{
 		assert(is_directed());
 		reverse_helper::make_symmetric(_v, _num_edges, oriented);
 		num_edges_debug(); // will notice if you were lying.
@@ -1495,7 +1495,7 @@ VCTtemplate
             class VDP2, \
             template<class G> class CFG2>
 graph<SGARGS>& graph<SGARGS>::operator=(graph<ECT2,VCT2,VDP2,CFG2> const& x)
-{ untested();
+{
 	typedef graph<ECT2,VCT2,VDP2,CFG2> Gsrc;
 	if((void*)&x==(void*)this){ untested();
 		return *this;
@@ -1514,7 +1514,7 @@ graph<SGARGS>& graph<SGARGS>::operator=(graph<ECT2,VCT2,VDP2,CFG2> const& x)
 /*--------------------------------------------------------------------------*/
 VCTtemplate
 graph<SGARGS>& graph<SGARGS>::operator=(graph<SGARGS> const& x)
-{ untested();
+{
 // 
 // detail::copy_helper<graph<SGARGS>, graph<SGARGS> >::merge(x, *this, IGNOREDUPS)
 // return *this
@@ -1523,7 +1523,7 @@ graph<SGARGS>& graph<SGARGS>::operator=(graph<SGARGS> const& x)
 /*--------------------------------------------------------------------------*/
 VCTtemplate
 graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
-{ untested();
+{
 	typedef graph<ECT, VCT, VDP, CFG> oG;
 	typedef typename oG::const_iterator other_const_iterator;
 	typedef typename oG::const_vertex_type other_const_vertex_type;
@@ -1586,7 +1586,7 @@ namespace detail{
 /*--------------------------------------------------------------------------*/
 template<class oG, class G, bool X, bool Y, bool srcCont, bool tgtCont>
 void copy_helper<oG, G, X, Y, srcCont, tgtCont>::assign(oG const& src, G& tgt)
-{ untested();
+{
 	auto& g=src;
 //	typedef graph<ECT2, VCT2, VDP2, CFG2> oG; // source graph
 	size_t nv = g.num_vertices();
@@ -1667,7 +1667,7 @@ void copy_helper<oG, G, X, Y, srcCont, tgtCont>::assign(oG const& src, G& tgt)
 		// OUCH. this does not work. must amend edgecount later.
 		// assert(tgt.num_edges() == g.num_edges() || tgt.num_edges() == 2*g.num_edges());
 
-	}else if( src.is_directed() && !tgt.is_directed()){ untested();
+	}else if( src.is_directed() && !tgt.is_directed()){
 		
 	}else{
 		unreachable();
@@ -1719,7 +1719,7 @@ template<class Gsrc, class Gtgt>
 struct copy_helper<Gsrc, Gtgt, false, true, true, true>
 {
 	static void assign(Gsrc const& src, Gtgt& tgt)
-	{ untested();
+	{
 		// for now
 		return copy_helper<Gsrc, Gtgt, false, true, false, false>::assign(src, tgt);
 	}
@@ -1730,7 +1730,7 @@ namespace detail{
 	template<class S, class T, class X=void>
 	struct set_hlp{
 		static void copy_set(S const& src, T& tgt)
-		{ untested();
+		{
 			for(auto w : src){ itested();
 				tgt.push_back(w);
 			}
@@ -1744,7 +1744,7 @@ namespace detail{
 		typedef T hmm2;
 
 		static void copy_set(S const& src, T& tgt)
-		{ untested();
+		{
 			for(auto w : src){ itested();
 				tgt.insert(w); // FIXME: hint, if ordered.
 			}
@@ -1753,7 +1753,7 @@ namespace detail{
 	template<class S>
 	struct set_hlp<S, S> {
 		static void copy_set(S const& src, S& tgt)
-		{ untested();
+		{
 			tgt = src;
 			// applymap...?
 		}
@@ -1782,7 +1782,7 @@ template<class Gsrc, class Gtgt>
 struct copy_helper<Gsrc, Gtgt, true, true, true, true >
 {
 	static void assign(Gsrc const& src, Gtgt& tgt)
-	{ untested();
+	{
 		auto& g=src;
 	//	typedef graph<ECT2, VCT2, VDP2, CFG2> oG; // source graph
 		size_t nv = g.num_vertices();

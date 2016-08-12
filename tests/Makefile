@@ -27,7 +27,7 @@ TESTS: gala
 
 
 $(LOGS): %.log: %
-	./$< | tee $@
+	./$< 2>&1 | tee $@
 
 gala:
 	-ln -sf ../ gala

@@ -61,7 +61,7 @@ int main(int , char* [])
 //
 //
 	assert(boost::num_edges(G3)==4);
-	{untested();
+	{
 		boost::copy_graph(G3, G2);
 
 		assert(boost::num_vertices(G3)==boost::num_vertices(G2));
@@ -69,7 +69,7 @@ int main(int , char* [])
 
 		assert(boost::num_vertices(G3)==5);
 	}
-	{untested();
+	{
 		boost::copy_graph(G3,G2);
 		assert(boost::num_edges(G2)==8);
 		assert(boost::num_vertices(G3)==boost::num_vertices(G2));
