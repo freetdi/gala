@@ -704,7 +704,6 @@ namespace boost { //
 	{
 		h = g;
 	}
-
 }
 
 // TODO: cleanup;
@@ -860,27 +859,17 @@ namespace boost {
 	};
 
   // g++ 'enumeral_type' in template unification not implemented workaround
-  // // FIXME: SGARGS?!
-	template< template<class T, class=std::less<T>, class=std::allocator<T> > class ECT,
-	          template<class T, class=std::allocator<T> > class VCT,
-				 class VDP,
-	          template<class G> class CFG,
-				 class Tag>
+	template<galaPARMS, class Tag>
 	struct property_map<gala::graph<SGARGS>, Tag> {
 		typedef typename simplegraph_property_map<Tag>::template bind_<SGARGS> map_gen;
 		typedef typename map_gen::type type;
 		typedef typename map_gen::const_type const_type;
 	};
 
-	template< template<class T, class=std::less<T>, class=std::allocator<T> > class ECT,
-	          template<class T, class=std::allocator<T> > class VCT,
-				 class VDP,
-	          template<class G> class CFG>
-	struct property_map<gala::graph<SGARGS>,
-	                    typename gala::graph<SGARGS>::vertex_index_type> {
-//		typedef typename simplegraph_property_map<Tag>::template bind_<SGARGS> map_gen;
-		typedef void* type;
-		typedef void* const_type;
+	VCTtemplate
+	struct property_map<gala::graph<SGARGS>, vertex_index_t>{ //
+		typedef simplegraph_graph_index_map<SGARGS> type;
+		typedef type const_type;
 	};
 
 	VCTtemplate
@@ -918,7 +907,7 @@ namespace boost {
 	}
 
 	VCTtemplate
-	inline simplegraph_graph_index_map<SGARGS>
+	inline typename property_map<gala::graph<SGARGS>, vertex_index_t>::const_type
 	get(vertex_index_t, const gala::graph<SGARGS> &g)
 	{
 //		return pmap_type(&g);

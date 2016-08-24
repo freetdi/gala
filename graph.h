@@ -190,7 +190,7 @@ struct iter_helper{ //
 
 	template<class iter, class VL>
 	static size_t fill_pos(iter first, iter last, VL& _v, bool dir=false)
-	{ untested();
+	{
 		auto nv=_v.size(); (void)nv;
 		assert(!dir); (void) dir;
 		size_t c=0;

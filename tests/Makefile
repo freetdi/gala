@@ -11,6 +11,7 @@ TESTS = \
 	count_adj \
 	dir \
 	edg \
+	idmap \
 	iter \
 	move \
 	rewire \
