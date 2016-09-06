@@ -762,16 +762,17 @@ namespace boost {
 	{ //
 		public:
 			typedef typename gala::bits::vertex_selector<ECT, VDP>::vertex_index_type vertex_index_type;
+			typedef typename gala::graph<SGARGS>::vertex_type vertex_descriptor;
 			typedef readable_property_map_tag category;
 			typedef vertex_index_type value_type;
 			typedef vertex_index_type reference;
-			typedef vertex_index_type key_type;
+			typedef vertex_descriptor key_type;
 			simplegraph_graph_index_map(gala::graph<SGARGS>const & g)
 			    : _g(g)
 			{
 			}
 			template <class T>
-			key_type operator[](T x) const
+			value_type operator[](T x) const
 			{
 //				assert(x == _g.position(x));
 				return _g.position(x);

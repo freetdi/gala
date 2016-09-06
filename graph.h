@@ -648,7 +648,7 @@ struct reverse_helper<ECT, VCT, VDP,
 		trace3("make_symmetric", oriented, e, checksum);
 		assert(checksum==e || !oriented);
 		// ssg only. for now.
-		if(oriented){ untested();
+		if(oriented){
 			vertex_type vpos=0;
 			for(unsigned j=0; j<_v.size(); ++j){ itested();
 				auto K = _v[j].begin();
@@ -675,7 +675,7 @@ struct reverse_helper<ECT, VCT, VDP,
 
 #ifndef NDEBUG
 		trace3("make_symm", oriented, ebefore, e);
-		if(oriented){ untested();
+		if(oriented){
 			assert(ebefore*2==e);
 		}else{
 		}

@@ -220,6 +220,23 @@ struct iterator_traits<my_counter<D> >{ //
 };
 }
 /*--------------------------------------------------------------------------*/
+template<class C>
+struct sorted_helper{
+	static bool contains(C const&c, typename C::value_type e)
+	{
+		return c.find(e)!=c.end();
+	}
+};
+template<class E>
+struct sorted_helper<std::vector<E> >{
+	typedef std::vector<E> C;
+	static bool contains(C const&c, E e)
+	{
+		incomplete(); // inefficient.
+		return std::find(c.begin(), c.end(), e)!=c.end();
+	}
+};
+/*--------------------------------------------------------------------------*/
 template<class S, class S_iterator, class T_iterator>
 struct merge<S, S_iterator, T_iterator, typename is_ordered_set<S>::type >{ //
 
@@ -480,7 +497,7 @@ private:
 		while(true){
 			if(S_iterator(*this)==_ve){
 				return;
-			}else if(_s.find(**this) == _s.end()){
+			}else if(!sorted_helper<S>::contains(_s, **this)){
 				S_iterator::operator++();
 			}else{
 				return;

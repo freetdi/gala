@@ -25,6 +25,7 @@
 #include "trace.h"
 #include <assert.h>
 #include <boost/graph/graph_traits.hpp>
+#include <stack>
 
 namespace gala{
 
@@ -81,6 +82,11 @@ public: // queueing
         unlink(v,d);
     }
 
+    void q_update(const vertex_descriptor& v)
+    {
+        unlink(v);
+        _q.push(v);
+    }
     void reg(const vertex_descriptor& v)
     {
         size_t d=_g.degree(v);
@@ -90,6 +96,15 @@ public: // queueing
     {
         bool n=_degs[d].insert(v).second;
         assert(n); (void)n;
+    }
+
+    void update_queued()
+    { untested();
+
+        while(!_q.empty()){
+            reg(_q.top());
+            _q.pop();
+        }
     }
 
     void flush() const
@@ -178,6 +193,7 @@ private:
     container_type _degs;
 private:
     G& _g;
+    std::stack<vertex_descriptor> _q;
 }; // default_DEGS
 
 }// gala

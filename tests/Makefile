@@ -14,6 +14,7 @@ TESTS = \
 	idmap \
 	iter \
 	move \
+	pmap \
 	rewire \
 	sfinae \
 	view

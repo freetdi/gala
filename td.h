@@ -20,7 +20,8 @@
 #ifndef GALA_TREEDEC_H
 #define GALA_TREEDEC_H
 
-#include <gala/boost.h>
+#include "boost.h"
+#include "sfinae.h"
 
 // HACK
 #include <tdlib/degree.hpp>
@@ -141,6 +142,8 @@ static size_t mcah(
 		callback_proxy<CB, G> cbp(N, cb, g);
 
 		// merge II .. E into out_edges(N)
+		// call back on newly inserted out edges.
+		//  ... before inserting them.
 		zipfwdb4(g.out_edges(N), II, E, &cbp);
 		if(cbp.done()){
 			assert(cb);
@@ -228,7 +231,35 @@ typedef typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor ve
 			g.out_edges(vd).clear();
 		}
 	}
-}; // ghelp_hack
+}; // sghelp_hack
+
+template<galaPARMS, class CB>
+struct sghelp_hack< ECT, VCT, VDP, CFG, CB,
+	typename gala::sfinae::is_vec_tpl<ECT>::type > { //
+static size_t mcah(
+		typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor c,
+		gala::graph<SGARGS>& g,
+// 		typename treedec::graph_traits< gala::graph<SGARGS> >::bag_type& bag,
+		 typename treedec::treedec_traits<
+		   typename treedec::treedec_chooser<  gala::graph<SGARGS>  >::type>::bag_type& bag,
+		CB* cb)
+{
+	(void)c;
+	(void)cb;
+	(void)bag;
+	(void)g;
+	incomplete();
+	return 0;
+}
+typedef typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor vertex_descriptor;
+	static void ce(vertex_descriptor vd, vertex_descriptor into,
+	                   gala::graph<SGARGS> &g,
+							 bool erase=true,
+	                   treedec::vertex_callback<typename gala::graph<SGARGS>::vertex_type >* cb=NULL)
+{
+	incomplete();
+}
+};
 
 } //treedec
 
