@@ -23,6 +23,7 @@
 #ifndef IMMUTABLE_H
 #define IMMUTABLE_H
 #include <boost/graph/directed_graph.hpp>
+#include <boost/graph/graph_traits.hpp>
 #include <boost/iterator/counting_iterator.hpp>
 #include <tdlib/graph.hpp>
 
@@ -110,7 +111,7 @@ namespace boost_dissect{ //
 		}
 		return i;
 	}
-}
+} // boost_dissect
 
 // hmm, template argument only needed for construction/assignment?
 template<class G>
@@ -386,6 +387,8 @@ namespace boost{ //
 		typedef typename immvecgraph<G>::edge_iterator edge_iterator;
 		typedef typename immvecgraph<G>::out_edge_iterator out_edge_iterator;
 		typedef boost::counting_iterator<vertex_descriptor> vertex_iterator;
+		typedef typename graph_traits<G>::vertices_size_type vertices_size_type;
+		typedef typename graph_traits<G>::edges_size_type edges_size_type;
 	};
 	template<class G>
 		unsigned /*FIXME*/
