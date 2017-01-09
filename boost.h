@@ -649,12 +649,11 @@ namespace boost { //
 		vi u = gg->begin();
 		vi e = gg->end();
 
-		while(true){
+		while(u!=e){ untested();
 			vertex_type U=G::iter::deref(u);
-			if(!gg->out_edges(U).empty()){
+			if(!gg->out_edges(U).empty()){ untested();
 				break;
-			}else if(u==e){
-				break;
+			}else{ untested();
 			}
 			++u;
 		}
