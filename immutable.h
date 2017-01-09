@@ -495,6 +495,24 @@ namespace boost{ //
 	          typename immvecgraph<G>::vertex_iterator> vertices(const immvecgraph<G>& g){
 		return g.vertices();
 	}
+	class imm_vid_map
+		: public put_get_helper<unsigned, imm_vid_map>
+	{
+		public:
+			typedef readable_property_map_tag category;
+			typedef unsigned value_type;
+			typedef unsigned reference;
+			typedef unsigned key_type;
+			imm_vid_map(){}
+			template <class T>
+				long operator[](T x) const { return x; }
+	};
+	template <class G>
+	inline imm_vid_map
+	get(vertex_index_t, const immvecgraph<G>&)
+	{ untested();
+    return imm_vid_map();
+	}
 } // boost
 
 
