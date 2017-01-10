@@ -20,12 +20,13 @@
 // a simple graph with edge labels overlay for an immutable graph.
 //
 //
-#ifndef IMMUTABLE_H
-#define IMMUTABLE_H
+#ifndef G_IMMUTABLE_H
+#define G_IMMUTABLE_H
 #include <boost/graph/directed_graph.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/iterator/counting_iterator.hpp>
 #include <tdlib/graph.hpp>
+#include <boost/iterator/iterator_facade.hpp>
 
 // HACK HACK HACK
 #ifndef TD_DEFS_NETWORK_FLOW
@@ -130,7 +131,18 @@ public: // types
 	typedef void edge_parallel_category;
 	typedef void traversal_category;
 
-	class edge_iterator{ //
+	class edge_iterator
+      : public boost::iterator_facade<edge_iterator,
+                                      edge_descriptor,
+                                      boost::forward_traversal_tag,
+                                      const edge_descriptor&>
+	{ //
+		public: // types
+			typedef edge_descriptor value_type;
+//       typedef edge_descriptor* difference_type;
+//       typedef edge_descriptor reference;
+//       typedef edge_descriptor* pointer;
+//       typedef std::input_iterator_tag iterator_category;
 	public: // cons
 		edge_iterator()
 		{
@@ -155,11 +167,10 @@ public: // types
 			assert( _s!=p._s || p._t==_t);
 			return p._t!=_t;
 		}
-		edge_iterator& operator++()
+		void increment()
 		{
 			++_t;
 			skip();
-			return *this;
 		}
 		void skip()
 		{
@@ -179,7 +190,7 @@ public: // types
 				}
 			}
 		}
-		edge_descriptor operator*() const
+		value_type operator*() const
 		{
 			return std::make_pair(_s, _t);
 		}
@@ -197,7 +208,11 @@ public: // types
 		immvecgraph const* _g;
 	};
 
-	class out_edge_iterator{ //
+	class out_edge_iterator
+      : public boost::iterator_facade<out_edge_iterator,
+                                      edge_descriptor,
+                                      boost::forward_traversal_tag,
+                                      const edge_descriptor&>{
 	public: // cons
 		out_edge_iterator()
 		{
@@ -221,10 +236,9 @@ public: // types
 			assert(_s==p._s);
 			return p._t != _t;
 		}
-		out_edge_iterator& operator++()
+		void increment()
 		{
 			++_t;
-			return *this;
 		}
 		edge_descriptor operator*() const
 		{
@@ -387,8 +401,14 @@ namespace boost{ //
 		typedef typename immvecgraph<G>::edge_iterator edge_iterator;
 		typedef typename immvecgraph<G>::out_edge_iterator out_edge_iterator;
 		typedef boost::counting_iterator<vertex_descriptor> vertex_iterator;
+		typedef typename immvecgraph<G>::edge_descriptor edge_descriptor;
+
 		typedef typename graph_traits<G>::vertices_size_type vertices_size_type;
 		typedef typename graph_traits<G>::edges_size_type edges_size_type;
+		typedef typename graph_traits<G>::directed_category directed_category;
+		typedef typename graph_traits<G>::edge_parallel_category edge_parallel_category;
+		typedef typename graph_traits<G>::traversal_category traversal_category;
+		typedef typename graph_traits<G>::degree_size_type degree_size_type;
 	};
 	template<class G>
 		unsigned /*FIXME*/
@@ -417,6 +437,11 @@ namespace boost{ //
 	}
 	template<class G>
 	unsigned degree(typename immvecgraph<G>::vertex_descriptor v, immvecgraph<G> const& g)
+	{
+		return g.degree(v);
+	}
+	template<class G>
+	unsigned out_degree(typename immvecgraph<G>::vertex_descriptor v, immvecgraph<G> const& g)
 	{
 		return g.degree(v);
 	}
@@ -756,5 +781,6 @@ inline immvecgraph<G_t> const& immutable_clone(
 }
 
 } // draft
-}
+} // treedec
+
 #endif // guard
