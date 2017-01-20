@@ -78,33 +78,33 @@ public:
 //	{ untested();
 //	}
 	skip_it(I& i, I const& e, const ref& what): I(i), _skip(what), _end(e)
-	{
+	{ untested();
 		skip();
 	}
 	skip_it& operator++()
-	{
+	{ untested();
 		if (I::operator==(_end)){ untested();
-		}else{
+		}else{ untested();
 			I::operator++();
 			skip();
 		}
 		return *this;
 	}
 	bool operator==(const I& i)
-	{
+	{ untested();
 		return I::operator==(i);
 	}
 	bool operator!=(const I& i)
-	{
+	{ untested();
 		return I::operator!=(i);
 	}
 
 private:
 	void skip()
-	{
-		if (I::operator==(_end)){
-		}else if (I::operator*() != _skip){
-		}else{
+	{ untested();
+		if (I::operator==(_end)){ untested();
+		}else if (I::operator*() != _skip){ untested();
+		}else{ untested();
 			I::operator++();
 		}
 	}
@@ -114,7 +114,7 @@ private:
 
 template<class I, class S>
 inline skip_it<I,S> make_skip_it(I b, I e, S s)
-{
+{ untested();
 	return skip_it<I,S>(b, e, s);
 }
 
@@ -201,14 +201,14 @@ class my_counter{ //
       typedef D value_type;
 	public:
 		my_counter() : _cnt(0){}
-		void operator++(){
+		void operator++(){ untested();
 			++_cnt;
 		}
 		size_t count() const
 		{itested();
 			return _cnt;
 		}
-		D& operator*(){
+		D& operator*(){ untested();
 			return _dummy;
 		}
 };
@@ -223,7 +223,7 @@ struct iterator_traits<my_counter<D> >{ //
 template<class C>
 struct sorted_helper{
 	static bool contains(C const&c, typename C::value_type e)
-	{
+	{ untested();
 		return c.find(e)!=c.end();
 	}
 };
@@ -231,7 +231,7 @@ template<class E>
 struct sorted_helper<std::vector<E> >{
 	typedef std::vector<E> C;
 	static bool contains(C const&c, E e)
-	{
+	{ untested();
 		incomplete(); // inefficient.
 		return std::find(c.begin(), c.end(), e)!=c.end();
 	}
@@ -267,7 +267,7 @@ struct merge<S, S_iterator, T_iterator, typename is_ordered_set<S>::type >{ //
 
 		S_iterator seek=src_begin;
 		typename S::iterator hint;
-		if(seek==src_end){
+		if(seek==src_end){ untested();
 			return;
 		}
 
@@ -275,7 +275,7 @@ struct merge<S, S_iterator, T_iterator, typename is_ordered_set<S>::type >{ //
 		// find twice? should be optimized out (hopefully).
 		// turns out faster in FI2, could be the callback...
 		hint = tgt.find(*seek);
-		if(hint == tgt.end()){
+		if(hint == tgt.end()){ untested();
 			(*cb)(*seek);
 			hint = tgt.insert(*seek).first;
 		}
@@ -292,18 +292,18 @@ struct merge<S, S_iterator, T_iterator, typename is_ordered_set<S>::type >{ //
 		++hint;
 		++seek;
 
-		if(seek==src_end){
+		if(seek==src_end){ untested();
 			return;
 		}
 
 		if(unlikely(hint==tgt.end())){itested();
-		}else{
+		}else{ untested();
 
-		while(true){
+		while(true){ untested();
 			assert(seek!=src_end);
 			assert(hint!=tgt.end());
-			if(unlikely(*seek<*hint)){
-				if(cb){
+			if(unlikely(*seek<*hint)){ untested();
+				if(cb){ untested();
 					(*cb)(*seek);
 				}
 				size_t l=tgt.size();
@@ -313,12 +313,12 @@ struct merge<S, S_iterator, T_iterator, typename is_ordered_set<S>::type >{ //
 				if(seek==src_end){itested();
 					return;
 				}
-			}else if(unlikely(*seek==*hint)){
+			}else if(unlikely(*seek==*hint)){ untested();
 				++hint;
 				++seek;
-				if(unlikely(seek==src_end)){
+				if(unlikely(seek==src_end)){ untested();
 					return;
-				}else if(unlikely(hint==tgt.end())){
+				}else if(unlikely(hint==tgt.end())){ untested();
 					break; // h_at_end
 				}
 			}else if(unlikely(*seek>100+*hint)){ // TODO: fine tuning?
@@ -349,12 +349,12 @@ struct merge<S, S_iterator, T_iterator, typename is_ordered_set<S>::type >{ //
 				}else if(unlikely(hint==tgt.end())){itested();
 					break; // h_at_end
 				}
-			}else{
-				while(*seek>*hint){
+			}else{ untested();
+				while(*seek>*hint){ untested();
 					++hint;
 					if(hint==tgt.end()){itested();
 						goto h_at_end;
-					}else{
+					}else{ untested();
 					}
 				}
 			}
@@ -363,8 +363,8 @@ struct merge<S, S_iterator, T_iterator, typename is_ordered_set<S>::type >{ //
 
 	h_at_end:
 		assert(hint==tgt.end());
-		while(seek!=src_end){
-			if(cb){
+		while(seek!=src_end){ untested();
+			if(cb){ untested();
 				(*cb)(*seek);
 			}
 
@@ -386,14 +386,14 @@ class dummy{ //
 // call back BEFORE insertion (if possible?)
 template<class S, class S_iterator, class T_iterator, class CB=dummy<typename S::value_type> >
 void zipfwdb4(S& tgt, S_iterator src_begin, T_iterator src_end, CB* cb=nullptr)
-{
+{ untested();
 	return merge<S, S_iterator, T_iterator>::zipfwd(tgt, src_begin, src_end, cb);
 }
 
 // S_iterator and T_iterator must be comparable...
 template<class S, class S_iterator, class T_iterator>
 size_t count_missing(S const& tgt, S_iterator src_begin, T_iterator src_end)
-{
+{ untested();
 	return merge<S,S_iterator,T_iterator>::count_missing(tgt, src_begin, src_end);
 }
 
@@ -404,7 +404,7 @@ void zipfwdb42(S& tgt, S const& src)
 }
 template<class S>
 void zipfwdb4(S& tgt, S const& src)
-{
+{ untested();
 	zipfwdb4(tgt, src.begin(), src.end());
 }
 
@@ -468,7 +468,7 @@ public: // types
 public: // construct
 	intersection_iterator(S_iterator v, S_iterator ve, T& s)
 		: S_iterator(v), _ve(ve), _s(s)
-	{
+	{ untested();
 		skip();
 	}
 	intersection_iterator(S const& v, T const& s)
@@ -479,11 +479,11 @@ public: // construct
 	}
 	intersection_iterator(const intersection_iterator& p)
 		: S_iterator(p), _ve(p._ve), _s(p._s)
-	{
+	{ untested();
 	}
 public: //ops
 	S_iterator& operator++()
-	{
+	{ untested();
 		assert(_ve!=S_iterator(*this));
 		assert(S_iterator(*this)!=_ve);
 		S_iterator::operator++();
@@ -493,13 +493,13 @@ public: //ops
 	}
 private:
 	void skip()
-	{
-		while(true){
-			if(S_iterator(*this)==_ve){
+	{ untested();
+		while(true){ untested();
+			if(S_iterator(*this)==_ve){ untested();
 				return;
-			}else if(!sorted_helper<S>::contains(_s, **this)){
+			}else if(!sorted_helper<S>::contains(_s, **this)){ untested();
 				S_iterator::operator++();
-			}else{
+			}else{ untested();
 				return;
 			}
 		}
@@ -540,9 +540,9 @@ public: //ops
 		assert(S_iterator(*this)!=_ve);
 		// still inefficient...
 		S_iterator::operator++();
-		if(unlikely(**this>10+*_s)){
+		if(unlikely(**this>10+*_s)){ untested();
 			_s = _w->lower_bound(**this);
-		}else{
+		}else{ untested();
 			++_s;
 		}
 		skip();
@@ -552,13 +552,13 @@ public: //ops
 	}
 private:
 	void skip()
-	{
+	{ untested();
 		while(true){ untested();
-			if(S_iterator(*this)==_ve){
+			if(S_iterator(*this)==_ve){ untested();
 				return;
-			}else if(_s.find(**this) == _s.end()){
+			}else if(_s.find(**this) == _s.end()){ untested();
 				S_iterator::operator++();
-			}else{
+			}else{ untested();
 				return;
 			}
 		}

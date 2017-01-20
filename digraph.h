@@ -25,7 +25,7 @@
 class mybool{ //
 public:
 	mybool() : value_(bool())
-	{
+	{ untested();
 	}
 	/* explicit */ mybool(bool const& t): value_(t) {}
 	// /* explicit */ operator bool&() { return value_; }
@@ -60,7 +60,7 @@ public: // types
 	class out_edge_iterator{ //
 	public: // cons
 		out_edge_iterator()
-		{
+		{ untested();
 		}
 		out_edge_iterator(vertex_descriptor v, idgwel const& g)
 		    : _s(v), _t(g._vertices[v])
@@ -82,7 +82,7 @@ public: // types
 			return p._t != _t;
 		}
 		out_edge_iterator& operator++()
-		{
+		{ untested();
 			++_t;
 			return *this;
 		}
@@ -99,7 +99,7 @@ public: // construct
 	{untested();
 	}
  	idgwel() : _g(NULL)
- 	{
+ 	{ untested();
  	}
 	template<class S>
 	idgwel(const G& g, std::vector<bool> const & disabled,
@@ -111,10 +111,10 @@ public: // construct
 		  _predecessor(boost::num_vertices(g)-num_dis),
 		  _edges(0), _path(0),
 		  _g(&g)
-	{
+	{ untested();
 #ifndef NDEBUG
 		unsigned c=0;
-		for(auto x : disabled){
+		for(auto x : disabled){ untested();
 			if(x) ++c;
 		}
 		assert(num_dis==c);
@@ -123,7 +123,7 @@ public: // construct
 	}
 public: // assign
 	idgwel& operator=(idgwel&& p)
-	{
+	{ untested();
 		assert(p._g == _g || !_g);
 		_vertices = std::move(p._vertices);
 		_edges = std::move(p._edges);
@@ -150,26 +150,26 @@ public: // assign
 	}
 	std::pair<internal_out_edge_iterator, internal_out_edge_iterator>
 	internal_out_edges(vertex_descriptor v) const
-	{
+	{ untested();
 		assert(unsigned(v+1)<_vertices.size());
 		return std::make_pair(_vertices[v], _vertices[v+1]);
 	}
 	std::pair<vertex_iterator, vertex_iterator> vertices() const
-	{
+	{ untested();
 		assert(_vertices.size());
 		return std::make_pair(vertex_iterator(0), vertex_iterator(_vertices.size()-1));
 	}
 	bool& path(edge_descriptor e)
-	{
+	{ untested();
 		assert(edge_pos(e)<_path.size());
 		return _path[edge_pos(e)];
 	}
 	bool path(edge_descriptor e) const
-	{
+	{ untested();
 		return _path[edge_pos(e)];
 	}
 	bool& visited(vertex_descriptor v)
-	{
+	{ untested();
 		return _visited[v];
 	}
 	bool visited(vertex_descriptor v) const
@@ -177,7 +177,7 @@ public: // assign
 		return _visited[v];
 	}
 	vertex_descriptor& predecessor(vertex_descriptor v)
-	{
+	{ untested();
 		return _predecessor[v];
 	}
 	vertex_descriptor predecessor(vertex_descriptor v) const
@@ -185,22 +185,22 @@ public: // assign
 		return _predecessor[v];
 	}
 	vertex_descriptor source() const
-	{
+	{ untested();
 		return _vertices.size()-3;
 	}
 	vertex_descriptor sink() const
-	{
+	{ untested();
 		return _vertices.size()-2;
 	}
 
 	std::pair<edge_descriptor, bool> edge(vertex_descriptor s,
 	                                      vertex_descriptor t) const
-	{
+	{ untested();
 		auto range=internal_out_edges(s);
 		auto f=boost_dissect::find(range.first, range.second, t);
-		if(f==range.second){
+		if(f==range.second){ untested();
 			return std::make_pair(edge_descriptor(), false);
-		}else{
+		}else{ untested();
 			edge_descriptor e(s,f);
 			assert(edge_pos(e) < _path.size());
 			return std::make_pair(e, true);
@@ -208,13 +208,13 @@ public: // assign
 	}
 private: // implementation
 	unsigned edge_pos(internal_out_edge_iterator e) const
-	{
+	{ untested();
 		unsigned p = std::distance(_edges.begin(), e);
 		assert(p<_path.size());
 		return p;
 	}
 	unsigned edge_pos(edge_descriptor e) const
-	{
+	{ untested();
 		return edge_pos(e.second);
 	}
 private: // data
@@ -246,7 +246,7 @@ namespace boost{ //
     typename idgwel<G>::out_edge_iterator,
     typename idgwel<G>::out_edge_iterator>
 		 out_edges(typename idgwel<G>::vertex_descriptor v, const idgwel<G>& g)
-	 {
+	 { untested();
 		 return g.out_edges(v);
 	 }
 
@@ -266,13 +266,13 @@ namespace boost{ //
 	template<class G>
 	bool get(bool treedec::Edge_NF::*, const idgwel<G>& g,
 			typename idgwel<G>::edge_descriptor e)
-	{
+	{ untested();
 		return g.path(e);
 	}
 	template<class G>
 	bool& get(bool treedec::Edge_NF::*, idgwel<G>& g,
 			typename idgwel<G>::edge_descriptor e)
-	{
+	{ untested();
 		return g.path(e);
 	}
 	template<class G>
@@ -282,7 +282,7 @@ namespace boost{ //
 	}
 	template<class G>
 	bool& get(bool treedec::Vertex_NF::*, idgwel<G>& g, typename idgwel<G>::vertex_descriptor v)
-	{
+	{ untested();
 		return g.visited(v);
 	}
 	template<class G>
@@ -294,19 +294,19 @@ namespace boost{ //
 	template<class G>
 	typename idgwel<G>::vertex_descriptor&
 	get(int treedec::Vertex_NF::*, idgwel<G>& g, typename idgwel<G>::vertex_descriptor v)
-	{
+	{ untested();
 		return g.predecessor(v);
 	}
 	template<class G>
 	std::pair<typename idgwel<G>::edge_descriptor, bool> edge(
 			typename idgwel<G>::vertex_descriptor s,
 			typename idgwel<G>::vertex_descriptor t, idgwel<G> const& g)
-	{
+	{ untested();
 		return g.edge(s,t);
 	}
 	template<class G>
 	std::pair<typename idgwel<G>::vertex_iterator,
-	          typename idgwel<G>::vertex_iterator> vertices(const idgwel<G>& g){
+	          typename idgwel<G>::vertex_iterator> vertices(const idgwel<G>& g){ untested();
 		return g.vertices();
 	}
 } // boost
@@ -318,7 +318,7 @@ template<class G>
 			vertex_index_t num_dis,
 			std::vector<typename boost::graph_traits<G>::vertex_descriptor> &idxMap,
 			S const& SRC, S const& SNK)
-	{
+	{ untested();
 		// 0, 1 .... SRC SNK
 		vertex_descriptor vsource=boost::num_vertices(g)-num_dis; (void)vsource;
 		vertex_descriptor vsink=boost::num_vertices(g)-num_dis+1;
@@ -345,10 +345,10 @@ template<class G>
 		BOOST_AUTO(vend, V.second);
 
 		unsigned vn=0;
-		for(;v!=vend;++v){
+		for(;v!=vend;++v){ untested();
 			auto vpos=treedec::get_pos(*v, *_g);
-			if(disabled[vpos]){
-			}else{
+			if(disabled[vpos]){ untested();
+			}else{ untested();
 				idxMap[vn] = *v;
 				_idxInverseMap[*v] = vn;
 				_vertices[vn] = _edges.end();
@@ -358,21 +358,21 @@ template<class G>
 				BOOST_AUTO(e, E.first);
 				BOOST_AUTO(eend, E.second);
 				for(;e!=eend;++e){ itested();
-					if(!disabled[treedec::get_pos(*e, *_g)]){
+					if(!disabled[treedec::get_pos(*e, *_g)]){ untested();
 						//std::cerr << "push " << vn << "(" << *v << ")" << " -> " << *e << "\n";
 						_edges.push_back(*e); // later: translate to diG vertex
 						_path.push_back(false);
-					}else{
+					}else{ untested();
 					}
 				}
 
 				// connect to sink vertex if it is in SNK.
 				// inefficient!
-				if(SNK.find(*v)!=SNK.end()){
+				if(SNK.find(*v)!=SNK.end()){ untested();
 						_edges.push_back(tmpsink);
 						//std::cerr << "pushsink " << vn << "(" << *v << ")" << " -> " << tmpsink << "\n";
 						_path.push_back(false);
-				}else{
+				}else{ untested();
 				}
 				++vn;
 			}
@@ -383,11 +383,11 @@ template<class G>
 		assert(vn==vsource);
 		assert(vn==source());
 
-		for(auto& e : _edges){
+		for(auto& e : _edges){ untested();
 			e = _idxInverseMap[e];
 		}
 
-		for(auto s : SRC){
+		for(auto s : SRC){ untested();
 			auto p=treedec::get_pos(s, *_g);
 			assert(p<boost::num_vertices(*_g));
 			assert(!disabled[p]);
@@ -410,16 +410,16 @@ template<class G>
 
 
 #ifndef NDEBUG
-		{
+		{ untested();
 			vertex_iterator i=vertices().first;
 			unsigned c=0;
-			for(;i!=vertices().second; ++i){
+			for(;i!=vertices().second; ++i){ untested();
 				//std::cerr << *i << ": ";
 				++c;
 				auto O=out_edges(*i);
 				auto Oi=O.first;
 				auto Oe=O.second;
-				for(;Oi!=Oe;++Oi){
+				for(;Oi!=Oe;++Oi){ untested();
 					//std::cerr << boost::source(*Oi, *this) << " ";
 					//std::cerr << boost::target(*Oi, *this) << " ";
 					assert(boost::source(*Oi, *this) != sink());

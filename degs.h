@@ -34,11 +34,11 @@ struct sgdeg_config {
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
     typedef typename G::EL bag_type;
     static void alloc_init(size_t)
-	 {
+	 { untested();
     }
     static unsigned num_threads(){return 1;}
 	 template<class container_t>
-    static vertex_descriptor pick(unsigned degree, container_t &c){
+    static vertex_descriptor pick(unsigned degree, container_t &c){ untested();
         return *c[degree].begin();
     }
 };
@@ -61,9 +61,9 @@ public: // types
 
 public: // construct
     default_DEGS(G& g): _degs(g.num_vertices()), _g(g)
-    {
+    { untested();
 		 CFG::alloc_init(g.num_vertices());
-		 for(vertex_iterator vIt=g.begin(); vIt!=g.end(); ++vIt){
+		 for(vertex_iterator vIt=g.begin(); vIt!=g.end(); ++vIt){ untested();
 			  vertex_descriptor v=G::iter::deref(vIt);
 			 _degs[g.degree(v)].insert(v);
         }
@@ -71,29 +71,29 @@ public: // construct
 
 public: // queueing
     void unlink(const vertex_descriptor& v, size_t d)
-    {
+    { untested();
         int n=_degs[d].erase(v);
         (void)n;
         assert(n==1);
     }
     void unlink(const vertex_descriptor& v)
-    {
+    { untested();
         size_t d=_g.degree(v);
         unlink(v,d);
     }
 
     void q_update(const vertex_descriptor& v)
-    {
+    { untested();
         unlink(v);
         _q.push(v);
     }
     void reg(const vertex_descriptor& v)
-    {
+    { untested();
         size_t d=_g.degree(v);
         reg(v,d);
     }
     void reg(const vertex_descriptor& v, size_t d)
-    {
+    { untested();
         bool n=_degs[d].insert(v).second;
         assert(n); (void)n;
     }
@@ -101,19 +101,19 @@ public: // queueing
     void update_queued()
     { untested();
 
-        while(!_q.empty()){
+        while(!_q.empty()){ untested();
             reg(_q.top());
             _q.pop();
         }
     }
 
     void flush() const
-    {
+    { untested();
     }
 
 public: // picking
     vertex_descriptor pick(unsigned degree)
-    {
+    { untested();
         return *_degs[degree].begin();
     }
     bag_type const detach_bag(unsigned degree)
@@ -124,9 +124,9 @@ public: // picking
     }
     // pick a minimum degree vertex within degree range [lower, upper]
     std::pair<vertex_descriptor,degree_t> pick_min(unsigned lower=0, unsigned upper=-1) const
-    {
+    { untested();
 		 (void) upper;
-        while(_degs[lower].empty()){
+        while(_degs[lower].empty()){ untested();
             ++lower;
             // min_ntd==num_vert contradicts the outer loop condition
             // (this loop should be safe)
@@ -154,15 +154,15 @@ public: // picking
 
             iterator j=degs._degs.begin();
             unsigned N=0;
-            for(iterator i=_degs.begin(); i!=_degs.end();) {
+            for(iterator i=_degs.begin(); i!=_degs.end();) { untested();
                 assert(N<boost::num_vertices(_g));
                 unsigned I=i->size();
                 unsigned J=j->size(); //actual _g
 
-                if(I>J){
+                if(I>J){ untested();
                     std::cerr<<"mismatch " << I << " " << J << "\n";
                     std::cerr<<"extra node " << *i->begin() << " of deg " << N << " in degs\n";
-                }else if(I<J){
+                }else if(I<J){ untested();
                     std::cerr<<"mismatch " << I << " " << J << " in " << N << "\n";
                     std::cerr<<"extra node " << *j->begin() << " of deg " << N << " in g\n";
                 }
@@ -176,16 +176,16 @@ public: // picking
     } //void check()
 
     bag_type const& operator[](size_t x) const
-    {
+    { untested();
         return _degs[x];
     }
     size_t size() const
-    {
+    { untested();
         return _degs.size();
     }
 private:
     bag_type& operator[](size_t x)
-    {
+    { untested();
         return _degs[x];
     }
 

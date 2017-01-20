@@ -24,16 +24,17 @@
 //
 //
 #include <iostream>
+#include <vector>
 
 #ifndef HP_hp
 #define HP_hp
 class hp{
 	intptr_t p;
 	public:
-	hp(const void* x){
+	hp(const void* x){ //
 		p = (intptr_t)x %30011;
 	}
-	operator int(){
+	operator int(){ //
 		return static_cast<int>(p);
 	}
 };
@@ -135,10 +136,10 @@ inline bool contains(C const& c, typename C::value_type const& v)
 }
 template <class X>
 inline bool contains(std::vector<X> const& c, X const& v)
-{
+{ untested();
 	typedef typename std::vector<X>::const_iterator it;
 
-	for(it i=c.begin(); i!=c.end(); ++i){
+	for(it i=c.begin(); i!=c.end(); ++i){ untested();
 		if(v == *i) return true;
 	}
 	return false;

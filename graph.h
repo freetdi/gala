@@ -21,6 +21,8 @@
 #ifndef GALA_GRAPH_H
 #define GALA_GRAPH_H
 
+#include "trace.h"
+
 #include <cstdlib>
 #include <vector>
 #include <map>
@@ -28,14 +30,11 @@
 #include <stx/btree_set.h>
 #include <type_traits>
 		
-
 #include <boost/iterator/counting_iterator.hpp>
 #include <boost/tuple/tuple.hpp>
 
-
 #include "degs.h"
 #include "sfinae.h"
-#include "trace.h"
 #include <assert.h>
 #include <boost/mpl/bool.hpp>
 
@@ -48,7 +47,7 @@
 #endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-namespace gala{ //
+namespace gala{
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 struct vertex_ptr_tag {}; // not in use yet.
@@ -84,18 +83,18 @@ namespace bits{ //
 /*--------------------------------------------------------------------------*/
 template<class C, class E>
 void my_push_back(C& c, E e)
-{
+{ untested();
 	c.insert(e);
 }
 template<class E>
 void my_push_back(std::vector<unsigned>& c, E e)
-{
+{ untested();
 	// it's better not there yet (up to you).
 	c.push_back(e);
 }
 template<class E>
 void my_push_back(std::vector<short unsigned>& c, E e)
-{
+{ untested();
 	c.push_back(e);
 }
 /*--------------------------------------------------------------------------*/
@@ -171,9 +170,9 @@ struct vertex_helper<vertex_ptr_tag>{ //
 	}
 	template<class T, class S>
 	static void rebase(T& tgt, S const& src, intptr_t delta)
-	{
+	{ untested();
 		tgt.clear();
-		for(auto i : src) {
+		for(auto i : src) { untested();
 #ifdef NOHINT_REBASE
 			tgt.insert( typename T::value_type((intptr_t(i)+delta)));
 #else // faster. check applicability
@@ -190,11 +189,11 @@ struct iter_helper{ //
 
 	template<class iter, class VL>
 	static size_t fill_pos(iter first, iter last, VL& _v, bool dir=false)
-	{
+	{ untested();
 		auto nv=_v.size(); (void)nv;
 		assert(!dir); (void) dir;
 		size_t c=0;
-		for(;first!=last; ++first){
+		for(;first!=last; ++first){ untested();
 			unsigned v=first->first;
 			unsigned w=first->second;
 			assert(v<nv);
@@ -251,7 +250,7 @@ static size_t fill_pos(iter first, iter last, size_t nv, VL& _v, bool dir)
 	GALA_DEFAULT_VECTOR<v_t*> vmap(nv);
 	assert(nv==_v.size());
 	size_t index=0;
-	for(auto& i : _v){
+	for(auto& i : _v){ untested();
 		vmap[index++] = &i;
 	}
 	assert(index==_v.size());
@@ -303,7 +302,7 @@ struct vertex_selector<ECT, vertex_ptr_tag>{ //
 /*--------------------------------------------------------------------------*/
 // part of storage? not sure yet.
 STtemplate
-struct rewire_helper{ //
+struct rewire_helper{
 	template<class A, class B>
 	static void rewire_nodes(A& new_vl, B offset)
 	{
@@ -328,7 +327,7 @@ struct storage_base{ //
 	typedef VCT<vertex_> container_type;
 	typedef typename vs::vertex_index_type vertex_index_type;
 	static vertex_index_type num_edges(vertex_index_type n, container_type const&)
-	{
+	{ untested();
 		return n;
 	}
 };
@@ -346,7 +345,7 @@ struct storage : storage_base<STARGS>{ //
 	typedef ECT<vertex_type> edge_container_type; // -> storage base?
 	typedef VCT<vertex_> VL;
 	static bool need_rewire()
-	{
+	{ untested();
 		return false;
 	}
 	static vertex_type new_node(container_type& _v)
@@ -361,16 +360,16 @@ struct storage : storage_base<STARGS>{ //
 		return _v[v].size();
 	}
 	static VDP degree(container_type const& _v)
-	{
+	{ untested();
 		vertex_index_type ret=0;
-		for(auto const& e : _v){
+		for(auto const& e : _v){ untested();
 			vertex_index_type d = e.size();
 			if(d>ret) ret=d;
 		}
 		return ret;
 	}
 	static void clear_vertex(const VDP v, container_type& _v)
-	{
+	{ untested();
 		_v[v].clear();
 	}
 	static edge_container_type& out_edges(vertex_type& v, container_type& _v)
@@ -382,12 +381,12 @@ struct storage : storage_base<STARGS>{ //
 		return _v[v];
 	}
 	static const edge_container_type& out_edges(const_vertex_type& v, const container_type& _v)
-	{
+	{ untested();
 		return _v[v];
 	}
 	static void add_pos_edge(vertex_index_type v, vertex_index_type w,
 	                         container_type& _v)
-	{
+	{ untested();
 		assert(v<w); // for now
 		_v[v].insert(w);
 		_v[w].insert(v);
@@ -415,7 +414,7 @@ struct storage<ECT, VCT, vertex_ptr_tag> : public storage_base<ECT, VCT, vertex_
 	typedef ECT<vertex_type> edge_container_type;
 	typedef VCT<vertex_> VL;
 	static bool need_rewire()
-	{
+	{ untested();
 		return true;
 	}
 	static vertex_type new_node(container_type& _v)
@@ -438,18 +437,18 @@ struct storage<ECT, VCT, vertex_ptr_tag> : public storage_base<ECT, VCT, vertex_
 		return v->n.size();
 	}
 	static vertex_index_type degree(container_type const& _v)
-	{
+	{ untested();
 		vertex_index_type ret=0;
 		typename container_type::const_iterator v = _v.begin();
 		typename container_type::const_iterator e = _v.end();
-		for(; v!=e ; ++v){
+		for(; v!=e ; ++v){ untested();
 			vertex_index_type d = v->n.size();
 			if(d>ret) ret=d;
 		}
 		return ret;
 	}
 	static void clear_vertex(const vertex_type v, container_type&)
-	{
+	{ untested();
 		v->n.clear();
 	}
 	static edge_container_type& out_edges(vertex_& v, container_type&)
@@ -457,7 +456,7 @@ struct storage<ECT, VCT, vertex_ptr_tag> : public storage_base<ECT, VCT, vertex_
 		return v.n;
 	}
 	static const edge_container_type& out_edges(vertex_& v, const container_type&)
-	{
+	{ untested();
 		return v.n;
 	}
 	static edge_container_type& out_edges(vertex_type& v, container_type&)
@@ -465,13 +464,13 @@ struct storage<ECT, VCT, vertex_ptr_tag> : public storage_base<ECT, VCT, vertex_
 		return v->n;
 	}
 	static const edge_container_type& out_edges(const_vertex_type& v, const container_type&)
-	{
+	{ untested();
 		return v->n;
 	}
 public:
 	static void add_pos_edge(vertex_index_type v, vertex_index_type w,
 	                         container_type& _v)
-	{
+	{ untested();
 		assert(v<w); // for now
 		_v[v].n.insert(&_v[w]);
 		_v[w].n.insert(&_v[v]);
@@ -482,7 +481,7 @@ public:
 	{ incomplete();
 		tgt.clear();
 		auto e=tgt.end();
-		for(auto i : src) {
+		for(auto i : src) { untested();
 			tgt.insert( (vertex_*) (intptr_t(i)+delta), e);
 		}
 	}
@@ -569,7 +568,7 @@ struct reverse_helper : public storage<STARGS> { //
 
 //	template<class E>
 //	static void make_symmetric(vertex_container_type& , E& , bool /*oriented*/)
-//	{
+//	{ untested();
 //		// base case. hmm better don't use yet.
 //
 //		assert(false);
@@ -648,7 +647,7 @@ struct reverse_helper<ECT, VCT, VDP,
 		trace3("make_symmetric", oriented, e, checksum);
 		assert(checksum==e || !oriented);
 		// ssg only. for now.
-		if(oriented){
+		if(oriented){ untested();
 			vertex_type vpos=0;
 			for(unsigned j=0; j<_v.size(); ++j){ itested();
 				auto K = _v[j].begin();
@@ -675,7 +674,7 @@ struct reverse_helper<ECT, VCT, VDP,
 
 #ifndef NDEBUG
 		trace3("make_symm", oriented, ebefore, e);
-		if(oriented){
+		if(oriented){ untested();
 			assert(ebefore*2==e);
 		}else{
 		}
@@ -777,7 +776,7 @@ struct iter<ECT, VCT, vertex_ptr_tag>{ //
 	typedef typename vertex_selector<ECT,VDP>::const_type const_vertex;
 
 	static const_vertex_iterator vbegin(typename storage<STARGS>::VL const& v)
-	{
+	{ untested();
 		return v.begin();
 	}
 	static vertex_iterator vbegin(typename storage<STARGS>::VL& v)
@@ -802,7 +801,7 @@ struct iter<ECT, VCT, vertex_ptr_tag>{ //
 		return &*v;
 	}
 	static const_vertex deref(const_vertex_iterator& v)
-	{
+	{ untested();
 		return &*v;
 	}
 
@@ -828,7 +827,7 @@ struct iter<ECT, VCT, vertex_ptr_tag>{ //
 /*--------------------------------------------------------------------------*/
 template<class C>
 void prealloc(C const&, size_t /*howmany*/)
-{
+{ untested();
 }
 /*--------------------------------------------------------------------------*/
 // typedef vertex_ptr_tag use_pointers;
@@ -838,8 +837,7 @@ struct graph_cfg_default;
 /*--------------------------------------------------------------------------*/
 namespace detail{
 template<class CFG, class X=void>
-struct is_directed_select
-{
+struct is_directed_select {
 	typedef boost::mpl::false_ type; // uuh, obsolete?
 	static constexpr bool value=false;
 	operator bool() const {return false;}
@@ -848,7 +846,7 @@ struct is_directed_select
 template<class CFG>
 struct is_directed_select<CFG,
 	typename tovoid < typename std::enable_if< CFG::is_directed >::type >::type >
-{
+{ //
 //	typedef boost::mpl::true_ type;
 	static constexpr bool value=CFG::is_directed;
 // 	typedef typename std::enable_if< CFG::is_directed >::type type;
@@ -856,32 +854,30 @@ struct is_directed_select<CFG,
 
 // temporary hack. use proper maps later
 template<STPARMS, class X=void>
-struct is_nn
-{
+struct is_nn {
 	static constexpr bool value=false;
 };
 template<template<class T, typename... > class ECT,
          template<class T, typename... > class VCT>
-struct is_nn<ECT, VCT, vertex_ptr_tag>
-{
+struct is_nn<ECT, VCT, vertex_ptr_tag> {
 	// incomplete: this is not what it is meant to be...
 	static constexpr bool value=false;
 };
 template<STPARMS>
 struct is_nn<STARGS,
 	typename std::enable_if<sfinae::is_vec_tpl<VCT>::value >::type >
-{
+{ //
 	static constexpr bool value=true;
 };
 #if 0
 // old approach. will go, does no longer work!
 template<class CFG>
 struct is_directed_select<CFG, typename tovoid<typename CFG::is_directed_t>::type >
-{
+{ untested();
 	typedef typename CFG::is_directed_t type;
 
 	static constexpr bool value=type();
-	operator bool() const {
+	operator bool() const { untested();
 		unreachable();
 		return type();}
 };
@@ -915,12 +911,10 @@ public: // types
 //	typedef typename detail::is_directed_select<myCFG>::type is_directed_t;
 //	typedef typename detail::is_directed_select<myCFG>::value is_directed;
 	static constexpr bool is_directed_v=detail::is_directed_select<myCFG>::value;
-	static constexpr bool is_directed() // humm
-	{
+	static constexpr bool is_directed() {
 		return is_directed_v;
 	}
-	static constexpr bool is_ordered()
-	{
+	static constexpr bool is_ordered() {
 		// for now.
 		return sfinae::is_set< ECT<sfinae::any> >::value;
 	}
@@ -984,7 +978,7 @@ public: // construct
 #ifndef NDEBUG
 		for(auto i = begin(); i!=end(); ++i){
 			assert(is_valid(iter::deref(i)));
-			//   		for(auto& j : vertices()){
+			//   		for(auto& j : vertices()){ untested();
 			//   //			assert(is_edge(&j,&i) == is_edge(&i,&j));
 			//   		}
 		}
@@ -1000,7 +994,7 @@ public: // move
 		for(auto i = begin(); i!=end(); ++i){
 			assert(is_valid(iter::deref(i)));
 #ifdef MORE_DEBUG
-			for(auto& j : vertices()){
+			for(auto& j : vertices()){ untested();
 				assert(is_edge(&j,&i) == is_edge(&i,&j));
 			}
 #endif
@@ -1009,7 +1003,7 @@ public: // move
 	graph(vertices_size_type n=0, edges_size_type m=0)
 	    : _v(n), _num_edges(0)
 	{
-		if(m){
+		if(m){ untested();
 			EL a;
 			prealloc(a, 2*m);
 		}
@@ -1023,7 +1017,7 @@ public: // Required by Iterator Constructible Graph
 	void fill_in_edges(EI1 first, EI2 last, bool checkdups);
 	template <class RANGE>
 	void fill_in_edges(const RANGE& r)
-	{
+	{ untested();
 		return fill_in_edges(r.first, r.second, true);
 	}
 public: //assign
@@ -1054,7 +1048,7 @@ public: //assign
 			_v = std::move(x._v);
 //			x._v.clear(); // hmm, does not work for sl
 			x._num_edges = 0;
-		}else{
+		}else{ untested();
 		}
 		trace2("move assign", size_t(num_vertices()), size_t(num_edges()));
 #ifndef NDEBUG
@@ -1075,7 +1069,7 @@ public: // construct
 	template <typename G_t>
 	explicit graph(G_t const &G)
 	    : _num_edges(0)
-	{
+	{ untested();
 		assign(G);
 	}
 #endif
@@ -1143,13 +1137,13 @@ public:
 		_num_edges = 0;
 	}
 	bool is_edge(const_vertex_type a, const_vertex_type b) const
-	{
+	{ untested();
 		return a->n.find(const_cast<vertex_type>(b)) != a->n.end();
 	}
 private:
 	//O(log d), where d is the degree of a
 	void remove_edge_single(vertex_type a, vertex_type b)
-	{
+	{ untested();
 		assert(a!=b);
 		out_edges(a).erase(b);
 		--_num_edges;
@@ -1157,12 +1151,12 @@ private:
 private: // required by contruct from iterator
 	// add edge from vertex positions \in [0, nv)
 	void add_pos_edge(vertex_index_type a, vertex_index_type b)
-	{
+	{ untested();
 		storage::add_pos_edge(a, b, _v);
 	}
 	// same, but from strings.
 	void add_pos_edge(const char* a, const char* b)
-	{
+	{ untested();
 		storage::add_pos_edge(a, b, _v);
 	}
 public:
@@ -1187,8 +1181,8 @@ public:
 	size_t num_edges_debug(){
 #ifdef DEBUG
 		auto ne=0;
-		for(auto& v:_v){
-			for(auto& w:v){
+		for(auto& v:_v){ untested();
+			for(auto& w:v){ untested();
 				++ne;
 			}
 		}
@@ -1268,7 +1262,7 @@ public:
 	}
 	// O(log max{d_1, d_2}), where d_1 is the degree of a and d_2 is the degree of b
 	void remove_edge(vertex_type a, vertex_type b)
-	{
+	{ untested();
 		// must exist, for now.
 		assert(exists_edge(a,b));
 		assert(exists_edge(b,a));
@@ -1283,22 +1277,22 @@ public:
 		return storage::degree(who, _v);
 	}
 	vertex_index_type out_degree(const_vertex_type who) const
-	{
+	{ untested();
 		return storage::degree(who, _v);
 	}
 	// degree of the graph, O(V)
 	vertex_index_type degree() const
-	{
+	{ untested();
 		return storage::degree(_v);
 	}
 public:
 	// O(n + deg(v)*log(D)), where D is the maximum of the degrees of the
 	// neighbours of v
 	void clear_vertex(vertex_type v)
-	{
+	{ untested();
 		assert(is_valid(v));
 		unsigned c = 0;
-		for(auto& nIt : out_edges(v)){
+		for(auto& nIt : out_edges(v)){ untested();
 			remove_edge_single(nIt, v);
 			++c;
 		}
@@ -1316,7 +1310,7 @@ public:
 	void remove_vertex(iterator v);
 	// O(log d), where d is the degree of v
 	bool exists_edge(vertex_type v, vertex_type w)
-	{
+	{ untested();
 		assert((out_edges(v).find(w) == out_edges(v).end())
 				== (out_edges(w).find(v) == out_edges(w).end()));
 		return (out_edges(v).find(w) != out_edges(v).end());
@@ -1324,9 +1318,9 @@ public:
 
 		/*
 			template<class S>
-			void print(S& s){
-			for(unsigned int i = 0; i < num_vertices(); i++){
-			for(edgecontainer<size_t>::iterator nIt = _v[i].begin(); nIt != _v[i].end(); nIt++) {
+			void print(S& s){ untested();
+			for(unsigned int i = 0; i < num_vertices(); i++){ untested();
+			for(edgecontainer<size_t>::iterator nIt = _v[i].begin(); nIt != _v[i].end(); nIt++) { untested();
 			s << i << " -- " << *nIt << " ";
 			}
 			s << std::endl;
@@ -1391,8 +1385,7 @@ public: // experimental...?
 }; // class graph
 /*--------------------------------------------------------------------------*/
 template<class G>
-struct graph_cfg_default
-{
+struct graph_cfg_default {
 	typedef default_DEGS<G> degs_type;
 	typedef typename G::edges_size_type edges_size_type;
 //	typedef size_t edges_size_type; // uuh
@@ -1412,7 +1405,7 @@ graph<SGARGS>::num_edges() const
 VCTtemplate
 void
 graph<SGARGS>::set_num_edges(typename graph<SGARGS>::edges_size_type e)
-{
+{ untested();
 	return CFG<graph<SGARGS> >::set_num_edges(e, *this);
 }
 /*--------------------------------------------------------------------------*/
@@ -1436,14 +1429,14 @@ template <class EdgeIterator>
 graph<SGARGS>::graph(EdgeIterator first, EdgeIterator last,
                      vertices_size_type nv, edges_size_type ne)
     : graph(nv, ne)
-{
+{ untested();
 	_num_edges=0;
 	fill_in_edges(first, last, false);
 	assert(!ne || ne==_num_edges); // unique edges? for now.
 
 #ifndef NDEBUG
 	unsigned c = 0;
-	for(auto& i : _v){
+	for(auto& i : _v){ untested();
 		c += i.size();
 	}
 	assert(is_directed() || 2*num_edges() == c);
@@ -1453,7 +1446,7 @@ graph<SGARGS>::graph(EdgeIterator first, EdgeIterator last,
 VCTtemplate
 typename graph<SGARGS>::EL const&
     graph<SGARGS>::out_edges(const_vertex_type& v) const
-{
+{ untested();
 	assert(is_valid(v));
 	return storage::out_edges(v, _v);
 }
@@ -1485,7 +1478,7 @@ typename graph<SGARGS>::EL& // const?!
 // VCTtemplate
 // const typename graph<SGARGS>::EL&
 // 	graph<SGARGS>::out_edges(const typename graph<SGARGS>::vertex_type& v) const
-// {
+// { untested();
 // 	return storage::out_edges(v);
 // }
 /*--------------------------------------------------------------------------*/
@@ -1528,14 +1521,14 @@ graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
 	typedef typename oG::const_iterator other_const_iterator;
 	typedef typename oG::const_vertex_type other_const_vertex_type;
 
-	if (intptr_t(&x) == intptr_t(this)) {
+	if (intptr_t(&x) == intptr_t(this)) { untested();
 	}else if (num_vertices()==0){ itested();
 		detail::copy_helper<graph, graph,
 			is_directed_v, is_directed_v,
 			is_nn_v, is_nn_v>::assign(x, *this);
 	}else if (num_vertices()!=x.num_vertices()){ incomplete();
-	// }else if( .. incomplete){
-	}else{
+	// }else if( .. incomplete){ untested();
+	}else{ untested();
 // 		dead?. should not get here.
 		// why not assign_?
 		const_iterator b = begin();
@@ -1545,7 +1538,7 @@ graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
 		iterator v = begin();
 		iterator e = end();
 		_num_edges = x._num_edges;
-		for(; v!=e ; ++v){
+		for(; v!=e ; ++v){ untested();
 			vertex_type vd = iter::deref(v);
 			other_const_vertex_type sd = oG::iter::deref(s);
 			EL& E = out_edges(vd); // ?!
@@ -1558,7 +1551,7 @@ graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
 			E = MS;
 			//for(vertex& h : out_edges(vd))
 			// works for std::set only...
-			for(typename EL::iterator i=vd->n.begin(); i!=vd->n.end(); ++i){
+			for(typename EL::iterator i=vd->n.begin(); i!=vd->n.end(); ++i){ untested();
 				vertex* j= const_cast<vertex*>(&(*i));
 				assert(*j >= &*x.begin());
 				assert(*j < &*x.end());
@@ -1570,7 +1563,7 @@ graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
 				assert(*j >= &*begin());
 				assert(*j < &*end());
 			}
-			for(typename EL::iterator i=vd->n.begin(); i!=vd->n.end(); ++i){
+			for(typename EL::iterator i=vd->n.begin(); i!=vd->n.end(); ++i){ untested();
 				assert(*i >= &*begin());
 				assert(*i < &*end());
 			}
@@ -1627,7 +1620,7 @@ void copy_helper<oG, G, X, Y, srcCont, tgtCont>::assign(oG const& src, G& tgt)
 	}
 
 	assert(tgt._num_edges == 0);
-	if(i!=nv){
+	if(i!=nv){ untested();
 		std::cerr << i << " " << nv << "\n";
 		assert(false);
 	}
@@ -1649,19 +1642,19 @@ void copy_helper<oG, G, X, Y, srcCont, tgtCont>::assign(oG const& src, G& tgt)
 //	trace3("debug", tgt.is_directed, src.is_directed, num_og_edges);
 	if(tgt._num_edges == 2*ne){ untested();
 	}else if(tgt.num_edges() == ne){
-	}else if(tgt.is_directed() && !g.is_directed() ){
+	}else if(tgt.is_directed() && !g.is_directed() ){ untested();
 		trace2("bug", tgt._num_edges, ne );
 		tgt._num_edges = ne;
 		assert(tgt.num_edges() == 2*g.num_edges());
 		incomplete();
-	}else if(tgt.is_directed() && g.is_directed() ){
+	}else if(tgt.is_directed() && g.is_directed() ){ untested();
 
 //		trace5("assign..1 1",nv, ne, tgt.num_vertices(), tgt.num_edges(), GG->num_edges());
 //		trace2("assign...",GG->_num_edges, tgt._num_edges);
 //		tgt._num_edges = 1; // HACK
 		// this is dangerous?!
-		if(tgt._num_edges !=  tgt.num_edges()){
-		}else{
+		if(tgt._num_edges !=  tgt.num_edges()){ untested();
+		}else{ untested();
 		}
 
 		// OUCH. this does not work. must amend edgecount later.
@@ -1669,7 +1662,7 @@ void copy_helper<oG, G, X, Y, srcCont, tgtCont>::assign(oG const& src, G& tgt)
 
 	}else if( src.is_directed() && !tgt.is_directed()){
 		
-	}else{
+	}else{ untested();
 		unreachable();
 		std::cerr << "assign_ oops " << tgt._num_edges << ":" << ne << "\n";
 	}
@@ -1682,7 +1675,7 @@ void copy_helper<oG, G, X, Y, srcCont, tgtCont>::assign(oG const& src, G& tgt)
 	// incomplete...
 	for(auto i = tgt.begin(); i!=tgt.end(); ++i){
 		assert(tgt.is_valid(G::iter::deref(i)));
-		//   		for(auto& j : vertices()){
+		//   		for(auto& j : vertices()){ untested();
 		//   //			assert(is_edge(&j,&i) == is_edge(&i,&j));
 		//   		}
 	}
@@ -1693,12 +1686,11 @@ void copy_helper<oG, G, X, Y, srcCont, tgtCont>::assign(oG const& src, G& tgt)
 #if 0 // use default
 template<class Gsrc, class Gtgt>
 struct copy_helper<Gsrc, Gtgt,  boost::mpl::true_,  boost::mpl::false_ >
-{
+{ untested();
 }; // copy_helper
 #endif
 template<class Gsrc, class Gtgt>
-struct copy_helper<Gsrc, Gtgt, false, true >
-{
+struct copy_helper<Gsrc, Gtgt, false, true > {
 	static void assign(Gsrc const& src, Gtgt& tgt)
 	{
 		trace2("assigning undirected to directed", src.num_edges(), tgt.num_edges());
@@ -1716,8 +1708,7 @@ struct copy_helper<Gsrc, Gtgt, false, true >
 }; // copy_helper
 
 template<class Gsrc, class Gtgt>
-struct copy_helper<Gsrc, Gtgt, false, true, true, true>
-{
+struct copy_helper<Gsrc, Gtgt, false, true, true, true> {
 	static void assign(Gsrc const& src, Gtgt& tgt)
 	{
 		// for now
@@ -1761,8 +1752,7 @@ namespace detail{
 }//detail
 
 template<class Gsrc, class Gtgt>
-struct copy_helper<Gsrc, Gtgt, true, false >
-{
+struct copy_helper<Gsrc, Gtgt, true, false > {
 	static void assign(Gsrc const& src, Gtgt& tgt)
 	{
 //		must weed out double edges?
@@ -1779,8 +1769,7 @@ struct copy_helper<Gsrc, Gtgt, true, false >
 }; // copy_helper
 
 template<class Gsrc, class Gtgt>
-struct copy_helper<Gsrc, Gtgt, true, true, true, true >
-{
+struct copy_helper<Gsrc, Gtgt, true, true, true, true > {
 	static void assign(Gsrc const& src, Gtgt& tgt)
 	{
 		auto& g=src;
@@ -1816,9 +1805,9 @@ struct copy_helper<Gsrc, Gtgt, true, true, true, true >
 #if 0
 template<class Gsrc, class Gtgt>
 struct copy_helper<Gsrc, Gtgt, boost::mpl::true_, boost::mpl::true_>
-{
+{ untested();
 	static void assign(Gsrc const&, Gtgt&)
-	{
+	{ untested();
 		incomplete();
 	}
 }; // copy_helper
@@ -1831,19 +1820,19 @@ namespace gala{
 // TODO: runtime info?
 VCTtemplate
 void graph<SGARGS>::contract(vertex_type& vd, vertex_type into)
-{
+{ untested();
 	assert(vd);
 	assert(into);
 
 	auto x=vd->n.find(into);
-	if(x!=vd->n.end()){
+	if(x!=vd->n.end()){ untested();
 		// delete edge in between
 		vd->n.erase(x); // can we avoid it? we will vd.clear() later on.
 		--_num_edges;
 		x = into->n.find(vd);
 		assert(x!=into->n.end());
 		into->n.erase(x);
-	}else{
+	}else{ untested();
 	}
 
 	// merge outnodes.
@@ -1851,12 +1840,12 @@ void graph<SGARGS>::contract(vertex_type& vd, vertex_type into)
 	auto E = vd->n.end();
 	into->n.insert(I,E);
 
-	for(auto& I : vd->n){ // untested();
+	for(auto& I : vd->n){ untested();
 		assert(&*I != &*into);
 		bool inserted_new = I->n.insert(into).second;
-		if(inserted_new){
+		if(inserted_new){ untested();
 			// edge has moved.
-		}else{
+		}else{ untested();
 			// there are two, one of which will be gone.
 			--_num_edges;
 		}
@@ -1874,7 +1863,7 @@ void graph<SGARGS>::contract(vertex_type& vd, vertex_type into)
 VCTtemplate
 inline void graph<SGARGS>::remove_vertex(iterator v)
 { untested();
-	if(storage::need_rewire()){
+	if(storage::need_rewire()){ untested();
 		incomplete();
 	}
 	_v.erase(v);
@@ -1889,26 +1878,26 @@ inline typename graph<SGARGS>::vertex_type graph<SGARGS>::new_node()
 #if 0
 VCTtemplate
 static inline size_t num_edges(graph<SGARGS> &G)
-{
+{ untested();
     return G.num_edges();
 }
 /*--------------------------------------------------------------------------*/
 VCTtemplate
 static inline size_t num_edges(graph<SGARGS> const &G)
-{
+{ untested();
     return G.num_edges();
 }
 /*--------------------------------------------------------------------------*/
 // VCTtemplate
 // static inline void remove_edge(vertex_type v,
 // 		typename graph<SGARGS>::vertex w, graph<SGARGS> &G)
-// {
+// { untested();
 //     G.remove_edge(v, w);
 // }
 /*--------------------------------------------------------------------------*/
 // VCTtemplate
 // static inline size_t out_degree(const /*_*/ vertex_type v, graph<SGARGS> const& G)
-// {
+// { untested();
 //     return G.degree(v);
 // }
 #endif
@@ -1917,7 +1906,7 @@ VCTtemplate
 static inline boost::tuple<typename graph<SGARGS>::out_iterator,
                            typename graph<SGARGS>::out_iterator>
 adjacent_vertices(typename graph<SGARGS>::vertex v, graph<SGARGS> &G)
-{
+{ untested();
 	typedef typename graph<SGARGS>::out_iterator Iter;
 	typedef boost::tuple<Iter, Iter> P;
 	auto& o=G.out_edges(v);
@@ -1926,14 +1915,14 @@ adjacent_vertices(typename graph<SGARGS>::vertex v, graph<SGARGS> &G)
 /*--------------------------------------------------------------------------*/
 VCTtemplate
 static inline void clear_vertex(typename graph<SGARGS>::vertex v, graph<SGARGS> &G)
-{
+{ untested();
     G.clear_vertex(v);
 }
 /*--------------------------------------------------------------------------*/
 VCTtemplate
 static inline std::pair<bool, bool> edge(typename graph<SGARGS>::vertex v,
 		typename graph<SGARGS>::vertex w, graph<SGARGS> &G)
-{
+{ untested();
     return std::pair<bool, bool>(true, G.exists_edge(v, w));
 }
 /*--------------------------------------------------------------------------*/
@@ -1943,7 +1932,7 @@ inline void storage<GALA_DEFAULT_SET, GALA_DEFAULT_VECTOR, vertex_ptr_tag>::add_
       typename storage<GALA_DEFAULT_SET, GALA_DEFAULT_VECTOR, vertex_ptr_tag>::vertex_index_type v,
       typename storage<GALA_DEFAULT_SET, GALA_DEFAULT_VECTOR, vertex_ptr_tag>::vertex_index_type w,
       typename storage<GALA_DEFAULT_SET, GALA_DEFAULT_VECTOR, vertex_ptr_tag>::container_type& _v)
-{
+{ untested();
 	trace2("pos edge", v, w);
 	assert(v<w); // for now
 	_v[v].n.insert(&_v[w]);
@@ -1956,7 +1945,7 @@ inline void storage<GALA_DEFAULT_SET, GALA_DEFAULT_VECTOR, vertex_ptr_tag>::add_
 //       typename storage<ECT, std::vector, vertex_ptr_tag>::vertex_index_type v,
 //       typename storage<ECT, std::vector, vertex_ptr_tag>::vertex_index_type w,
 //       typename storage<ECT, std::vector, vertex_ptr_tag>::container_type& _v)
-// {
+// { untested();
 // 	_v[v].insert(&_v[w]);
 // 	_v[w].insert(&_v[v]);
 // }

@@ -10,8 +10,7 @@
 #include <boost/graph/minimum_degree_ordering.hpp>
 
 template<class G>
-struct dvv_config : public gala::graph_cfg_default<G>
-{
+struct dvv_config : public gala::graph_cfg_default<G> {
 //	typedef gala::default_DEGS<G> degs_type;
 	static constexpr bool is_directed=true;
 };
@@ -33,9 +32,9 @@ int main(int argc, char** argv)
 {
 #if 0
 	PARSE* p;
-	try{
+	try{ untested();
 		p = new PARSE(std::cin);
-	}catch(...){
+	}catch(...){ untested();
 		std::cout << "uuh\n";
 		exit(2);
 	}
@@ -57,10 +56,10 @@ int main(int argc, char** argv)
 	size_t n=boost::num_vertices(g);
 	std::cout << "generated " << e << " edges, " << n << " vertices\n";
 	auto EE=boost::edges(g);
- 	for(;EE.first!=EE.second; ++EE.first){
+ 	for(;EE.first!=EE.second; ++EE.first){ untested();
  		auto s=boost::source(*EE.first, g);
  		auto t=boost::target(*EE.first, g);
- 		if(!boost::edge(t,s,g).second){
+ 		if(!boost::edge(t,s,g).second){ untested();
 			boost::add_edge(t,s,g);
 		}
  	}

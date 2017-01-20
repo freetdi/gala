@@ -55,7 +55,7 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, V
 
 namespace treedec{
 template<>
-struct graph_traits<ssg_16i>{ //
+struct graph_traits<ssg_16i>{
 	typedef typename treedec_chooser<ssg_16i>::type treedec_type;
 	typedef typename outedge_set<ssg_16i>::type outedge_set_type;
 	typedef idgwel<ssg_16i> directed_overlay;

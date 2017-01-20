@@ -42,7 +42,7 @@ struct is_set{
 template<class S, class T>
 struct is_set<S, typename std::enable_if < std::is_same<
 std::set<typename S::value_type, typename S::key_compare, typename S::allocator_type >, S
->::value, any >::type , T>{
+>::value, any >::type , T>{ //
 
 	typedef T type;
 	static constexpr bool value = true;
@@ -51,7 +51,7 @@ std::set<typename S::value_type, typename S::key_compare, typename S::allocator_
 template<class S, class T>
 struct is_set<S, typename std::enable_if < std::is_same<
 stx::btree_set<typename S::value_type, typename S::key_compare, typename S::allocator_type >, S
->::value, any >::type , T>{
+>::value, any >::type , T>{ //
 
 	typedef T type;
 	static constexpr bool value = true;
@@ -66,7 +66,7 @@ struct is_seq{
 template<class S, class T>
 struct is_seq<S, typename std::enable_if < std::is_same<
 std::vector<any, typename S::allocator_type >, S
->::value, any >::type , T>{
+>::value, any >::type , T>{ //
 
 	typedef T type;
 	static constexpr bool value = true;
@@ -74,7 +74,7 @@ std::vector<any, typename S::allocator_type >, S
 template<class S, class T>
 struct is_seq<S, typename std::enable_if < std::is_same<
 std::deque<any, typename S::allocator_type >, S
->::value, any >::type , T>{
+>::value, any >::type , T>{ //
 
 	typedef T type;
 	static constexpr bool value = true;
@@ -89,7 +89,7 @@ struct is_vector{
 template<class S, class T>
 struct is_vector<S, typename std::enable_if < std::is_same<
 std::vector<typename S::value_type, typename S::allocator_type >, S
->::value, any >::type , T>{
+>::value, any >::type , T>{ //
 
 	typedef T type;
 	static constexpr bool value = true;

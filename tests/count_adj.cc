@@ -10,8 +10,7 @@
 #include <boost/graph/minimum_degree_ordering.hpp>
 
 template<class G>
-struct dir_conf : public gala::graph_cfg_default<G>
-{
+struct dir_conf : public gala::graph_cfg_default<G> {
 	static constexpr bool is_directed=true;
 };
 

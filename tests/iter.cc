@@ -10,8 +10,7 @@
 #include <boost/graph/minimum_degree_ordering.hpp>
 
 template<class G>
-struct dvv_config : public gala::graph_cfg_default<G>
-{
+struct dvv_config : public gala::graph_cfg_default<G> {
 //	typedef gala::default_DEGS<G> degs_type;
 	static constexpr bool is_directed=true;
 };

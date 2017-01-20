@@ -26,7 +26,7 @@ namespace boost{
 
 namespace detail {
 	template<class G, galaPARMS, class X=void>
-	struct copy_helper{ //
+	struct copy_helper{
 		template<class GG, class BEI=typename graph_traits<G>::edge_iterator >
 		class edge_iw : public BEI{ //
 			GG const& _g;
@@ -91,11 +91,11 @@ namespace detail {
 	template<class G, galaPARMS>
 	struct copy_helper<G, SGARGS, boost::graph_traits<G> > { //
 		static void boost_to_gala(const G& g, gala::graph<SGARGS>& h)
-		{
+		{ untested();
 			incomplete();
 		}
 		static void copy_from_gg(const gala::graph<SGARGS>& h, G& g)
-		{
+		{ untested();
 			incomplete();
 		}
 	};

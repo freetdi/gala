@@ -69,11 +69,11 @@ public:
 public:
 	callback_proxy(vertex_descriptor v, CB* cb, G const& g)
 	    : _done(false), _v(v), _cb(cb), _g(g)
-	{
+	{ untested();
 		assert( g.is_valid(v) );
 	}
 	void operator()(vertex_descriptor w)
-	{
+	{ untested();
 //		BUG:: :w
 		if(!_cb){ itested();
 		}else if(_v<w){ itested();
@@ -87,11 +87,11 @@ public:
 			}
 #endif
 			_done=true;
-		}else{
+		}else{ untested();
 		}
 	}
 	bool done() const
-	{
+	{ untested();
 		return _done;
 	}
 private:
@@ -103,7 +103,7 @@ private:
 
 template<galaPARMS, class CB,
          typename=void /*required for sfinae*/ >
-struct sghelp_hack{ //
+struct sghelp_hack{
 static size_t mcah(
 		typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor c,
 		gala::graph<SGARGS>& g,
@@ -111,7 +111,7 @@ static size_t mcah(
 		 typename treedec::treedec_traits<
 		   typename treedec::treedec_chooser<  gala::graph<SGARGS>  >::type>::bag_type& bag,
 		CB* cb)
-{
+{ untested();
 	typedef gala::graph<SGARGS> G;
 	typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 	typedef typename boost::graph_traits<G>::adjacency_iterator Iter;
@@ -124,7 +124,7 @@ static size_t mcah(
 	boost::tie(I, E) = boost::adjacent_vertices(c, g);
 	long n=0;
 
-	for(J=boost::adjacent_vertices(c, g).first; J!=E; ++J){
+	for(J=boost::adjacent_vertices(c, g).first; J!=E; ++J){ untested();
 		vertex_descriptor N=*J;
 #ifndef q_in_cb
 		if(cb){untested();
@@ -145,10 +145,10 @@ static size_t mcah(
 		// call back on newly inserted out edges.
 		//  ... before inserting them.
 		zipfwdb4(g.out_edges(N), II, E, &cbp);
-		if(cbp.done()){
+		if(cbp.done()){ untested();
 			assert(cb);
 		// 	(*cb)(N); not yet.
-		}else{
+		}else{ untested();
 		}
 		n += g.out_edges(N).size();
 	}
@@ -201,7 +201,7 @@ typedef typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor ve
 #endif
 
 			for(typename G::EL::iterator iI=g.out_edges(vd).begin();
-			    iI!=E; ++iI){ // untested();
+			    iI!=E; ++iI){
 				typename G::vertex_type I = *iI;
 				assert(I != into);
 				bool inserted_new = g.out_edges(I).insert(into).second;
@@ -214,7 +214,7 @@ typedef typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor ve
 					// edge has moved.
 				}else{itested();
 					// there are two, one of which will be gone.
-					if(cb){
+					if(cb){ untested();
 						(*cb)(I);
 					}
 					--g._num_edges; // hack!!
@@ -243,7 +243,7 @@ static size_t mcah(
 		 typename treedec::treedec_traits<
 		   typename treedec::treedec_chooser<  gala::graph<SGARGS>  >::type>::bag_type& bag,
 		CB* cb)
-{
+{ untested();
 	(void)c;
 	(void)cb;
 	(void)bag;
@@ -256,7 +256,7 @@ typedef typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor ve
 	                   gala::graph<SGARGS> &g,
 							 bool erase=true,
 	                   treedec::vertex_callback<typename gala::graph<SGARGS>::vertex_type >* cb=NULL)
-{
+{ untested();
 	incomplete();
 }
 };
@@ -281,7 +281,7 @@ namespace treedec { //
 	VCTtemplate
 	bool is_valid(typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor v,
 	              gala::graph<SGARGS> const& g)
-	{
+	{ untested();
 		return g.is_valid(v);
 	}
 
@@ -356,7 +356,7 @@ namespace treedec{
 	   (typename outedge_set< gala::graph<SGARGS> >::type &b,
 	    typename gala::graph<SGARGS>::vertex_type v,
 	    gala::graph<SGARGS> const &g)
-	{
+	{ untested();
 		zipfwdb4(b, g.out_edges(v));
 	}
 
@@ -376,7 +376,7 @@ namespace treedec{
 	    typename gala::graph<SGARGS>::vertex_type w,
 	    typename gala::graph<SGARGS>::vertex_type x,
 	    gala::graph<SGARGS> const &g)
-	{
+	{ untested();
 		// not efficient yet...
 		b = g.out_edges(v);
 		insert_neighbours(b, w, g);
@@ -409,7 +409,7 @@ namespace treedec{
 			gala::graph<SGARGS>& g,
 			typename outedge_set< gala::graph<SGARGS> >::type& bag,
 			typename treedec::graph_callback<gala::graph<SGARGS> >* cb=NULL)
-	{
+	{ untested();
 		typedef typename treedec::graph_callback<gala::graph<SGARGS> > CB;
 		return treedec::sghelp_hack<ECT, VCT, VDP, CFG, CB>::mcah(c, g, bag, cb);
 	}
@@ -434,12 +434,12 @@ namespace treedec{
 	}
 
 	VCTtemplate
-	struct outedge_set< gala::graph<SGARGS> >{ //
+	struct outedge_set< gala::graph<SGARGS> >{
 		typedef typename gala::graph<SGARGS>::EL type;
 	};
 
 	VCTtemplate
-	struct treedec_chooser< gala::graph<SGARGS> >{ //
+	struct treedec_chooser< gala::graph<SGARGS> >{
 		typedef vertex_descriptor< gala::graph<SGARGS> > value_type;
 		typedef typename outedge_set< gala::graph<SGARGS> >::type bag_type;
 		typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, bag_type> type;
@@ -519,7 +519,7 @@ size_t degree(G const& g)
 
 VCTtemplate
 size_t degree(gala::graph<SGARGS> const& g)
-{
+{ untested();
 	return g.degree();
 }
 
@@ -544,18 +544,18 @@ void check(gala::graph<SGARGS> const& g)
 	}
 #endif
 
-	for(boost::tie(i,e) = boost::vertices(g); i!=e; ++i){
+	for(boost::tie(i,e) = boost::vertices(g); i!=e; ++i){ untested();
 	//	assert(treedec::is_valid(*i,g));
 		auto j = boost::out_edges(*i,g).first;
 		auto f = j;
-		for(boost::tie(j,f) = boost::out_edges(*i,g); j!=f; ++j){
+		for(boost::tie(j,f) = boost::out_edges(*i,g); j!=f; ++j){ untested();
 			++edges;
 		}
 	}
 	assert(g.is_directed() || !(edges%2));
 
-	if(g.is_directed()){
-	}else{
+	if(g.is_directed()){ untested();
+	}else{ untested();
 		edges/=2;
 	}
 
@@ -577,7 +577,7 @@ void check(gala::graph<SGARGS> const& g)
 
 #ifdef DEBUG
 			assert(boost::edge(*i,*aI,g).second);
-			if(g.is_directed()){
+			if(g.is_directed()){ untested();
 				assert(boost::edge(*aI,*i,g).second);
 			}
 #endif
@@ -585,7 +585,7 @@ void check(gala::graph<SGARGS> const& g)
 		// if !multiedge
 		assert(X.size() == boost::out_degree(*i, g));
 #ifdef DEBUG
-		if(g.is_directed()){
+		if(g.is_directed()){ untested();
 			for(boost::tie(I,E) = boost::vertices(g); I!=E; ++I){ itested();
 				assert(boost::edge(*I,*i,g).second == boost::edge(*i,*I,g).second);
 			}
@@ -595,7 +595,7 @@ void check(gala::graph<SGARGS> const& g)
 }
 
 	VCTtemplate
-	struct deg_chooser<gala::graph<SGARGS> >{ //
+	struct deg_chooser<gala::graph<SGARGS> >{
 		typedef gala::graph<SGARGS> G;
 		typedef CFG<G> cfg;
 		typedef typename cfg::degs_type type;
@@ -621,7 +621,7 @@ inline size_t count_missing_edges(
 
 	auto V=v;
 	auto e=g.out_edges(V);
-	for(auto nIt1 = e.begin(); nIt1!=e.end(); ++nIt1){
+	for(auto nIt1 = e.begin(); nIt1!=e.end(); ++nIt1){ untested();
 		auto nIt2 = nIt1;
 		++nIt2;
 		auto x=*nIt1; // hack for svu. something about const.
@@ -652,7 +652,7 @@ namespace detail{ //
 		shared_adj_iter(adjacency_iterator v, adjacency_iterator ve,
 		                vertex_descriptor w, G const& g)
 		    : parent(v.base(), ve.base(), g.out_edges(w))
-		{
+		{ untested();
 		}
 	};
 } // detail
@@ -680,7 +680,7 @@ inline typename boost::graph_traits<gala::graph<SGARGS> >::vertices_size_type
 // remove. and remove Vertex_NF/Edge_NF declarations.
 namespace treedec{
 VCTtemplate
-struct graph_traits<gala::graph<SGARGS> >{ //
+struct graph_traits<gala::graph<SGARGS> >{
 	using G_t = typename gala::graph<SGARGS>;
 
 	typedef typename treedec_chooser<G_t>::type treedec_type;

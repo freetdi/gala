@@ -1,9 +1,9 @@
 #include <iostream>
 #include <gala/sfinae.h>
+#include <gala/trace.h>
 #include <vector>
 #include <set>
 #include <list>
-
 
 // keep forgetting, how this works.
 // here's the test case.

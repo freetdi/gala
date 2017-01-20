@@ -6,8 +6,7 @@
 #include <boost/graph/graph_traits.hpp>
 
 template<class G>
-struct dvv_config : public gala::graph_cfg_default<G>
-{
+struct dvv_config : public gala::graph_cfg_default<G> {
 	 typedef boost::mpl::true_ is_directed_t;
 };
 
