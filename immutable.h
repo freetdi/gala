@@ -135,8 +135,7 @@ public: // types
       : public boost::iterator_facade<edge_iterator,
                                       edge_descriptor,
                                       boost::forward_traversal_tag,
-                                      const edge_descriptor&>
-	{ //
+                                      edge_descriptor> {
 		public: // types
 			typedef edge_descriptor value_type;
 //       typedef edge_descriptor* difference_type;
