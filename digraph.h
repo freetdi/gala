@@ -194,7 +194,7 @@ public: // assign
 	}
 
 	std::pair<edge_descriptor, bool> edge(vertex_descriptor s,
-	                                      vertex_descriptor t)
+	                                      vertex_descriptor t) const
 	{
 		auto range=internal_out_edges(s);
 		auto f=boost_dissect::find(range.first, range.second, t);
@@ -300,7 +300,7 @@ namespace boost{ //
 	template<class G>
 	std::pair<typename idgwel<G>::edge_descriptor, bool> edge(
 			typename idgwel<G>::vertex_descriptor s,
-			typename idgwel<G>::vertex_descriptor t, idgwel<G>& g)
+			typename idgwel<G>::vertex_descriptor t, idgwel<G> const& g)
 	{
 		return g.edge(s,t);
 	}
