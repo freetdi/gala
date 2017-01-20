@@ -827,7 +827,7 @@ struct iter<ECT, VCT, vertex_ptr_tag>{ //
 /*--------------------------------------------------------------------------*/
 template<class C>
 void prealloc(C const&, size_t /*howmany*/)
-{ untested();
+{
 }
 /*--------------------------------------------------------------------------*/
 // typedef vertex_ptr_tag use_pointers;
@@ -1003,7 +1003,7 @@ public: // move
 	graph(vertices_size_type n=0, edges_size_type m=0)
 	    : _v(n), _num_edges(0)
 	{
-		if(m){ untested();
+		if(m){
 			EL a;
 			prealloc(a, 2*m);
 		}
@@ -1429,14 +1429,14 @@ template <class EdgeIterator>
 graph<SGARGS>::graph(EdgeIterator first, EdgeIterator last,
                      vertices_size_type nv, edges_size_type ne)
     : graph(nv, ne)
-{ untested();
+{
 	_num_edges=0;
 	fill_in_edges(first, last, false);
 	assert(!ne || ne==_num_edges); // unique edges? for now.
 
 #ifndef NDEBUG
 	unsigned c = 0;
-	for(auto& i : _v){ untested();
+	for(auto& i : _v){
 		c += i.size();
 	}
 	assert(is_directed() || 2*num_edges() == c);

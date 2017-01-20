@@ -34,7 +34,7 @@ struct sgdeg_config {
     typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
     typedef typename G::EL bag_type;
     static void alloc_init(size_t)
-	 { untested();
+	 {
     }
     static unsigned num_threads(){return 1;}
 	 template<class container_t>
@@ -61,9 +61,9 @@ public: // types
 
 public: // construct
     default_DEGS(G& g): _degs(g.num_vertices()), _g(g)
-    { untested();
+    {
 		 CFG::alloc_init(g.num_vertices());
-		 for(vertex_iterator vIt=g.begin(); vIt!=g.end(); ++vIt){ untested();
+		 for(vertex_iterator vIt=g.begin(); vIt!=g.end(); ++vIt){
 			  vertex_descriptor v=G::iter::deref(vIt);
 			 _degs[g.degree(v)].insert(v);
         }
@@ -71,37 +71,37 @@ public: // construct
 
 public: // queueing
     void unlink(const vertex_descriptor& v, size_t d)
-    { untested();
+    {
         int n=_degs[d].erase(v);
         (void)n;
         assert(n==1);
     }
     void unlink(const vertex_descriptor& v)
-    { untested();
+    {
         size_t d=_g.degree(v);
         unlink(v,d);
     }
 
     void q_update(const vertex_descriptor& v)
-    { untested();
+    {
         unlink(v);
         _q.push(v);
     }
     void reg(const vertex_descriptor& v)
-    { untested();
+    {
         size_t d=_g.degree(v);
         reg(v,d);
     }
     void reg(const vertex_descriptor& v, size_t d)
-    { untested();
+    {
         bool n=_degs[d].insert(v).second;
         assert(n); (void)n;
     }
 
     void update_queued()
-    { untested();
+    {
 
-        while(!_q.empty()){ untested();
+        while(!_q.empty()){
             reg(_q.top());
             _q.pop();
         }
@@ -124,9 +124,9 @@ public: // picking
     }
     // pick a minimum degree vertex within degree range [lower, upper]
     std::pair<vertex_descriptor,degree_t> pick_min(unsigned lower=0, unsigned upper=-1) const
-    { untested();
+    {
 		 (void) upper;
-        while(_degs[lower].empty()){ untested();
+        while(_degs[lower].empty()){
             ++lower;
             // min_ntd==num_vert contradicts the outer loop condition
             // (this loop should be safe)
@@ -176,11 +176,11 @@ public: // picking
     } //void check()
 
     bag_type const& operator[](size_t x) const
-    { untested();
+    {
         return _degs[x];
     }
     size_t size() const
-    { untested();
+    {
         return _degs.size();
     }
 private:

@@ -164,7 +164,7 @@ namespace boost { //
 		// incomplete: other sets? use sfinae.h...
 		template<class E>
 		bool is_in_edgeset(std::set<E> const& c, E v)
-		{ untested();
+		{
 			return c.find(v)!=c.end();
 		}
 	}
@@ -432,7 +432,7 @@ namespace boost { //
 			out_edge_iterator(
 			    typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor v,
 			    typename gala::graph<SGARGS>::out_vertex_iterator w)
-			{ untested();
+			{
 				base.first = v;
 				base.second = w;
 			}
@@ -442,11 +442,11 @@ namespace boost { //
 				return std::make_pair(base.first, *base.second);
 			}
 			bool equal(const out_edge_iterator& other) const
-			{ untested();
+			{
 				return base.second == other.base.second;
 			}
 			void increment()
-			{ untested();
+			{
 				++(base.second);
 			}
 			void decrement()
@@ -482,7 +482,7 @@ namespace boost { //
 	                 typename graph_traits<::gala::graph<SGARGS> >::adjacency_iterator>
 	      adjacent_vertices(typename graph_traits<::gala::graph<SGARGS> >::vertex_descriptor u,
 	                        const gala::graph<SGARGS>& g)
-	{ untested();
+	{
 		typedef typename graph_traits<::gala::graph<SGARGS> >::adjacency_iterator Iter;
 		auto& o = g.out_edges(u);
 		return std::make_pair( Iter(o.begin()), Iter(o.end()));
@@ -676,7 +676,7 @@ namespace boost { //
 	inline std::pair<typename graph_traits<gala::graph<SGARGS> >::vertex_iterator,
 	                 typename graph_traits<gala::graph<SGARGS> >::vertex_iterator>
 	             vertices(gala::graph<SGARGS> const& g)
-	{ untested();
+	{
 		typedef typename graph_traits<gala::graph<SGARGS> >::vertex_iterator Iter;
 		::gala::graph<SGARGS>* G = const_cast<::gala::graph<SGARGS>*>(&g); // HACK
 		return std::make_pair( Iter(G->begin()), Iter(G->end()));
@@ -917,7 +917,7 @@ namespace boost {
 	typename boost::graph_traits<gala::graph<SGARGS > >::vertices_size_type
 	get(vertex_index_t t, const gala::graph<SGARGS>& g,
 			typename boost::graph_traits< gala::graph<SGARGS> >::vertex_descriptor v)
-	{ untested();
+	{
 		return get(get(t, g), v);
 	}
 
@@ -926,7 +926,7 @@ namespace boost {
 						  typename boost::graph_traits< gala::graph<SGARGS> >::out_edge_iterator >
 						out_edges(typename boost::graph_traits< gala::graph<SGARGS> >::vertex_descriptor v,
 								gala::graph<SGARGS> const& g)
-	{ untested();
+	{
 		typedef typename boost::graph_traits<gala::graph<SGARGS> >::out_edge_iterator Iter;
 		::gala::graph<SGARGS>* G = const_cast<::gala::graph<SGARGS>*>(&g); // HACK
 		return std::make_pair(Iter(v, G->out_edges(v).begin()), Iter(v, G->out_edges(v).end()));

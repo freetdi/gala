@@ -214,7 +214,7 @@ typedef typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor ve
 					// edge has moved.
 				}else{itested();
 					// there are two, one of which will be gone.
-					if(cb){ untested();
+					if(cb){
 						(*cb)(I);
 					}
 					--g._num_edges; // hack!!
@@ -281,7 +281,7 @@ namespace treedec { //
 	VCTtemplate
 	bool is_valid(typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor v,
 	              gala::graph<SGARGS> const& g)
-	{ untested();
+	{
 		return g.is_valid(v);
 	}
 
@@ -544,18 +544,18 @@ void check(gala::graph<SGARGS> const& g)
 	}
 #endif
 
-	for(boost::tie(i,e) = boost::vertices(g); i!=e; ++i){ untested();
+	for(boost::tie(i,e) = boost::vertices(g); i!=e; ++i){
 	//	assert(treedec::is_valid(*i,g));
 		auto j = boost::out_edges(*i,g).first;
 		auto f = j;
-		for(boost::tie(j,f) = boost::out_edges(*i,g); j!=f; ++j){ untested();
+		for(boost::tie(j,f) = boost::out_edges(*i,g); j!=f; ++j){
 			++edges;
 		}
 	}
 	assert(g.is_directed() || !(edges%2));
 
-	if(g.is_directed()){ untested();
-	}else{ untested();
+	if(g.is_directed()){
+	}else{
 		edges/=2;
 	}
 
@@ -652,7 +652,7 @@ namespace detail{ //
 		shared_adj_iter(adjacency_iterator v, adjacency_iterator ve,
 		                vertex_descriptor w, G const& g)
 		    : parent(v.base(), ve.base(), g.out_edges(w))
-		{ untested();
+		{
 		}
 	};
 } // detail

@@ -65,19 +65,19 @@ namespace boost_dissect{ //
    template <class RanIt, class key_type, typename size_type=size_t>
    inline RanIt priv_lower_bound(RanIt first, const RanIt last,
                           const key_type & key)
-   { untested();
+   {
       size_type len = (last - first);
       RanIt middle;
 
-      while (len) { untested();
+      while (len) {
          size_type step = len >> 1;
          middle = first;
          middle += step;
 
-         if (*middle < key) { untested();
+         if (*middle < key) {
             first = ++middle;
             len -= step + 1;
-         }else{ untested();
+         }else{
             len = step;
          }
       }
@@ -87,17 +87,17 @@ namespace boost_dissect{ //
 	template <class RanIt, class key_type>
 	inline RanIt find(RanIt first, const RanIt last,
 			const key_type& k)
-	{ untested();
+	{
 #ifndef NDEBUG
 		RanIt a = first;
-		while(true){ untested();
+		while(true){
 			if(a==last){ untested();
 			  	break;
-			}else{ untested();
+			}else{
 			}
 			auto p=*a;
 			++a;
-			if(a==last){ untested();
+			if(a==last){
 			  	break;
 			}
 			assert(p < *a);
@@ -105,9 +105,9 @@ namespace boost_dissect{ //
 #endif
 
 		RanIt i = priv_lower_bound(first, last, k);
-		if (i != last && k < *i){ untested();
+		if (i != last && k < *i){
 			i = last;
-		}else{ untested();
+		}else{
 		}
 		return i;
 	}
@@ -143,7 +143,7 @@ public: // types
 //       typedef std::input_iterator_tag iterator_category;
 	public: // cons
 		edge_iterator()
-		{ untested();
+		{
 		}
 		edge_iterator(vertex_descriptor v, immvecgraph const& g)
 		    : _s(v), _t(g._vertices[v]), _g(&g)
@@ -161,7 +161,7 @@ public: // types
 			return p._t==_t;
 		}
 		bool operator!=(edge_iterator const& p) const
-		{ untested();
+		{
 			assert( _s!=p._s || p._t==_t);
 			return p._t!=_t;
 		}
@@ -172,18 +172,18 @@ public: // types
 		}
 		void skip()
 		{ untested();
-			while( _t != _g->_vertices.back()){ untested();
+			while( _t != _g->_vertices.back()){
 
-				if(*_t>_s){ untested();
+				if(*_t>_s){
 					++_s;
 					_t = _g->_vertices[_s];
 					if(_t == _g->_vertices.back()){ untested();
 						break;
-					}else{ untested();
+					}else{
 					}
-				}else if(_g->_vertices[_s+1] == _t){ untested();
+				}else if(_g->_vertices[_s+1] == _t){
 					++_s;
-				}else{ untested();
+				}else{
 					break;
 				}
 			}
@@ -213,7 +213,7 @@ public: // types
                                       const edge_descriptor&> { //
 	public: // cons
 		out_edge_iterator()
-		{ untested();
+		{
 		}
 		out_edge_iterator(vertex_descriptor v, immvecgraph const& g)
 		    : _s(v), _t(g._vertices[v])
@@ -221,7 +221,7 @@ public: // types
 		}
 		out_edge_iterator(vertex_descriptor v, internal_out_edge_iterator w)
 		    : _s(v), _t(w)
-		{ untested();
+		{
 		}
 	public: // op
 		bool operator==(out_edge_iterator const& p) const
@@ -230,12 +230,12 @@ public: // types
 			return p._t == _t;
 		}
 		bool operator!=(out_edge_iterator const& p) const
-		{ untested();
+		{
 			assert(_s==p._s);
 			return p._t != _t;
 		}
 		void increment()
-		{ untested();
+		{
 			++_t;
 		}
 		edge_descriptor operator*() const
@@ -248,7 +248,7 @@ public: // types
 	};
 public: // construct
 	immvecgraph(const G& g) : _g(&g)
-	{ untested();
+	{
 	}
  	immvecgraph() : _g(NULL)
  	{ untested();
@@ -293,7 +293,7 @@ public: // assign
 	}
 	std::pair<out_edge_iterator, out_edge_iterator>
 	out_edges(vertex_descriptor v) const
-	{ untested();
+	{
 		assert(unsigned(v+1)<_vertices.size());
 		assert(_vertices[v] <= _vertices[v+1]);
 		out_edge_iterator begin(v, _vertices[v]);
@@ -302,34 +302,34 @@ public: // assign
 	}
 public:
 	void clear()
-	{ untested();
+	{
 		_vertices.resize(0);
 		_edges.resize(0);
 	}
 	void reserve_edges(size_t t)
-	{ untested();
+	{
 		_edges.reserve(t);
 	}
 
 	std::pair<internal_out_edge_iterator, internal_out_edge_iterator>
 	internal_out_edges(vertex_descriptor v) const
-	{ untested();
+	{
 		assert(unsigned(v+1)<_vertices.size());
 		return std::make_pair(_vertices[v], _vertices[v+1]);
 	}
 	std::pair<vertex_iterator, vertex_iterator> vertices() const
-	{ untested();
+	{
 		assert(_vertices.size());
 		return std::make_pair(vertex_iterator(0), vertex_iterator(_vertices.size()-1));
 	}
 	std::pair<edge_descriptor, bool> edge(vertex_descriptor s,
 	                                      vertex_descriptor t) const
-	{ untested();
+	{
 		auto range=internal_out_edges(s);
 		auto f=boost_dissect::find(range.first, range.second, t);
-		if(f==range.second){ untested();
+		if(f==range.second){
 			return std::make_pair(edge_descriptor(), false);
-		}else{ untested();
+		}else{
 			edge_descriptor e(s,f);
 			return std::make_pair(e, true);
 		}
@@ -340,32 +340,32 @@ public: // boost interface
 		return _edges.size() / 2;
 	}
 	unsigned degree(vertex_descriptor v) const
-	{ untested();
+	{
 		auto range=internal_out_edges(v);
 		return range.second-range.first;
 	}
 	std::pair<adjacency_iterator, adjacency_iterator>
 		adjacent_vertices(vertex_descriptor v) const
-	{ untested();
+	{
 		auto range=internal_out_edges(v);
 		return range;
 	}
 	unsigned num_vertices() const
-	{ untested();
-		if(_vertices.size()){ untested();
+	{
+		if(_vertices.size()){
 			return _vertices.size()-1;
-		}else{ untested();
+		}else{
 			return 0;
 		}
 	}
 	unsigned add_vertex()
-	{ untested();
+	{
 		_vertices.push_back(_edges.end());
 		return _vertices.size()-1;
 	}
 public: // backend hacks.
 	void push_edge(vertex_descriptor v)
-	{ untested();
+	{
 		_edges.push_back(v);
 	}
 private: // implementation
@@ -412,7 +412,7 @@ namespace boost{ //
 		unsigned /*FIXME*/
 	get(boost::vertex_index_t, const immvecgraph<G>&,
 			typename immvecgraph<G>::vertex_descriptor v)
-	{ untested();
+	{
 		return v;
 	}
 	template<class G>
@@ -420,7 +420,7 @@ namespace boost{ //
 	          typename immvecgraph<G>::adjacency_iterator>
 	    adjacent_vertices(typename immvecgraph<G>::vertex_descriptor v,
 	          immvecgraph<G> const& g)
-	{ untested();
+	{
 		return g.adjacent_vertices(v);
 	}
 	template<class G>
@@ -430,12 +430,12 @@ namespace boost{ //
 	}
 	template<class G>
 	unsigned num_vertices(immvecgraph<G> const& g)
-	{ untested();
+	{
 		return g.num_vertices();
 	}
 	template<class G>
 	unsigned degree(typename immvecgraph<G>::vertex_descriptor v, immvecgraph<G> const& g)
-	{ untested();
+	{
 		return g.degree(v);
 	}
 	template<class G>
@@ -461,14 +461,14 @@ namespace boost{ //
 	inline typename immvecgraph<G>::vertex_descriptor target(
 			const typename immvecgraph<G>::edge_descriptor e,
 	      immvecgraph<G> const&)
-	{ untested();
+	{
 		return *e.second;
 	}
 	template<class G>
 	inline std::pair<typename immvecgraph<G>::out_edge_iterator,
 	                 typename immvecgraph<G>::out_edge_iterator>
 	    out_edges(typename immvecgraph<G>::vertex_descriptor v, const immvecgraph<G>& g)
-	{ untested();
+	{
 		return g.out_edges(v);
 	}
 	template<class G>
@@ -509,7 +509,7 @@ namespace boost{ //
 	template<class G>
 	typename immvecgraph<G>::vertex_descriptor vertex(
 			size_t t, immvecgraph<G> const& g)
-	{ untested();
+	{
 		return t;
 	}
 	template<class G>
@@ -517,7 +517,7 @@ namespace boost{ //
 			typename immvecgraph<G>::vertex_descriptor s,
 			typename immvecgraph<G>::vertex_descriptor t,
 			immvecgraph<G> const& g)
-	{ untested();
+	{
 		return g.edge(s,t);
 	}
 	// template<class G>
@@ -527,7 +527,7 @@ namespace boost{ //
 	// }
 	template<class G>
 	std::pair<typename immvecgraph<G>::vertex_iterator,
-	          typename immvecgraph<G>::vertex_iterator> vertices(const immvecgraph<G>& g){ untested();
+	          typename immvecgraph<G>::vertex_iterator> vertices(const immvecgraph<G>& g){
 		return g.vertices();
 	}
 	class imm_vid_map : public put_get_helper<unsigned, imm_vid_map> {
@@ -543,7 +543,7 @@ namespace boost{ //
 	template <class G>
 	inline imm_vid_map
 	get(vertex_index_t, const immvecgraph<G>&)
-	{ untested();
+	{
     return imm_vid_map();
 	}
 } // boost
@@ -636,7 +636,7 @@ template<class G>
 namespace treedec{
 template<typename G_t>
 inline unsigned int get_pos(typename immvecgraph<G_t>::vertex_descriptor v, const immvecgraph<G_t>& G)
-{ untested();
+{
     return boost::get(boost::vertex_index, G, v);
 }
 
@@ -655,7 +655,7 @@ inline immvecgraph<G_t> const& immutable_clone(
      M_t* vdMap, /*=NULL*/
      CB_t* cb
      )
-{ untested();
+{
 	typedef typename graph_traits<G_t>::immutable_type IG_t;
 	typedef typename boost::graph_traits<IG_t>::vertex_descriptor vertex_descriptor_ig;
 
@@ -664,7 +664,7 @@ inline immvecgraph<G_t> const& immutable_clone(
 
 	BOOST_AUTO(nv, boost::num_vertices(G));
 
-	if(bag_nv != boost::num_vertices(ig)){ untested();
+	if(bag_nv != boost::num_vertices(ig)){
 		// drop a new one... (for now?)
 		// FIXME: just resize
 //		ig = MOVE(IG_t(0));
@@ -680,7 +680,7 @@ inline immvecgraph<G_t> const& immutable_clone(
 	// map ig vertices (positions) to bag elements (= vertices in G)
 	M_t local_vd_map;
 	// std::vector<typename boost::graph_traits<G_t>::vertex_descriptor> local_vd_map;
-	if(vdMap){ untested();
+	if(vdMap){
 		// use that...
 	}else{ untested();
 		vdMap = &local_vd_map;
@@ -695,7 +695,7 @@ inline immvecgraph<G_t> const& immutable_clone(
 	BOOST_AUTO(be, bend);
 	unsigned i=0;
 	auto prevpos=0; (void)prevpos;
-	for(; bi!=be; ++bi){ untested();
+	for(; bi!=be; ++bi){
 		// FIXME: pos, vertex_index?
 		assert(i < vdMap->size());
 		(*vdMap)[i] = *bi;
@@ -712,19 +712,19 @@ inline immvecgraph<G_t> const& immutable_clone(
 	unsigned t=-1;
 
 	 // apparently inefficient...
-	for(; bi!=be; ++bi){ untested();
+	for(; bi!=be; ++bi){
 		unsigned new_vertex=ig.add_vertex();
 		assert(new_vertex<bag_nv);
 		BOOST_AUTO(N, get_pos(*bi, G)); (void)N;
 		assert(reverse_map[N] == new_vertex);
 
 		BOOST_AUTO(vi, bbegin);
-		for(; vi!=be; ++vi){ untested();
+		for(; vi!=be; ++vi){
 			char edg = 0;
-			if(*vi==*bi){ untested();
+			if(*vi==*bi){
 				continue;
 				// skip self loop
-			}else if(*vi<*bi){ untested();
+			}else if(*vi<*bi){
 				// egde if the inverse edge exists
 				// inefficient?! yes.
 				BOOST_AUTO(s, get_pos(*vi, G)); (void) s;
@@ -733,16 +733,16 @@ inline immvecgraph<G_t> const& immutable_clone(
 				assert(reverse_map[s] < new_vertex);
 				auto rs=boost::vertex(reverse_map[s], ig);
 				edg = boost::edge(rs, new_vertex, ig).second;
-			}else if( boost::edge(*bi, *vi, G).second){ untested();
+			}else if( boost::edge(*bi, *vi, G).second){
 				edg = 2;
-			}else if(!cb){ untested();
+			}else if(!cb){
 			}else if((*cb)(*bi, *vi)){ untested();
 				edg = 3;
 			}else{ untested();
 				// no edge.
 			}
 
-			if(edg){ untested();
+			if(edg){
 				BOOST_AUTO(s, get_pos(*bi, G)); (void)s;
 				BOOST_AUTO(t, get_pos(*vi, G));
 				assert(ig._vertices.size()==unsigned(reverse_map[s]+1));
@@ -752,7 +752,7 @@ inline immvecgraph<G_t> const& immutable_clone(
 				s = get_pos(*bi, G);
 				t = get_pos(*vi, G);
 				assert(s!=t);
-			}else{ untested();
+			}else{
 			}
 		}
 	}
@@ -761,15 +761,15 @@ inline immvecgraph<G_t> const& immutable_clone(
 	assert(ig.num_vertices() == bag_nv);
 
 #ifndef NDEBUG
-		{ untested();
+		{
 			auto i = ig.vertices().first;
 			unsigned c=0;
-			for(;i!=ig.vertices().second; ++i){ untested();
+			for(;i!=ig.vertices().second; ++i){
 				++c;
 				auto O=ig.out_edges(*i);
 				auto Oi=O.first;
 				auto Oe=O.second;
-				for(;Oi!=Oe;++Oi){ untested();
+				for(;Oi!=Oe;++Oi){
 					assert(
 							boost::edge(boost::target(*Oi, ig),
 								boost::source(*Oi, ig), ig).second);
@@ -782,7 +782,7 @@ inline immvecgraph<G_t> const& immutable_clone(
 		if(cb && s!=-1u){ untested();
 			cb->a = reverse_map[s];
 			cb->b = reverse_map[t];
-		}else{ untested();
+		}else{
 			// assert(is_clique(ig));
 		}
 

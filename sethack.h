@@ -223,7 +223,7 @@ struct iterator_traits<my_counter<D> >{ //
 template<class C>
 struct sorted_helper{
 	static bool contains(C const&c, typename C::value_type e)
-	{ untested();
+	{
 		return c.find(e)!=c.end();
 	}
 };
@@ -267,7 +267,7 @@ struct merge<S, S_iterator, T_iterator, typename is_ordered_set<S>::type >{ //
 
 		S_iterator seek=src_begin;
 		typename S::iterator hint;
-		if(seek==src_end){ untested();
+		if(seek==src_end){
 			return;
 		}
 
@@ -275,7 +275,7 @@ struct merge<S, S_iterator, T_iterator, typename is_ordered_set<S>::type >{ //
 		// find twice? should be optimized out (hopefully).
 		// turns out faster in FI2, could be the callback...
 		hint = tgt.find(*seek);
-		if(hint == tgt.end()){ untested();
+		if(hint == tgt.end()){
 			(*cb)(*seek);
 			hint = tgt.insert(*seek).first;
 		}
@@ -292,17 +292,17 @@ struct merge<S, S_iterator, T_iterator, typename is_ordered_set<S>::type >{ //
 		++hint;
 		++seek;
 
-		if(seek==src_end){ untested();
+		if(seek==src_end){
 			return;
 		}
 
 		if(unlikely(hint==tgt.end())){itested();
-		}else{ untested();
+		}else{
 
-		while(true){ untested();
+		while(true){
 			assert(seek!=src_end);
 			assert(hint!=tgt.end());
-			if(unlikely(*seek<*hint)){ untested();
+			if(unlikely(*seek<*hint)){
 				if(cb){ untested();
 					(*cb)(*seek);
 				}
@@ -313,10 +313,10 @@ struct merge<S, S_iterator, T_iterator, typename is_ordered_set<S>::type >{ //
 				if(seek==src_end){itested();
 					return;
 				}
-			}else if(unlikely(*seek==*hint)){ untested();
+			}else if(unlikely(*seek==*hint)){
 				++hint;
 				++seek;
-				if(unlikely(seek==src_end)){ untested();
+				if(unlikely(seek==src_end)){
 					return;
 				}else if(unlikely(hint==tgt.end())){ untested();
 					break; // h_at_end
@@ -349,12 +349,12 @@ struct merge<S, S_iterator, T_iterator, typename is_ordered_set<S>::type >{ //
 				}else if(unlikely(hint==tgt.end())){itested();
 					break; // h_at_end
 				}
-			}else{ untested();
-				while(*seek>*hint){ untested();
+			}else{
+				while(*seek>*hint){
 					++hint;
 					if(hint==tgt.end()){itested();
 						goto h_at_end;
-					}else{ untested();
+					}else{
 					}
 				}
 			}
@@ -363,7 +363,7 @@ struct merge<S, S_iterator, T_iterator, typename is_ordered_set<S>::type >{ //
 
 	h_at_end:
 		assert(hint==tgt.end());
-		while(seek!=src_end){ untested();
+		while(seek!=src_end){
 			if(cb){ untested();
 				(*cb)(*seek);
 			}
@@ -386,7 +386,7 @@ class dummy{ //
 // call back BEFORE insertion (if possible?)
 template<class S, class S_iterator, class T_iterator, class CB=dummy<typename S::value_type> >
 void zipfwdb4(S& tgt, S_iterator src_begin, T_iterator src_end, CB* cb=nullptr)
-{ untested();
+{
 	return merge<S, S_iterator, T_iterator>::zipfwd(tgt, src_begin, src_end, cb);
 }
 
@@ -468,7 +468,7 @@ public: // types
 public: // construct
 	intersection_iterator(S_iterator v, S_iterator ve, T& s)
 		: S_iterator(v), _ve(ve), _s(s)
-	{ untested();
+	{
 		skip();
 	}
 	intersection_iterator(S const& v, T const& s)
@@ -479,11 +479,11 @@ public: // construct
 	}
 	intersection_iterator(const intersection_iterator& p)
 		: S_iterator(p), _ve(p._ve), _s(p._s)
-	{ untested();
+	{
 	}
 public: //ops
 	S_iterator& operator++()
-	{ untested();
+	{
 		assert(_ve!=S_iterator(*this));
 		assert(S_iterator(*this)!=_ve);
 		S_iterator::operator++();
@@ -493,13 +493,13 @@ public: //ops
 	}
 private:
 	void skip()
-	{ untested();
-		while(true){ untested();
-			if(S_iterator(*this)==_ve){ untested();
+	{
+		while(true){
+			if(S_iterator(*this)==_ve){
 				return;
-			}else if(!sorted_helper<S>::contains(_s, **this)){ untested();
+			}else if(!sorted_helper<S>::contains(_s, **this)){
 				S_iterator::operator++();
-			}else{ untested();
+			}else{
 				return;
 			}
 		}
