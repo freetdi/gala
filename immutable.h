@@ -261,7 +261,7 @@ public: // construct
 			std::vector<typename boost::graph_traits<G>::vertex_descriptor> &idxMap,
 			S const& SRC, S const& SINK)
 		: _vertices(boost::num_vertices(g)+1),
-		  _edges(0), _g(&g)
+		  _edges(NULL), _g(&g)
 	{ //
 #ifndef NDEBUG
 		unsigned c=0;
@@ -289,7 +289,7 @@ public: // assign
 
 	std::pair<edge_iterator, edge_iterator> edges() const
 	{ untested();
-		edge_iterator begin(0, _vertices[0], *this);
+		edge_iterator begin(0, *this);
 		edge_iterator end(num_vertices(), _vertices.back(), *this);
 		return std::make_pair(begin, end);
 	}
