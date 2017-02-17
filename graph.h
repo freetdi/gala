@@ -916,7 +916,7 @@ public: // types
 	}
 	static constexpr bool is_ordered() {
 		// for now.
-		return sfinae::is_set< ECT<sfinae::any> >::value;
+		return sfinae::is_set_tpl<ECT>::value;
 	}
 	static constexpr bool is_nn_v=detail::is_nn<ECT, VCT, VDP>::value;
 

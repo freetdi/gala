@@ -658,18 +658,18 @@ namespace boost { //
 		auto deref=G::iter::deref(u);
 
 		if(u!=e){
+			ovi U = gg->out_edges(deref).begin();
+			assert(!gg->is_ordered() || (deref<*U) || u==e);
+
+			return std::make_pair(Iter(u, U, &g),
+			                      Iter(e, U, &g));
 		}else{ untested();
 			// mpty
 			ovi E;
 			return std::make_pair(Iter(e, E, &g),
-		                         Iter(e, E, &g));
+			                      Iter(e, E, &g));
 		}
 
-		ovi U = gg->out_edges(deref).begin();
-		assert((deref<*U) || u==e);
-
-		return std::make_pair(Iter(u, U, &g),
-		                      Iter(e, U, &g));
 	}
 
 	VCTtemplate

@@ -30,9 +30,11 @@ int main(int , char**)
 	using namespace boost;
 	sg_dvv G(5);
 
-	add_edge(0, 1, G);
-	add_edge(1, 0, G);
+	assert(!G.is_ordered());
+	add_edge(3, 1, G);
+//	add_edge(1, 0, G);
 	add_edge(1, 2, G);
+	add_edge(1, 0, G);
 	add_edge(2, 0, G);
 
 	auto E=boost::edges(G);
@@ -40,12 +42,13 @@ int main(int , char**)
 	unsigned i=0;
 	for(;E.first!=E.second;++E.first){
 		++i;
-		std::cout << boost::source(*E.first,G) << "\n";
+		std::cout << boost::source(*E.first,G) << " ";
+		std::cout << boost::target(*E.first ,G) << "\n";
 	}
 
 	assert(i==4);
 
-	assert(edge(0,1,G).second);
+	assert(!edge(0,1,G).second);
 	assert(edge(1,0,G).second);
 	assert(edge(1,2,G).second);
 	assert(edge(2,0,G).second);
@@ -56,7 +59,7 @@ int main(int , char**)
 	assert(!edge(1,3,G).second);
 	assert(!edge(2,3,G).second);
 	assert(!edge(3,0,G).second);
-	assert(!edge(3,1,G).second);
+	assert(edge(3,1,G).second);
 	assert(!edge(3,2,G).second);
 
 
