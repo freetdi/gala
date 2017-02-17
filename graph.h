@@ -320,6 +320,29 @@ struct rewire_helper{
 	}
 };
 /*--------------------------------------------------------------------------*/
+template<template<class T, typename... > class S, class X=void>
+struct outedge_helper {
+	template<class C, class V>
+	static void erase(C& s, V w){
+		s.erase(w);
+	}
+};
+template<template<class T, typename... > class ECT>
+struct outedge_helper<ECT, typename sfinae::is_vec_tpl<ECT>::type >
+{
+	//this is inefficient. probably not what you need.
+	//just for backwards compatibility
+	template<class C, class V>
+	static void erase(C& s, V w){
+		for(auto& i: s){
+			if(i==w){
+				i=s.back();
+				s.pop_back();
+			}
+		}
+	}
+};
+/*--------------------------------------------------------------------------*/
 STtemplate
 struct storage_base{ //
 	typedef vertex_selector<ECT,VDP> vs;
@@ -383,6 +406,11 @@ struct storage : storage_base<STARGS>{ //
 	static const edge_container_type& out_edges(const_vertex_type& v, const container_type& _v)
 	{ untested();
 		return _v[v];
+	}
+	static void remove_edge_single(vertex_index_type v, vertex_index_type w,
+	                         container_type& _v)
+	{ untested();
+		outedge_helper<ECT>::erase(out_edges(v, _v), w);
 	}
 	static void add_pos_edge(vertex_index_type v, vertex_index_type w,
 	                         container_type& _v)
@@ -468,6 +496,11 @@ struct storage<ECT, VCT, vertex_ptr_tag> : public storage_base<ECT, VCT, vertex_
 		return v->n;
 	}
 public:
+	static void remove_edge_single(vertex_index_type v, vertex_index_type w,
+	                         container_type& _v)
+	{ untested();
+		out_edges(v, _v).erase(w);
+	}
 	static void add_pos_edge(vertex_index_type v, vertex_index_type w,
 	                         container_type& _v)
 	{ untested();
@@ -1145,7 +1178,7 @@ private:
 	void remove_edge_single(vertex_type a, vertex_type b)
 	{ untested();
 		assert(a!=b);
-		out_edges(a).erase(b);
+		storage::remove_edge_single(a, b, _v);
 		--_num_edges;
 	}
 private: // required by contruct from iterator
