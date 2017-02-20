@@ -32,7 +32,10 @@ struct ssg16i_config : public gala::graph_cfg_default<G> {
 typedef gala::graph< std::set, std::vector, uint16_t, ssg16i_config > ssg_16i;
 
 // HACK HACK HACK
+#include <gala/boost.h>
 #include <gala/td.h>
+#include <tdlib/directed_view.hpp>
+#include <gala/boost_copy.h>
 #ifndef TD_DEFS_NETWORK_FLOW
 #define TD_DEFS_NETWORK_FLOW
 namespace treedec{
@@ -54,6 +57,8 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, V
 #include <gala/immutable.h>
 
 namespace treedec{
+
+// FIXME: get rid of these traits.
 template<>
 struct graph_traits<ssg_16i>{
 	typedef typename treedec_chooser<ssg_16i>::type treedec_type;
@@ -66,6 +71,8 @@ struct graph_traits<ssg_16i>{
 #else
 	typedef typename boost::adjacency_matrix<boost::undirectedS> immutable_type;
 #endif
+	// typedef typename ssg_16i::directed_self_type directed_type;
+	typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> directed_type;
 };
 
 using ssg16i_traits=graph_traits<ssg_16i>;
