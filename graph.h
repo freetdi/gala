@@ -1444,10 +1444,20 @@ public: // BUG: private. use "friend"...
 	vertex_container_type _v;
 	size_t _num_edges;
 
-public: // experimental...?
-	// does this have to be public?!
+public: // directions
 	template<class GG>
 	struct my_directed_config : public CFG<GG> { //
+		static constexpr bool is_directed=true;
+	};
+	template<class GG>
+	struct my_undirected_config : public CFG<GG> { //
+		static constexpr bool is_directed=false;
+	};
+public: // experimental...?
+
+	// does this really work? directed/undirected are binary incompatible...
+	template<class GG>
+	struct my_directed_self_config : public CFG<GG> { //
 		// hmm, this must proxy all supported types
 //		typedef boost::mpl::true_ is_directed_t;
 		static constexpr bool is_directed=true;
@@ -1474,13 +1484,15 @@ public: // experimental...?
 
 	template<class self, bool dir>
 	struct directed_self{
-		typedef typename reconfig<my_directed_config>::type type;
+		typedef typename reconfig<my_directed_self_config>::type type;
 	};
 	template<class self>
 	struct directed_self<self, true>{
 		typedef self type;
 	};
 	typedef typename directed_self<this_type, is_directed_v>::type directed_self_type;
+	typedef typename reconfig<my_directed_config>::type directed_type;
+	typedef typename reconfig<my_undirected_config>::type undirected_type;
 
 	directed_self_type const& directed_view() const
 	{ untested();

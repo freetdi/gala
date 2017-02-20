@@ -71,8 +71,8 @@ struct graph_traits<ssg_16i>{
 #else
 	typedef typename boost::adjacency_matrix<boost::undirectedS> immutable_type;
 #endif
-	// typedef typename ssg_16i::directed_self_type directed_type;
-	typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> directed_type;
+	typedef typename ssg_16i::directed_type directed_type;
+	// typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> directed_type;
 };
 
 using ssg16i_traits=graph_traits<ssg_16i>;
