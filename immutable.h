@@ -508,7 +508,7 @@ namespace boost{ //
 	}
 	template<class G>
 	typename immvecgraph<G>::vertex_descriptor vertex(
-			size_t t, immvecgraph<G> const& g)
+			size_t t, immvecgraph<G> const&)
 	{
 		return t;
 	}

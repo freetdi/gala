@@ -25,6 +25,10 @@
 #include <boost/graph/graph_traits.hpp> // bidirectional_graph_tag
 #include <boost/graph/properties.hpp>
 
+// hrm. doesn't work
+// #include "boost_copy.h"
+
+
 namespace boost { //
 	struct simplegraph_traversal_category :
 		public virtual bidirectional_graph_tag, // ?!
@@ -164,7 +168,7 @@ namespace boost { //
 		// incomplete: other sets? use sfinae.h...
 		template<class E>
 		bool is_in_edgeset(std::set<E> const& c, E v)
-		{
+		{ untested();
 			return c.find(v)!=c.end();
 		}
 	}
@@ -176,6 +180,14 @@ namespace boost { //
 	template<>
 	struct galaboost_dir<true> {
 		typedef directed_tag type;
+	};
+	template<bool X>
+	struct galaboost_par {
+		typedef disallow_parallel_edge_tag type;
+	};
+	template<>
+	struct galaboost_par<true> {
+		typedef allow_parallel_edge_tag type;
 	};
 	}
 
@@ -191,7 +203,8 @@ namespace boost { //
 
 		typedef typename detail::galaboost_dir<G::is_directed()>::type directed_category;
 		typedef simplegraph_traversal_category traversal_category;
-		typedef disallow_parallel_edge_tag edge_parallel_category;
+
+		typedef typename detail::galaboost_par<G::is_multiedge()>::type edge_parallel_category;
 
 		class vertex_iterator
 		    : public iterator_facade<
@@ -259,7 +272,7 @@ namespace boost { //
 				return base == other.base;
 			}
 			void increment()
-			{
+			{ itested();
 				++base;
 			}
 			void decrement()
@@ -432,7 +445,7 @@ namespace boost { //
 			out_edge_iterator(
 			    typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor v,
 			    typename gala::graph<SGARGS>::out_vertex_iterator w)
-			{
+			{ untested();
 				base.first = v;
 				base.second = w;
 			}
@@ -442,11 +455,11 @@ namespace boost { //
 				return std::make_pair(base.first, *base.second);
 			}
 			bool equal(const out_edge_iterator& other) const
-			{
+			{ untested();
 				return base.second == other.base.second;
 			}
 			void increment()
-			{
+			{ untested();
 				++(base.second);
 			}
 			void decrement()
@@ -467,7 +480,7 @@ namespace boost { //
 			friend class iterator_core_access;
 		};
 
-	}; // traits<sgVCT>
+	}; // graph_traits<sgVCT>
 	// =============================================================================//
 
 	VCTtemplate
@@ -482,7 +495,7 @@ namespace boost { //
 	                 typename graph_traits<::gala::graph<SGARGS> >::adjacency_iterator>
 	      adjacent_vertices(typename graph_traits<::gala::graph<SGARGS> >::vertex_descriptor u,
 	                        const gala::graph<SGARGS>& g)
-	{
+	{ untested();
 		typedef typename graph_traits<::gala::graph<SGARGS> >::adjacency_iterator Iter;
 		auto& o = g.out_edges(u);
 		return std::make_pair( Iter(o.begin()), Iter(o.end()));
@@ -552,13 +565,6 @@ namespace boost { //
 //	}
 
 	VCTtemplate
-	typename graph_traits<::gala::graph<SGARGS> >::edges_size_type
-	num_edges(const ::gala::graph<SGARGS>& g)
-	{ // untested();
-		return g.num_edges();
-	}
-
-	VCTtemplate
    std::pair<typename graph_traits<::gala::graph<SGARGS> >::edge_descriptor, bool>
 	   edge(/*const*/ typename graph_traits< ::gala::graph<SGARGS> >::vertex_descriptor u,
 	        /*const*/ typename graph_traits< ::gala::graph<SGARGS> >::vertex_descriptor v,
@@ -600,7 +606,7 @@ namespace boost { //
 	typename graph_traits<::gala::graph<SGARGS> >::degree_size_type
 	out_degree(typename graph_traits< ::gala::graph<SGARGS> >::vertex_descriptor u,
 			const ::gala::graph<SGARGS>&g)
-	{
+	{ itested();
 	   return g.degree(u);
 	}
 
@@ -691,6 +697,27 @@ namespace boost { //
 		return std::make_pair( Iter(g.begin(),&g), Iter(g.end(),&g) );
 	}
 
+	VCTtemplate
+	typename graph_traits<::gala::graph<SGARGS> >::edges_size_type
+	num_edges(const ::gala::graph<SGARGS>& g)
+	{
+#ifndef NDEBUG
+		if(!g.is_directed()){
+			size_t c=0;
+			auto p=vertices(g);
+			for(; p.first!=p.second; ++p.first){
+				c+=degree(*p.first, g);
+			}
+			if(g.is_multiedge()){
+			}else{
+			}
+			assert(c==g.num_edges()*2);
+		}
+#endif
+		return g.num_edges();
+	}
+
+
 // internal assignment
 	template<galaPARMS,
 	template<class T, typename... > class ECT2,
@@ -708,39 +735,13 @@ namespace boost { //
 
 namespace boost {
 
-// assign boost graph
-// (how to pick properly?
-   template<class G, galaPARMS>
-	inline void copy_graph(const G& g, gala::graph<SGARGS>& h,
-			typename boost::graph_traits<G>::vertex_descriptor=boost::graph_traits<G>::null_vertex() )
-	{
-		detail::copy_helper<G, SGARGS>::boost_to_gala(g, h);
-	}
 
-   template<class G, galaPARMS>
-	inline 	typename
-	std::enable_if<is_convertible< typename
-	  graph_traits<G>::traversal_category , edge_list_graph_tag>::value, void >::type
-	 copy_graph(const gala::graph<SGARGS>& g, G& h)
-	{
-		detail::copy_helper<G, SGARGS>::gala_to_boost(g, h);
-	}
-
-	/// collides with...
 	VCTtemplate
-	inline typename graph_traits<gala::graph<SGARGS> >::vertices_size_type
-	num_vertices(const gala::graph<SGARGS>& g)
-	{
+	typename graph_traits<::gala::graph<SGARGS> >::vertices_size_type
+	num_vertices(const gala::graph<SGARGS>& g) { // untested();
 		return g.num_vertices();
 	}
 
-
-//	VCTtemplate
-//	typename graph_traits<::gala::graph<SGARGS> >::vertices_size_type
-//	num_vertices(const gala::graph<SGARGS>& g) { // untested();
-//		return g.num_vertices();
-//	}
-//
 	VCTtemplate
 	struct vertex_property_type<::gala::graph<SGARGS> >{
 		typedef void type;
@@ -917,7 +918,7 @@ namespace boost {
 	typename boost::graph_traits<gala::graph<SGARGS > >::vertices_size_type
 	get(vertex_index_t t, const gala::graph<SGARGS>& g,
 			typename boost::graph_traits< gala::graph<SGARGS> >::vertex_descriptor v)
-	{
+	{ untested();
 		return get(get(t, g), v);
 	}
 
@@ -926,7 +927,7 @@ namespace boost {
 						  typename boost::graph_traits< gala::graph<SGARGS> >::out_edge_iterator >
 						out_edges(typename boost::graph_traits< gala::graph<SGARGS> >::vertex_descriptor v,
 								gala::graph<SGARGS> const& g)
-	{
+	{ untested();
 		typedef typename boost::graph_traits<gala::graph<SGARGS> >::out_edge_iterator Iter;
 		::gala::graph<SGARGS>* G = const_cast<::gala::graph<SGARGS>*>(&g); // HACK
 		return std::make_pair(Iter(v, G->out_edges(v).begin()), Iter(v, G->out_edges(v).end()));
@@ -935,6 +936,11 @@ namespace boost {
 	bool is_directed(gala::graph<SGARGS> const& g)
 	{
 		return g.is_directed();
+	}
+	VCTtemplate
+	bool is_undirected(gala::graph<SGARGS> const& g)
+	{ untested();
+		return !g.is_directed();
 	}
 
 } // namespace boost

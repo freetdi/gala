@@ -202,7 +202,7 @@ struct hmhelp{
   typedef HMT type;
   typedef HMT const& ref;
   template<class H>
-  static const H& get(H const& h, unsigned W){ untested();
+  static const H& get(H const& h, unsigned){ untested();
     return h;
   }
   template<class H>

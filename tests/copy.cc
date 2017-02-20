@@ -3,6 +3,7 @@
 #include <boost/functional/hash.hpp> // BUG?!
 #include <boost/graph/adjacency_matrix.hpp>
 #include "../boost.h"
+#include "../boost_copy.h"
 #include <boost/graph/graph_traits.hpp>
 
 template<class G>

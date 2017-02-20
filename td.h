@@ -1,4 +1,4 @@
-// Felix Salfelder 2016
+// Felix Salfelder 2016-2017
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -24,10 +24,10 @@
 #include "sfinae.h"
 
 // HACK
-#include <tdlib/degree.hpp>
-#include <tdlib/graph.hpp>
+// #include <tdlib/degree.hpp> // BUG. degree includes view stuff
+// #include <tdlib/graph.hpp>
 #include <tdlib/graph_traits.hpp>
-#include <tdlib/platform.hpp>
+// #include <tdlib/platform.hpp>
 
 #include <boost/graph/iteration_macros.hpp>
 //hack
@@ -36,7 +36,7 @@
 
 #include "sethack.h"
 //#include "parallel.h"
-#include "degs.h"
+// #include "degs.h"
 
 #define q_in_cb
 
@@ -244,11 +244,9 @@ static size_t mcah(
 		   typename treedec::treedec_chooser<  gala::graph<SGARGS>  >::type>::bag_type& bag,
 		CB* cb)
 { untested();
-	(void)c;
-	(void)cb;
-	(void)bag;
-	(void)g;
 	incomplete();
+	assert(0);
+	// BOOST_STATIC_ASSERT(0);
 	return 0;
 }
 typedef typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor vertex_descriptor;
@@ -258,6 +256,8 @@ typedef typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor ve
 	                   treedec::vertex_callback<typename gala::graph<SGARGS>::vertex_type >* cb=NULL)
 { untested();
 	incomplete();
+	assert(0);
+	// BOOST_STATIC_ASSERT(0);
 }
 };
 
@@ -688,8 +688,9 @@ struct graph_traits<gala::graph<SGARGS> >{
 	typedef typename boost::adjacency_list<boost::vecS, boost::vecS,
 	    boost::bidirectionalS, Vertex_NF, Edge_NF> directed_overlay;
 
-    typedef typename boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> immutable_type;
+	typedef typename boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> immutable_type;
 	//                                 for now. ^^^^^
+	typedef typename gala::graph<SGARGS>::directed_type directed_type;
 };
 } // treedec
 

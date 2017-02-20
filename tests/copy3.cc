@@ -5,6 +5,7 @@
 #include "../boost.h"
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/copy.hpp>
+#include "../boost_copy.h"
 #include <gala/examples/ssg16i.h>
 
 template<class G>

@@ -4,9 +4,11 @@ CXXFLAGS=-std=c++11 -O0 -g -Wall -Wextra $(LOCAL_CXXFLAGS)
 
 TESTS = \
 	bmd \
+	concepts \
 	copy \
 	copy2 \
 	copy3 \
+	copy4 \
 	count \
 	count_adj \
 	dir \
