@@ -23,12 +23,11 @@ TESTS = \
 
 LOGS = ${TESTS:%=%.log}
 
-CLEANFILES = ${TESTS} ${LOGS}
+CLEANFILES = ${TESTS} ${LOGS} gala
 
 all: $(LOGS)
 
-TESTS: gala
-
+$(TESTS): | gala
 
 $(LOGS): %.log: %
 	./$< 2>&1 | tee $@
