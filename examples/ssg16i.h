@@ -34,7 +34,6 @@ typedef gala::graph< std::set, std::vector, uint16_t, ssg16i_config > ssg_16i;
 // HACK HACK HACK
 #include <gala/boost.h>
 #include <gala/td.h>
-#include <tdlib/directed_view.hpp>
 #include <gala/boost_copy.h>
 #ifndef TD_DEFS_NETWORK_FLOW
 #define TD_DEFS_NETWORK_FLOW
