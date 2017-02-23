@@ -53,12 +53,8 @@ struct m_deg_config : public misc::detail::random_deg_config<G> {
 	}
 };
 
-template<class T, class...>
-using DEX = misc::DEGS<T, m_deg_config<T> >;
-
 template<class G>
 struct svbs_config : public gala::graph_cfg_default<G> {
-	typedef DEX<G> degs_type;
 };
 }
 

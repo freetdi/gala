@@ -40,12 +40,8 @@ struct m_deg_config : public misc::detail::deg_config<G> {
 	}
 };
 
-template<class T, class...>
-using DEX = misc::DEGS<T, m_deg_config<T> >;
-
 template<class G>
 struct svbs_config : public gala::graph_cfg_default<G> {
-	typedef DEX<G> degs_type;
 };
 
-typedef gala::graph< stx::btree_set, std::vector, void*, svbs_config> simplegraph_vector_bs;
+typedef gala::graph< stx::btree_set, std::vector, gala::vertex_ptr_tag, svbs_config> simplegraph_vector_bs;

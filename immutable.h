@@ -27,6 +27,8 @@
 #include <boost/iterator/counting_iterator.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 
+#include <tdlib/graph_traits.hpp> // hmmm
+
 // HACK HACK HACK
 #ifndef TD_DEFS_NETWORK_FLOW
 #define TD_DEFS_NETWORK_FLOW

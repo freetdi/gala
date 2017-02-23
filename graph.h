@@ -156,6 +156,7 @@ struct outedge_helper<ECT, typename sfinae::is_vec_tpl<ECT>::type > {
 	}
 };
 /*--------------------------------------------------------------------------*/
+// TODO: move to bits header
 template<class S, class X=void>
 struct container_helper {
 	template<class C, class E>
@@ -166,6 +167,14 @@ struct container_helper {
 };
 template<class S>
 struct container_helper<S, typename sfinae::is_vector<S>::type > {
+	template<class C, class E>
+	static bool exists(C&, E)
+	{ incomplete();
+		return false;
+	}
+};
+template<class S>
+struct container_helper<S, typename sfinae::is_hash<S>::type > {
 	template<class C, class E>
 	static bool exists(C&, E)
 	{ incomplete();
@@ -204,7 +213,8 @@ struct vertex_helper<vertex_ptr_tag>{ //
 	static bool contains(T& v, V&, VC* wp)
 	{ itested();
 		incomplete();
-		return contains(v.n, wp);
+		// return contains(v.n, wp);
+		return container_helper<VC>::exists(v.n, wp);
 	}
 	template<class T, class V, class VC>
 	static void insert(T& v, V&, VC* wp)
@@ -330,13 +340,16 @@ template<class VDP, bool is_directed, bool is_multiedge>
 struct iter_helper<std::bidirectional_iterator_tag, VDP, is_directed, is_multiedge>{ //
 
 template<class iter, class VL>
-static size_t fill_pos(iter first, iter last, size_t nv, VL& _v, bool dir)
+static size_t fill_pos(iter first, iter last, /* size_t nv, */ VL& _v, bool dir, bool dup=false)
 { untested();
 	if(dir){ incomplete();
 	}
 	typedef typename VL::value_type v_t;
-	GALA_DEFAULT_VECTOR<v_t*> vmap(nv);
-	assert(nv==_v.size());
+	size_t nv=_v.size();
+	if(nv){ untested();
+	}else{ untested();
+	}
+	GALA_DEFAULT_VECTOR<v_t*> vmap(_v.size());
 	size_t index=0;
 	for(auto& i : _v){ untested();
 		vmap[index++] = &i;
@@ -566,7 +579,7 @@ struct storage<ECT, VCT, vertex_ptr_tag> : public storage_base<ECT, VCT, vertex_
 		return v->n;
 	}
 public:
-	static void remove_edge_single(vertex_index_type v, vertex_index_type w,
+	static void remove_edge_single(vertex_type v, vertex_type w,
 	                         container_type& _v)
 	{ untested();
 		out_edges(v, _v).erase(w);
@@ -967,7 +980,7 @@ struct is_multiedge_select<ECT,
 // temporary hack. use proper maps later
 template<STPARMS, class X=void>
 struct is_nn {
-	static constexpr bool value=false;
+	static constexpr bool value=sfinae::is_vec_tpl<VCT>::value;
 };
 template<template<class T, typename... > class ECT,
          template<class T, typename... > class VCT>
@@ -975,12 +988,15 @@ struct is_nn<ECT, VCT, vertex_ptr_tag> {
 	// incomplete: this is not what it is meant to be...
 	static constexpr bool value=false;
 };
+#if 0
 template<STPARMS>
 struct is_nn<STARGS,
 	typename std::enable_if<sfinae::is_vec_tpl<VCT>::value >::type >
 { //
 	static constexpr bool value=true;
 };
+#endif
+// struct gala::detail::is_nn<uset, std::vector, gala::vertex_ptr_tag, void>
 /*--------------------------------------------------------------------------*/
 template<class Gsrc, class Gtgt, bool srcDir, bool tgtDir,
 	bool srcCont=false, bool tgtCont=false>
@@ -995,6 +1011,9 @@ template< template<class T, typename... > class ECT=GALA_DEFAULT_SET,
           typename VDP=vertex_ptr_tag, // use_pointers,
           template<class G> class CFG=graph_cfg_default>
 class graph{ //
+	BOOST_STATIC_ASSERT( (std::numeric_limits<VDP>::is_integer
+	                 && !std::numeric_limits<VDP>::is_signed )
+						  || std::is_same<VDP, vertex_ptr_tag>::value );
 public: // types
 	using this_type = graph<SGARGS>;
 
@@ -1559,6 +1578,8 @@ graph<SGARGS>::graph(EdgeIterator first, EdgeIterator last,
     : graph(nv, ne)
 { untested();
 	_num_edges=0;
+
+	assert(_v.size()==nv);
 	fill_in_edges(first, last, false);
 	assert(!ne || ne==_num_edges); // unique edges? for now.
 
@@ -1725,7 +1746,7 @@ void copy_helper<oG, G, X, Y, srcCont, tgtCont>::assign(oG const& src, G& tgt)
 
 	assert(tgt._v.size()==nv);
 	typename G::vertex_type map[nv];
-	std::map<typename oG::vertex_type, size_t> reverse_map;
+	std::map<typename oG::const_vertex_type, size_t> reverse_map;
 	size_t i=0;
 	tgt._num_edges = 0;
 
@@ -1742,8 +1763,9 @@ void copy_helper<oG, G, X, Y, srcCont, tgtCont>::assign(oG const& src, G& tgt)
 	oG* GG = const_cast<oG*>(&g);
 	i=0;
 	// FIXME: use const_iter
-	for(typename oG::iterator v=GG->cbegin(); v!=GG->cend(); ++v){ itested();
-		reverse_map[oG::iter::deref(v)] = i;
+	for(auto v=GG->cbegin(); v!=GG->cend(); ++v){ itested();
+		typename oG::const_vertex_type ov=oG::iter::deref(v);
+		reverse_map[ov] = i;
 		++i;
 	}
 
@@ -1943,8 +1965,6 @@ struct copy_helper<Gsrc, Gtgt, boost::mpl::true_, boost::mpl::true_>
 /*--------------------------------------------------------------------------*/
 } // namespace detail
 /*--------------------------------------------------------------------------*/
-} // gala
-namespace gala{
 // TODO: runtime info?
 VCTtemplate
 void graph<SGARGS>::contract(vertex_type& vd, vertex_type into)

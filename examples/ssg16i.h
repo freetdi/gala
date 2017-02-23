@@ -42,7 +42,7 @@ struct Vertex_NF{
 };
 
 struct Edge_NF{
-    bool path; //true if a path uses the edge
+   bool path; //true if a path uses the edge
 };
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Vertex_NF, Edge_NF> digraph_t;
 
@@ -58,7 +58,7 @@ namespace treedec{
 template<>
 struct graph_traits<ssg_16i>{
 	typedef typename treedec_chooser<ssg_16i>::type treedec_type;
-	typedef typename outedge_set<ssg_16i>::type outedge_set_type;
+//	typedef typename outedge_set<ssg_16i>::type outedge_set_type;
 	typedef idgwel<ssg_16i> directed_overlay;
 	typedef idgwel<ssg_16i> immutable_directed_type;
 #if 1

@@ -1,6 +1,7 @@
-
 CPPFLAGS=-I. -DTRACE_UNTESTED $(LOCAL_CPPFLAGS)
 CXXFLAGS=-std=c++11 -O0 -g -Wall -Wextra $(LOCAL_CXXFLAGS)
+
+all: check
 
 TESTS = \
 	bmd \
@@ -25,7 +26,7 @@ LOGS = ${TESTS:%=%.log}
 
 CLEANFILES = ${TESTS} ${LOGS} gala
 
-all: $(LOGS)
+check: $(LOGS)
 
 $(TESTS): | gala
 
