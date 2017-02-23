@@ -26,12 +26,30 @@
 #include <set>
 #include <stx/btree_set.h>
 #include <vector>
+#include <unordered_set>
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 namespace gala{
 namespace sfinae{
 /*--------------------------------------------------------------------------*/
-struct any{int dummy;};
+struct any{
+	int dummy; // required for size!=0?
+	bool operator==(const any&)const{ unreachable(); return true; }
+	typedef int value_type; // dummy.
+};
+/*--------------------------------------------------------------------------*/
+}
+}
+/*--------------------------------------------------------------------------*/
+namespace std {
+template<>
+struct hash<gala::sfinae::any>{
+	size_t operator()(const gala::sfinae::any&)const{ unreachable(); return 0; }
+};
+} // std
+/*--------------------------------------------------------------------------*/
+namespace gala{
+namespace sfinae{
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 template<class A, class B=any, class T=void, class...>
@@ -74,6 +92,21 @@ std::vector<any, typename S::allocator_type >, S
 template<class S, class T>
 struct is_seq<S, typename std::enable_if < std::is_same<
 std::deque<any, typename S::allocator_type >, S
+>::value, any >::type , T>{ //
+
+	typedef T type;
+	static constexpr bool value = true;
+};
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+template<class A, class B=any, class T=void>
+struct is_hash{
+	static constexpr bool value = false;
+};
+/*--------------------------------------------------------------------------*/
+template<class S, class T>
+struct is_hash<S, typename std::enable_if < std::is_same<
+std::hash<typename S::value_type>, S
 >::value, any >::type , T>{ //
 
 	typedef T type;
