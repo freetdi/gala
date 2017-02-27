@@ -183,6 +183,7 @@ struct ofhelp{
   static void set(type& h, H x){ untested();
     h=x;
   }
+  static constexpr bool active=true;
 };
 /*--------------------------------------------------------------------------*/
 template<>
@@ -195,6 +196,7 @@ struct ofhelp<nooffset_t>{
   template<class H>
   static void set(nooffset_t&, H){ untested();
   }
+  static constexpr bool active=false;
 };
 /*--------------------------------------------------------------------------*/
 template<class HMT>
@@ -227,6 +229,7 @@ struct hmhelp{
   template<class D>
   static void clear(D*, unsigned){
   }
+  static constexpr bool active=true;
 };
 /*--------------------------------------------------------------------------*/
 template<>
@@ -255,6 +258,7 @@ struct hmhelp<nohowmany_t>{
       d[i]=0;
     }
   }
+  static constexpr bool active=false;
 };
 /*--------------------------------------------------------------------------*/
 } // detail
@@ -273,6 +277,9 @@ public:
   typedef enum{sqcup} _sqcup_t;
   typedef enum{cup} _cup_t;
   typedef enum{cap} _cap_t;
+public:
+  static bool use_offset(){ return detail::ofhelp<OST>::active; }
+  static bool use_howmany(){ return detail::hmhelp<HMT>::active; }
 public:
   BSET_DYNAMIC()
     : _howmany(0),
@@ -1177,7 +1184,9 @@ inline void BSET_DYNAMIC<BSDa>::remove_sorted_sequence(S const& s)
     --_howmany;
   }
 #endif
-  assert(!size() == !howmany());
+  if(use_howmany()){
+    assert(!size() == !howmany());
+  }
 }
 /*--------------------------------------------------------------------------*/
 BSDt
@@ -1695,11 +1704,13 @@ inline typename BSET_DYNAMIC<BSDa>::value_type BSET_DYNAMIC<BSDa>::back() const
 BSDt
 bool BSET_DYNAMIC<BSDa>::operator==(BSET_DYNAMIC const& t) const
 { untested();
-  if(howmany()){ untested();
+  if(!use_offset()){
+  }else if(howmany()){ untested();
     assert(_d[0]);
     assert(_d[howmany()-1]);
   }
-  if(t.howmany()){ untested();
+  if(!t.use_offset() || !t.use_howmany() ){ untested();
+  }else if(t.howmany()){ untested();
     assert(t._d[0]);
     assert(t._d[t.howmany()-1]);
   }

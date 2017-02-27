@@ -1569,7 +1569,7 @@ void graph<SGARGS>::fill_in_edges(EI1 first, EI2 last, bool possible_duplicates)
 					possible_duplicates/* template arg?! */ );
 		trace1("fillpos done", _num_edges);
 	}
-};
+}
 /*--------------------------------------------------------------------------*/
 VCTtemplate
 template <class EdgeIterator>
