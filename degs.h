@@ -74,7 +74,9 @@ public: // queueing
     {
         int n=_degs[d].erase(v);
         (void)n;
-        assert(n==1);
+        if(n!=1){ // bug in deltaC_least_c?
+			  unreachable();
+		  }
     }
     void unlink(const vertex_descriptor& v)
     {
