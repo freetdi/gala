@@ -16,9 +16,7 @@ HEADERS = \
 	sethack.h \
 	sfinae.h \
 	td.h \
-	trace.h \
-	traits.h \
-	treedec.h
+	trace.h
 
 INSTALL = install
 
