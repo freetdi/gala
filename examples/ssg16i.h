@@ -25,6 +25,8 @@
 #include <boost/functional/hash.hpp> // BUG?!
 #include <boost/graph/adjacency_matrix.hpp>
 
+#include <gala/td.h>
+
 template<class G>
 struct ssg16i_config : public gala::graph_cfg_default<G> {
 };
