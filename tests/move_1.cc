@@ -30,7 +30,6 @@ int main(int , char* [])
 
 	assert(boost::num_edges(ug)==1);
 
-	untested();
 	assert(!sg_uvv::is_directed_v);
 	assert(sg_dvv::is_directed_v);
 	sg_dvv dg(std::move(ug));
