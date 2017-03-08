@@ -25,22 +25,22 @@ namespace detail {
 		};
 
 		static void boost_to_gala(const SRC& src, gala::graph<SGARGS>& tgt)
-		{ untested();
+		{
 			typedef typename graph_traits<SRC>::edge_iterator BEI;
 			typedef edge_iw<SRC, BEI> bw_t;
 			tgt.reshape(boost::num_vertices(src), boost::num_edges(src), boost::is_directed(src));
 			auto E=edges(src);
 
-			if(boost::is_directed(src)){ untested();
-				if(tgt.is_multiedge()){ untested();
+			if(boost::is_directed(src)){
+				if(tgt.is_multiedge()){
 					// probably more cases...
 					incomplete();
 				}
 			}
 
-			if(boost::is_multigraph<SRC>()){ untested();
+			if(boost::is_multigraph<SRC>()){
 				tgt.fill_in_edges(bw_t(E.first, src), bw_t(E.second, src), true);
-			}else if(boost::is_directed(src)){ untested();
+			}else if(boost::is_directed(src)){
 				// edge counter ...
 				tgt.fill_in_edges(bw_t(E.first, src), bw_t(E.second, src), true);
 			}else{untested();
@@ -49,9 +49,9 @@ namespace detail {
 			}
 		}
 		static void gala_to_boost(const gala::graph<SGARGS>& src, SRC& tgt)
-		{ untested();
+		{
 			auto nv=src.num_vertices();
-			if(num_vertices(tgt)==0){ untested();
+			if(num_vertices(tgt)==0){
 				// good idea?
 				tgt=std::move(SRC(nv));
 			}else{ itested();
@@ -83,7 +83,7 @@ namespace detail {
    template<class SRC, galaPARMS>
 	inline void copy_graph(const SRC& g, gala::graph<SGARGS>& h,
 			typename boost::graph_traits<SRC>::vertex_descriptor=boost::graph_traits<SRC>::null_vertex() )
-	{ untested();
+	{
 		detail::copy_helper<SRC, SGARGS>::boost_to_gala(g, h);
 	}
 
@@ -92,7 +92,7 @@ namespace detail {
 	std::enable_if<is_convertible< typename
 	  graph_traits<SRC>::traversal_category , edge_list_graph_tag>::value, void >::type
 	 copy_graph(const gala::graph<SGARGS>& g, SRC& h)
-	{ untested();
+	{
 		detail::copy_helper<SRC, SGARGS>::gala_to_boost(g, h);
 	}
 

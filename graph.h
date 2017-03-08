@@ -285,9 +285,9 @@ struct iter_helper{ //
 				doit=true;
 			}else if(!dups){
 				doit=true;
-			}else if(vertex_helper<VDP>::contains(_v[v], w, &_v[w])){ untested();
+			}else if(vertex_helper<VDP>::contains(_v[v], w, &_v[w])){
 				doit=false;
-			}else{ untested();
+			}else{
 				doit=true;
 			}
 
@@ -303,10 +303,10 @@ struct iter_helper{ //
 
 };
 /*--------------------------------------------------------------------------*/
-inline size_t source(std::pair<size_t, size_t> const& p){ untested();
+inline size_t source(std::pair<size_t, size_t> const& p){
 	return p.first;
 }
-inline size_t target(std::pair<size_t, size_t> const& p){ untested();
+inline size_t target(std::pair<size_t, size_t> const& p){
 	return p.second;
 }
 /*--------------------------------------------------------------------------*/
@@ -315,8 +315,8 @@ struct iter_helper<c_iter_tag, VDP, /*directed*/ true, is_multiedge> {
 
 	template<class iter, class VL>
 	static size_t fill_pos(iter first, iter last, VL& _v, bool dir=false, bool dups=true)
-	{ untested();
-		if(dups){ untested();
+	{
+		if(dups){
 		}else{ untested();
 		}
 		assert(dir); (void) dir;
@@ -856,7 +856,7 @@ struct iter{ //
 		return vertex_iterator(0);
 	}
 	static const_vertex_iterator vbegin(const typename storage<STARGS>::VL&)
-	{ untested();
+	{
 		return vertex_iterator(0);
 	}
 	static vertex_iterator vend(typename storage<STARGS>::VL& v)
@@ -1092,15 +1092,15 @@ public: // move
 						pdummy >::type=pdummy())
 	    : _v(std::move(x._v)),
 	      _num_edges(x._num_edges)
-	{ untested();
-		if(is_directed()){ untested();
+	{
+		if(is_directed()){
 			_num_edges*=2;
 		}else{untested();
 		}
 	}
 public: // construct
 	graph(const graph& x) : _num_edges(0)
-	{ untested();
+	{
 		assign_same(x); // FIXME op=?
 	}
    template<template<class T, typename... > class ECT2, \
@@ -1109,20 +1109,20 @@ public: // construct
             template<class G> class CFG2>
 	graph(graph<ECT2, VCT2, VDP2, CFG2> const& x)
 	: _num_edges(0)
-	{ untested();
+	{
 
 		detail::copy_helper<graph<ECT2,VCT2,VDP2,CFG2>, graph,
 			  graph<ECT2,VCT2,VDP2,CFG2>::is_directed_v, is_directed_v
 			>::assign(x, *this);
 		assert(num_vertices()==x.num_vertices());
 
-		if( !is_directed() && x.is_directed() ){ untested();
+		if( !is_directed() && x.is_directed() ){
 			// anything.
-		}else{ untested();
+		}else{
 			assert(_num_edges==x._num_edges);
 		}
 #ifndef NDEBUG
-		for(auto i = begin(); i!=end(); ++i){ untested();
+		for(auto i = begin(); i!=end(); ++i){
 			assert(is_valid(iter::deref(i)));
 			//   		for(auto& j : vertices()){ untested();
 			//   //			assert(is_edge(&j,&i) == is_edge(&i,&j));
@@ -1808,7 +1808,7 @@ void copy_helper<oG, G, X, Y, srcCont, tgtCont>::assign(oG const& src, G& tgt)
 //	trace3("debug", tgt.is_directed, src.is_directed, num_og_edges);
 	if(tgt._num_edges == 2*ne){ untested();
 	}else if(tgt.num_edges() == ne){ untested();
-	}else if(tgt.is_directed() && !g.is_directed() ){ untested();
+	}else if(tgt.is_directed() && !g.is_directed() ){
 		trace2("bug", tgt._num_edges, ne );
 		tgt._num_edges = ne;
 		assert(tgt.num_edges() == 2*g.num_edges());
@@ -1888,7 +1888,7 @@ namespace detail{
 	struct set_hlp{
 		static void copy_set(S const& src, T& tgt)
 		{ untested();
-			for(auto w : src){ itested();
+			for(auto w : src){
 				tgt.push_back(w);
 			}
 		}
@@ -1902,7 +1902,7 @@ namespace detail{
 
 		static void copy_set(S const& src, T& tgt)
 		{ untested();
-			for(auto w : src){ itested();
+			for(auto w : src){
 				tgt.insert(w); // FIXME: hint, if ordered.
 			}
 		}
