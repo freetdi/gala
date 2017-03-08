@@ -26,6 +26,7 @@ int main(int , char* [])
 	auto next=V.first; ++next;
 	bool added = boost::add_edge(*V.first, *next, ug).second;
 	assert(added);
+	sg_uvv ug2(ug);
 
 	assert(boost::num_edges(ug)==1);
 
@@ -37,4 +38,7 @@ int main(int , char* [])
 	assert(boost::num_edges(dg)==2);
 	sg_dvv dg2(std::move(dg));
 	assert(boost::num_edges(dg2)==2);
+
+	typename sg_uvv::directed_type dg3(std::move(ug2));
+	assert(boost::num_edges(dg3)==2);
 }
