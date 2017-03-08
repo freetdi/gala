@@ -954,7 +954,7 @@ struct graph_cfg_default;
 namespace detail{
 template<class CFG, class X=void>
 struct is_directed_select {
-	typedef boost::mpl::false_ type; // uuh, obsolete?
+	typedef boost::mpl::false_ type; // obsolete. don't use.
 	static constexpr bool value=false;
 	operator bool() const {return false;}
 };
@@ -1054,6 +1054,16 @@ public: // types
 	static constexpr bool is_multiedge() {
 		return is_multiedge_v;
 	}
+public: // reconfig
+	template<template<class G> class new_config>
+	struct reconfig{
+		typedef graph<ECT, VCT, VDP, new_config> type;
+	};
+	template<class GG>
+	struct my_undirected_config : public CFG<GG> { //
+		static constexpr bool is_directed=false;
+	};
+	typedef typename reconfig<my_undirected_config>::type undirected_type;
 public:
 	typedef typename storage::container_type VL;
 	typedef typename storage::container_type vertex_container_type;
@@ -1073,6 +1083,21 @@ public: // range-based loops support aliases
 	typedef typename storage::edge_type edge_type;
 
 	typedef std::pair<iterator, out_vertex_iterator> edge_iterator;
+private: // inacessible sfinae
+	struct pdummy{};
+public: // move
+   template<template<class G> class CFG2>
+	graph( graph<ECT, VCT, VDP, CFG2> const&&x,
+			typename std::enable_if< !graph<ECT, VCT, VDP, CFG2>::is_directed_v,
+						pdummy >::type=pdummy())
+	    : _v(std::move(x._v)),
+	      _num_edges(x._num_edges)
+	{ untested();
+		if(is_directed()){ untested();
+			_num_edges*=2;
+		}else{untested();
+		}
+	}
 public: // construct
 	graph(const graph& x) : _num_edges(0)
 	{ untested();
@@ -1082,7 +1107,7 @@ public: // construct
             template<class T, typename... > class VCT2, \
             class VDP2, \
             template<class G> class CFG2>
-	graph(graph<ECT2,VCT2,VDP2,CFG2> const& x)
+	graph(graph<ECT2, VCT2, VDP2, CFG2> const& x)
 	: _num_edges(0)
 	{ untested();
 
@@ -1468,10 +1493,6 @@ public: // directions
 	struct my_directed_config : public CFG<GG> { //
 		static constexpr bool is_directed=true;
 	};
-	template<class GG>
-	struct my_undirected_config : public CFG<GG> { //
-		static constexpr bool is_directed=false;
-	};
 public: // experimental...?
 
 	// does this really work? directed/undirected are binary incompatible...
@@ -1496,10 +1517,6 @@ public: // experimental...?
 //			reinterpret_cast<base_type const&>(g).set_num_edges();
 		}
 	};
-	template<template<class G> class new_config>
-	struct reconfig{
-		typedef graph<ECT, VCT, VDP, new_config> type;
-	};
 
 	template<class self, bool dir>
 	struct directed_self{
@@ -1511,7 +1528,6 @@ public: // experimental...?
 	};
 	typedef typename directed_self<this_type, is_directed_v>::type directed_self_type;
 	typedef typename reconfig<my_directed_config>::type directed_type;
-	typedef typename reconfig<my_undirected_config>::type undirected_type;
 
 	directed_self_type const& directed_view() const
 	{ untested();
