@@ -167,7 +167,7 @@ struct container_helper {
 	}
 	template<class C, class E>
 	static void add(C& c, E e)
-	{ untested();
+	{
 		bool done=c.insert(e).second;
 		assert(done); (void)done;
 	}
@@ -186,17 +186,17 @@ struct container_helper<S, typename sfinae::is_vector<S>::type > {
 	}
 	template<class C, class E>
 	static void add(C& c, E e)
-	{ untested();
+	{
 		c.push_back(e);
 	}
 	template<class C, class E>
 	static bool remove(C& c, E e)
-	{ untested();
+	{
 		BOOST_STATIC_WARNING(false); // inefficient.
 		auto what=std::find(c.begin(), c.end(), e);
-		if(what==c.end()){ untested();
+		if(what==c.end()){
 			return false;
-		}else{ untested();
+		}else{
 			c.erase(what);
 			return true;
 		}
@@ -220,7 +220,7 @@ struct vertex_helper{ //
 	}
 	template<class T, class V, class VC>
 	static void add(T& v, V& w, VC*)
-	{ untested();
+	{
 		return container_helper<VC>::add(v, w);
 	}
 	template<class T, class V, class VC>
@@ -312,22 +312,22 @@ struct iter_helper{ //
 			bool dups=true)
 	{
 		unsigned all=0;
-		if(is_multiedge){ untested();
+		if(is_multiedge){
 			if(is_directed){ untested();
-			}else{ untested();
-				if(dups){ untested();
+			}else{
+				if(dups){
 				}else{ untested();
 				}
 			}
-		}else{ untested();
+		}else{
 			if(is_directed){ untested();
-			}else{ untested();
+			}else{
 			}
 		}
 		auto nv=_v.size(); (void)nv;
 		assert(!dir); (void) dir;
 		size_t c=0;
-		for(;first!=last; ++first){ untested();
+		for(;first!=last; ++first){
 			++all;
 			unsigned v=(*first).first;
 			unsigned w=(*first).second;
@@ -340,17 +340,17 @@ struct iter_helper{ //
 				doit=true;
 			}else if(!dups){ untested();
 				doit=true;
-			}else if(vertex_helper<VDP>::contains(_v[v], w, &_v[w])){ untested();
+			}else if(vertex_helper<VDP>::contains(_v[v], w, &_v[w])){
 				doit=false;
 			}else{
 				doit=true;
 			}
 
-			if(doit){ untested();
+			if(doit){
 				vertex_helper<VDP>::add(_v[v], w, &_v[w]);
 				vertex_helper<VDP>::add(_v[w], v, &_v[v]);
 				++c;
-			}else{ untested();
+			}else{
 			}
 		}
 		return c;
@@ -589,8 +589,8 @@ struct storage<ECT, VCT, vertex_ptr_tag> : public storage_base<ECT, VCT, vertex_
 		auto old_begin=_v.begin();
 		_v.resize(s+1);
 		vertex_type offset = (vertex_type) (uintptr_t(&*_v.begin()) - uintptr_t(&*old_begin));
-		if(!offset){ untested();
-		}else{ untested();
+		if(!offset){
+		}else{
 			// std::cerr << "add rewire " << _v.size() << "\n";
 			rewire_helper<STARGS>::rewire_nodes(_v, offset);
 		}
@@ -1190,7 +1190,7 @@ public: // move
 	graph(graph&& x)
 	    : _v(std::move(x._v)),
 	      _num_edges(x._num_edges)
-	{ untested();
+	{
 //		assert(nonvoid)
 		// assert(num_vertices()==x.num_vertices()); no. _v has gone ...
 		for(auto i = begin(); i!=end(); ++i){
@@ -1473,20 +1473,20 @@ public:
 	// O(log max{d_1, d_2}), where d_1 is the degree of a and d_2 is the degree of b
 	// check=false: "i am sure this edge exists"
 	void remove_edge(vertex_type a, vertex_type b, bool check=true)
-	{ untested();
-		if(check){ untested();
+	{
+		if(check){
 			// lets see..
 		}else{ untested();
 			assert(bits::vertex_helper<VDP>::contains(_v[a], b, &_v[b]));
 		}
 		bool done=bits::vertex_helper<VDP>::remove(_v[a], b, &_v[b]);
 
-		if(is_directed()){ untested();
+		if(is_directed()){
 			// only one edge involved.
-			if(check){ untested();
-				if(done){ untested();
+			if(check){
+				if(done){
 					--_num_edges;
-				}else{ untested();
+				}else{
 				}
 			}else{ untested();
 				--_num_edges;

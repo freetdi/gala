@@ -531,7 +531,7 @@ namespace boost { //
     typename graph_traits<gala::graph<SGARGS> >::vertex_descriptor u,
     typename graph_traits<gala::graph<SGARGS> >::vertex_descriptor v,
     gala::graph<SGARGS>& g)
-	{ untested();
+	{
 		g.remove_edge(u, v);
 	}
 
