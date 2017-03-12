@@ -235,7 +235,7 @@ struct hmhelp<nohowmany_t>{
   typedef unsigned type;
   typedef unsigned ref;
   template<class W>
-  static W get(nohowmany_t h, W w){ untested();
+  static W get(nohowmany_t, W w){ untested();
     return w;
   }
   template<class H>
@@ -248,7 +248,7 @@ struct hmhelp<nohowmany_t>{
   static void trim_(nohowmany_t&, D*){ untested();
   }
   template<class X, class D>
-  static void pad(nohowmany_t& h, X x, D* d){ untested();
+  static void pad(nohowmany_t&, X, D*){ untested();
   }
   template<class D>
   static void clear(D* d, unsigned n){
@@ -1215,6 +1215,9 @@ inline void BSET_DYNAMIC<BSDa>::erase(value_type i)
 BSDt
 inline void BSET_DYNAMIC<BSDa>::trim_below()
 { untested();
+  if(!use_offset()){
+    return;
+  }
   unsigned shift=0;
 
   // if !howmany, access uninitialized memory d[0]
@@ -1253,7 +1256,7 @@ inline bool BSET_DYNAMIC<BSDa>::contains(value_type i) const
   assert(howmany()<=W);
   unsigned w=i / CHUNKBITS; // block that i is in.
   assert(offset()<=W);
-  if(_howmany==0){
+  if(howmany()==0){
     return false;
   }else if(w<offset()){
     return false;
@@ -1281,10 +1284,11 @@ static inline unsigned long hash(BSET_DYNAMIC<BSDa> const& s)
 BSDt
 inline unsigned long BSET_DYNAMIC<BSDa>::hash() const
 { untested();
-  if(howmany()){ untested();
+  if(use_howmany() && howmany()){ untested();
     assert(_d[0]);
     assert(_d[howmany()-1]);
   }
+  assert(use_howmany() || howmany()==W);
 
 #ifdef stdhash
   char* setbase = (char*)this;
@@ -1374,11 +1378,13 @@ inline BSET_DYNAMIC<BSDa> union_(BSET_DYNAMIC<BSDa> const& s,
 BSDt
 inline void BSET_DYNAMIC<BSDa>::intersect(BSET_DYNAMIC const& t)
 { untested();
-  if(howmany()){ untested();
+  if(use_howmany() && howmany()){ untested();
     assert(_d[0]);
     assert(_d[howmany()-1]);
+  }else{
+    assert(W==howmany());
   }
-  if(t.howmany()){ untested();
+  if(t.use_howmany() && t.howmany()){ untested();
     assert(t._d[0]);
     assert(t._d[t.howmany()-1]);
   }
@@ -1386,6 +1392,7 @@ inline void BSET_DYNAMIC<BSDa>::intersect(BSET_DYNAMIC const& t)
   assert(size()==recount());
   int delta_=offset()-t.offset();
   if(delta_<0){ untested();
+    assert(use_offset());
     unsigned delta=-delta_;
     for(unsigned i=0; i<delta+howmany(); ++i){ untested();
 //      _size -= numberofones(_d[i]);
