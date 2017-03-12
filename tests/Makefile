@@ -5,6 +5,8 @@ all: check
 
 TESTS = \
 	bmd \
+	cbs \
+	cbsg \
 	concepts \
 	copy \
 	copy2 \
