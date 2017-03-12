@@ -14,6 +14,7 @@ TESTS = \
 	count_adj \
 	dir \
 	edg \
+	erase1 \
 	idmap \
 	iter \
 	move \

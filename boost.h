@@ -711,6 +711,9 @@ namespace boost { //
 			if(g.is_multiedge()){
 			}else{
 			}
+			if(c!=g.num_edges()*2){
+				std::cerr << c << " vs " << g.num_edges() << "\n";
+			}
 			assert(c==g.num_edges()*2);
 		}
 #endif

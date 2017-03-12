@@ -30,6 +30,7 @@
 #include <stx/btree_set.h>
 #include <type_traits>
 		
+#include <boost/serialization/static_warning.hpp>
 #include <boost/iterator/counting_iterator.hpp>
 #include <boost/tuple/tuple.hpp>
 
@@ -164,6 +165,17 @@ struct container_helper {
 	{ itested();
 		return c.find(e) != c.end();
 	}
+	template<class C, class E>
+	static void add(C& c, E e)
+	{ untested();
+		bool done=c.insert(e).second;
+		assert(done); (void)done;
+	}
+	template<class C, class E>
+	static bool remove(C& c, E e)
+	{ untested();
+		return c.erase(e);
+	}
 };
 template<class S>
 struct container_helper<S, typename sfinae::is_vector<S>::type > {
@@ -171,6 +183,23 @@ struct container_helper<S, typename sfinae::is_vector<S>::type > {
 	static bool exists(C&, E)
 	{ incomplete();
 		return false;
+	}
+	template<class C, class E>
+	static void add(C& c, E e)
+	{ untested();
+		c.push_back(e);
+	}
+	template<class C, class E>
+	static bool remove(C& c, E e)
+	{ untested();
+		BOOST_STATIC_WARNING(false); // inefficient.
+		auto what=std::find(c.begin(), c.end(), e);
+		if(what==c.end()){ untested();
+			return false;
+		}else{ untested();
+			c.erase(what);
+			return true;
+		}
 	}
 };
 template<class S>
@@ -190,9 +219,19 @@ struct vertex_helper{ //
 		return container_helper<VC>::exists(v, w);
 	}
 	template<class T, class V, class VC>
+	static void add(T& v, V& w, VC*)
+	{ untested();
+		return container_helper<VC>::add(v, w);
+	}
+	template<class T, class V, class VC>
 	static void insert(T& v, V& w, VC*)
 	{ itested();
 		edge_insert(v, w);
+	}
+	template<class T, class V, class VC>
+	static bool remove(T& v, V& w, VC*)
+	{ itested();
+		return container_helper<VC>::remove(v, w);
 	}
 	template<class VL>
 	static bool is_valid(VDP const& v, VL const& _v)
@@ -220,6 +259,17 @@ struct vertex_helper<vertex_ptr_tag>{ //
 	static void insert(T& v, V&, VC* wp)
 	{ itested();
 		v.n.insert(wp);
+	}
+	template<class T, class V, class VC>
+	static void add(T& v, V&, VC* wp)
+	{ untested();
+		container_helper<VC>::add(v.n, wp);
+	}
+	template<class T, class V, class VC>
+	static bool remove(T& v, V&, VC* wp)
+	{
+		incomplete();
+		return false;
 	}
 	template<class VL>
 	static bool is_valid(typename VL::value_type const* v, VL const& _v)
@@ -261,19 +311,24 @@ struct iter_helper{ //
 	static size_t fill_pos(iter first, iter last, VL& _v, bool dir=false,
 			bool dups=true)
 	{
-		if(is_multiedge){
-			if(is_directed){
-			}else{
-			}
-		}else{
+		unsigned all=0;
+		if(is_multiedge){ untested();
 			if(is_directed){ untested();
-			}else{
+			}else{ untested();
+				if(dups){ untested();
+				}else{ untested();
+				}
+			}
+		}else{ untested();
+			if(is_directed){ untested();
+			}else{ untested();
 			}
 		}
 		auto nv=_v.size(); (void)nv;
 		assert(!dir); (void) dir;
 		size_t c=0;
-		for(;first!=last; ++first){ itested();
+		for(;first!=last; ++first){ untested();
+			++all;
 			unsigned v=(*first).first;
 			unsigned w=(*first).second;
 			assert(v<nv);
@@ -283,19 +338,19 @@ struct iter_helper{ //
 			if(is_multiedge){
 				// use template arg!
 				doit=true;
-			}else if(!dups){
+			}else if(!dups){ untested();
 				doit=true;
-			}else if(vertex_helper<VDP>::contains(_v[v], w, &_v[w])){
+			}else if(vertex_helper<VDP>::contains(_v[v], w, &_v[w])){ untested();
 				doit=false;
 			}else{
 				doit=true;
 			}
 
-			if(doit){
-				vertex_helper<VDP>::insert(_v[v], w, &_v[w]);
-				vertex_helper<VDP>::insert(_v[w], v, &_v[v]);
+			if(doit){ untested();
+				vertex_helper<VDP>::add(_v[v], w, &_v[w]);
+				vertex_helper<VDP>::add(_v[w], v, &_v[v]);
 				++c;
-			}else{
+			}else{ untested();
 			}
 		}
 		return c;
@@ -534,9 +589,9 @@ struct storage<ECT, VCT, vertex_ptr_tag> : public storage_base<ECT, VCT, vertex_
 		auto old_begin=_v.begin();
 		_v.resize(s+1);
 		vertex_type offset = (vertex_type) (uintptr_t(&*_v.begin()) - uintptr_t(&*old_begin));
-		if(!offset){
-		}else{
-			std::cerr << "add rewire " << _v.size() << "\n";
+		if(!offset){ untested();
+		}else{ untested();
+			// std::cerr << "add rewire " << _v.size() << "\n";
 			rewire_helper<STARGS>::rewire_nodes(_v, offset);
 		}
 		return &_v.back();
@@ -1131,10 +1186,11 @@ public: // construct
 #endif
 	}
 public: // move
+	// move self.
 	graph(graph&& x)
 	    : _v(std::move(x._v)),
 	      _num_edges(x._num_edges)
-	{
+	{ untested();
 //		assert(nonvoid)
 		// assert(num_vertices()==x.num_vertices()); no. _v has gone ...
 		for(auto i = begin(); i!=end(); ++i){
@@ -1415,15 +1471,43 @@ public:
 		}
 	}
 	// O(log max{d_1, d_2}), where d_1 is the degree of a and d_2 is the degree of b
-	void remove_edge(vertex_type a, vertex_type b)
+	// check=false: "i am sure this edge exists"
+	void remove_edge(vertex_type a, vertex_type b, bool check=true)
 	{ untested();
-		// must exist, for now.
-		assert(exists_edge(a,b));
-		assert(exists_edge(b,a));
-		out_edges(a).erase(b);
-		out_edges(b).erase(a);
-		assert(_num_edges);
-		--_num_edges;
+		if(check){ untested();
+			// lets see..
+		}else{ untested();
+			assert(bits::vertex_helper<VDP>::contains(_v[a], b, &_v[b]));
+		}
+		bool done=bits::vertex_helper<VDP>::remove(_v[a], b, &_v[b]);
+
+		if(is_directed()){ untested();
+			// only one edge involved.
+			if(check){ untested();
+				if(done){ untested();
+					--_num_edges;
+				}else{ untested();
+				}
+			}else{ untested();
+				--_num_edges;
+			}
+		}else{ // undirected.
+			if(check){ untested();
+				// if there was an edge, we need to take care of the back edge
+				if(done){
+					assert(bits::vertex_helper<VDP>::contains(_v[b], a, &_v[a]));
+					bool done2=bits::vertex_helper<VDP>::remove(_v[b], a, &_v[a]);
+					assert(done2); (void)done2;
+					--_num_edges;
+				}else{ untested();
+				}
+			}else{ untested();
+				assert(bits::vertex_helper<VDP>::contains(_v[b], a, &_v[a]));
+				bool done2=bits::vertex_helper<VDP>::remove(_v[b], a, &_v[a]);
+				assert(done2==done); (void)done2;
+				--_num_edges;
+			}
+		}
 	}
 	void contract(vertex_type& vd, vertex_type into);
 	vertex_index_type degree(const_vertex_type who) const

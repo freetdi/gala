@@ -38,9 +38,9 @@ namespace detail {
 				}
 			}
 
-			if(boost::is_multigraph<SRC>()){
+			if(boost::is_multigraph<SRC>()){ untested();
 				tgt.fill_in_edges(bw_t(E.first, src), bw_t(E.second, src), true);
-			}else if(boost::is_directed(src)){
+			}else if(boost::is_directed(src)){ untested();
 				// edge counter ...
 				tgt.fill_in_edges(bw_t(E.first, src), bw_t(E.second, src), true);
 			}else{untested();
