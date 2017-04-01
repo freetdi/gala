@@ -17,6 +17,7 @@ TESTS = \
 	dir \
 	edg \
 	erase1 \
+	fbsg \
 	idmap \
 	iter \
 	move \
