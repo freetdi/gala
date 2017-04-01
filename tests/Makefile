@@ -25,7 +25,8 @@ TESTS = \
 	pmap \
 	rewire \
 	sfinae \
-	view
+	view \
+	vvg
 
 LOGS = ${TESTS:%=%.log}
 
@@ -35,8 +36,9 @@ check: $(LOGS)
 
 $(TESTS): | gala
 
+SHELL = /bin/bash
 $(LOGS): %.log: %
-	./$< 2>&1 | tee $@
+	./$< 2>&1 | tee $@; exit $${PIPESTATUS[0]}
 
 gala:
 	-ln -sf ../ gala

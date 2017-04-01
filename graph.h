@@ -1009,7 +1009,9 @@ struct graph_cfg_default;
 namespace detail{
 template<class CFG, class X=void>
 struct is_directed_select {
+#if 0
 	typedef boost::mpl::false_ type; // obsolete. don't use.
+#endif
 	static constexpr bool value=false;
 	operator bool() const {return false;}
 };
@@ -1018,6 +1020,21 @@ struct is_directed_select<CFG,
 	typename tovoid < typename std::enable_if< CFG::is_directed >::type >::type >
 { //
 	static constexpr bool value=CFG::is_directed;
+};
+/*--------------------------------------------------------------------------*/
+template<class CFG, template<class x, class ...> class ECT, class X=void>
+struct is_ordered_select {
+	// "sets" are ordered for now.
+	// careful with hashsets...
+	static constexpr bool value=sfinae::is_set_tpl<ECT>::value;
+	operator bool() const {return value;}
+};
+template<class CFG, template<class x, class ...> class ECT>
+struct is_ordered_select<CFG, ECT,
+	typename tovoid < typename std::enable_if< CFG::force_ordering >::type >::type >
+{ //
+	static constexpr bool value=
+		CFG::force_ordering || sfinae::is_set_tpl<ECT>::value;
 };
 /*--------------------------------------------------------------------------*/
 template<template<class T, typename... > class ECT,
@@ -1054,9 +1071,15 @@ struct is_nn<STARGS,
 // struct gala::detail::is_nn<uset, std::vector, gala::vertex_ptr_tag, void>
 /*--------------------------------------------------------------------------*/
 template<class Gsrc, class Gtgt, bool srcDir, bool tgtDir,
-	bool srcCont=false, bool tgtCont=false>
+	bool srcCont=false, bool tgtCont=false,
+	bool srcOrd=false, bool tgtOrd=false>
 struct copy_helper{
 	static void assign(Gsrc const&, Gtgt&);
+};
+/*--------------------------------------------------------------------------*/
+template<class Gsrc, class Gtgt, class X=void>
+struct move_helper{
+	static void move(Gsrc const&&, Gtgt&){ incomplete(); }
 };
 /*--------------------------------------------------------------------------*/
 } // namespace detail
@@ -1080,14 +1103,17 @@ public: // types
 	
 	using vs = bits::vertex_selector<ECT,VDP>;
 
+public: // BUG. private & helper friends..
 	typedef CFG<this_type> myCFG;
 	static constexpr bool is_directed_v=detail::is_directed_select<myCFG>::value;
+	static constexpr bool is_ordered_v=detail::is_ordered_select<myCFG, ECT>::value;
+public:
 	static constexpr bool is_directed() {
 		return is_directed_v;
 	}
+	// indicate that edge iterators are ordered.
 	static constexpr bool is_ordered() {
-		// for now.
-		return sfinae::is_set_tpl<ECT>::value;
+		return is_ordered_v;
 	}
 	static constexpr bool is_nn_v=detail::is_nn<ECT, VCT, VDP>::value;
 
@@ -1099,8 +1125,8 @@ public: // types
 	// typedef size_t edges_size_type; // ??
 	typedef typename vs::vertex_index_type vertex_index_type;
 // private: hmm not yet.
-	typedef typename bits::storage<STARGS> storage;
-	typedef typename bits::edge_helper<STARGS, is_directed_v> edge_helper;
+	using storage=bits::storage<STARGS>;
+	using edge_helper=bits::edge_helper<STARGS, is_directed_v>;
 	typedef typename bits::reverse_helper<STARGS> reverse_helper;
 	typedef typename bits::iter<STARGS> iter;
 	typedef edgecontainer<vertex_type> EL;
@@ -1223,7 +1249,6 @@ public: // Required by Iterator Constructible Graph
 		return fill_in_edges(r.first, r.second, true);
 	}
 public: //assign
-
    template<template<class T, typename... > class ECT2, \
             template<class T, typename... > class VCT2, \
             class VDP2, \
@@ -1236,9 +1261,10 @@ public: //assign
 	// does not work. same structure often sufficient...
 	graph& assign_same(graph<SGARGS> const& x);
 
+public: // move assign
 	graph& operator=(graph&& x)
-	{
-		trace2("move assign", size_t(num_vertices()), size_t(num_edges()));
+	{ untested();
+		trace2("move assign_same", size_t(num_vertices()), size_t(num_edges()));
 		trace2("move assign", size_t(x.num_vertices()), size_t(x.num_edges()));
 		trace2("move assign", is_directed(), x.is_directed());
 #ifndef NDEBUG
@@ -1252,6 +1278,9 @@ public: //assign
 			assert(2*x.num_edges() == c);
 		}
 #endif
+		if (!x.is_ordered() && is_ordered()){ unreachable();
+		}else{ untested();
+		}
 		if (&x!=this){
 			_num_edges = x._num_edges;
 			_v = std::move(x._v);
@@ -1269,6 +1298,11 @@ public: //assign
 #endif
 		return *this;
 	}
+   template<template<class T, typename... > class ECT2, \
+            template<class T, typename... > class VCT2, \
+            class VDP2, \
+            template<class G> class CFG2>
+	graph& operator=(graph<ECT2,VCT2,VDP2,CFG2> const&&);
 private:
 
 public: // construct
@@ -1524,6 +1558,13 @@ public:
 		return storage::degree(_v);
 	}
 public:
+	// BUG. don't use
+	void hacksort(){
+		for( auto v : *this){
+			std::sort(_v[v].begin(), _v[v].end());
+		}
+	}
+public:
 	// O(n + deg(v)*log(D)), where D is the maximum of the degrees of the
 	// neighbours of v
 	void clear_vertex(vertex_type v)
@@ -1744,13 +1785,43 @@ graph<SGARGS>& graph<SGARGS>::operator=(graph<ECT2,VCT2,VDP2,CFG2> const& x)
 	}else{
 	}
 
-	trace2("op=", Gsrc::is_directed_v, is_directed_v);
+	trace2("op=", Gsrc::is_directed(), is_directed_v);
 
 	detail::copy_helper<Gsrc, graph,
-		 Gsrc::is_directed_v,
-		 is_directed_v,
-		 Gsrc::is_nn_v,
-		 is_nn_v>::assign(x, *this);
+		 Gsrc::is_directed_v, is_directed_v,
+		 Gsrc::is_nn_v, is_nn_v,
+	    Gsrc::is_ordered_v, is_ordered() >::assign(x, *this);
+
+	//detail::order_helper::...?
+	if (!x.is_ordered() && is_ordered()){ itested();
+		hacksort();
+	}else{ untested();
+	}
+	return *this;
+}
+/*--------------------------------------------------------------------------*/
+VCTtemplate
+   template<template<class T, typename... > class ECT2, \
+            template<class T, typename... > class VCT2, \
+            class VDP2, \
+            template<class G> class CFG2>
+graph<SGARGS>& graph<SGARGS>::operator=(graph<ECT2,VCT2,VDP2,CFG2> const&& x)
+{
+	typedef graph<ECT2,VCT2,VDP2,CFG2> Gsrc;
+	if((void*)&x==(void*)this){ untested();
+		return *this;
+	}else{ itested();
+	}
+
+	trace2("op=", Gsrc::is_directed(), is_directed_v);
+
+	detail::move_helper<Gsrc, graph>::move(std::move(x), *this);
+
+	//detail::order_helper::...?
+	if (!x.is_ordered() && is_ordered()){ itested();
+		hacksort();
+	}else{ untested();
+	}
 	return *this;
 }
 /*--------------------------------------------------------------------------*/
@@ -1826,8 +1897,11 @@ graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
 /*--------------------------------------------------------------------------*/
 namespace detail{
 /*--------------------------------------------------------------------------*/
-template<class oG, class G, bool X, bool Y, bool srcCont, bool tgtCont>
-void copy_helper<oG, G, X, Y, srcCont, tgtCont>::assign(oG const& src, G& tgt)
+template<class oG, class G, bool X, bool Y, bool srcCont, bool tgtCont,
+bool srcOrd, bool tgtOrd>
+void copy_helper<oG, G, X, Y,
+                 srcCont, tgtCont,
+					  srcOrd, tgtOrd>::assign(oG const& src, G& tgt)
 {
 	auto& g=src;
 //	typedef graph<ECT2, VCT2, VDP2, CFG2> oG; // source graph
@@ -2210,6 +2284,29 @@ void graph_cfg_default<G>::set_num_edges(typename G::edges_size_type x, G& g)
 { untested();
 	g._num_edges = x;
 }
+/*--------------------------------------------------------------------------*/
+namespace detail{
+/*--------------------------------------------------------------------------*/
+template<class SRC, class TGT>
+struct move_helper<SRC, TGT,
+                   typename tovoid < typename std::enable_if<
+                        TGT::is_ordered() && !SRC::is_ordered()
+                    >::type >::type
+                  >
+                   {
+	static void move(SRC const&& src, TGT& tgt){
+		// BUG: check the other flags?!
+		if ((void*)&tgt==(void*)&src){ untested();
+		}else{ itested();
+			tgt._num_edges = src._num_edges;
+			tgt._v = std::move(src._v);
+//			x._v.clear(); // hmm, does not work for sl
+			tgt._num_edges = 0;
+			tgt.hacksort();
+		}
+	}
+};
+} // detail
 /*--------------------------------------------------------------------------*/
 } // gala
 /*--------------------------------------------------------------------------*/
