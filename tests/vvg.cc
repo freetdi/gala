@@ -50,7 +50,7 @@ int main(int , char* [])
 	boost::add_edge(0,1,h);
 #endif
 
-	{ untested();
+	{
 		h = g;
 	}
 
@@ -69,7 +69,7 @@ int main(int , char* [])
 	}
 #endif
 
-	{ untested();
+	{
 		h = std::move(g);
 	}
 	// ...

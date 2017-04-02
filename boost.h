@@ -162,9 +162,9 @@ namespace boost { //
 		template<class C>
 		bool is_in_edgeset(C const& c, typename C::value_type v, bool s)
 		{
-			if(s){ untested();
+			if(s){
 				return std::binary_search(c.begin(), c.end(), v);
-			}else{ untested();
+			}else{
 				return std::find(c.begin(), c.end(), v)!=c.end();
 			}
 		}
@@ -318,7 +318,7 @@ namespace boost { //
 				return const_value_type(_base) == other;
 			}
 			bool operator==(const adjacency_iterator& other) const
-			{ untested();
+			{
 				return _base == other._base;
 			}
 			bool operator!=(const adjacency_iterator& other) const

@@ -131,7 +131,7 @@ template<bool s,
          class X=void>
 struct order_helper {
 	template<class V>
-	static void do_it(V&){ untested();
+	static void do_it(V&){
 		// nop
 	}
 };
@@ -141,8 +141,8 @@ struct order_helper<true, ECT,
 	 sfinae::is_seq_tpl<ECT>::value
 	>::type >::type > {
 	template<class V>
-	static void do_it(V& v){ untested();
-		for( auto& i : v){ untested();
+	static void do_it(V& v){
+		for( auto& i : v){
 			std::sort(i.begin(), i.end());
 		}
 	}
@@ -1286,7 +1286,7 @@ public: //assign
 
 public: // move assign
 	graph& operator=(graph&& x)
-	{ untested();
+	{
 		trace2("move assign_same", size_t(num_vertices()), size_t(num_edges()));
 		trace2("move assign", size_t(x.num_vertices()), size_t(x.num_edges()));
 		trace2("move assign", is_directed(), x.is_directed());
@@ -1302,7 +1302,7 @@ public: // move assign
 		}
 #endif
 		if (!x.is_ordered() && is_ordered()){ unreachable();
-		}else{ untested();
+		}else{
 		}
 		if (&x!=this){
 			_num_edges = x._num_edges;
@@ -1802,7 +1802,7 @@ VCTtemplate
             class VDP2, \
             template<class G> class CFG2>
 graph<SGARGS>& graph<SGARGS>::operator=(graph<ECT2,VCT2,VDP2,CFG2> const& x)
-{ untested();
+{
 	typedef graph<ECT2,VCT2,VDP2,CFG2> Gsrc;
 	if((void*)&x==(void*)this){ untested();
 		return *this;
@@ -1832,7 +1832,7 @@ graph<SGARGS>& graph<SGARGS>::operator=(graph<ECT2,VCT2,VDP2,CFG2> const&& x)
 	typedef graph<ECT2,VCT2,VDP2,CFG2> Gsrc;
 	if((void*)&x==(void*)this){ untested();
 		return *this;
-	}else{ untested();
+	}else{
 	}
 
 	trace2("op=", Gsrc::is_directed(), is_directed_v);
@@ -1990,13 +1990,13 @@ void copy_helper<oG, G, X, Y,
 		tgt._num_edges = ne;
 		assert(tgt.num_edges() == 2*g.num_edges());
 		incomplete();
-	}else if(tgt.is_directed() && g.is_directed() ){ untested();
+	}else if(tgt.is_directed() && g.is_directed() ){
 
 //		trace5("assign..1 1",nv, ne, tgt.num_vertices(), tgt.num_edges(), GG->num_edges());
 //		trace2("assign...",GG->_num_edges, tgt._num_edges);
 //		tgt._num_edges = 1; // HACK
 		// this is dangerous?!
-		if(tgt._num_edges !=  tgt.num_edges()){ untested();
+		if(tgt._num_edges !=  tgt.num_edges()){
 		}else{ untested();
 		}
 
