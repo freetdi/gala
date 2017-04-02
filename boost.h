@@ -160,15 +160,20 @@ namespace boost { //
 #endif
 	namespace util{
 		template<class C>
-		bool is_in_edgeset(C const& c, typename C::value_type v)
+		bool is_in_edgeset(C const& c, typename C::value_type v, bool s)
 		{
-			return std::find(c.begin(), c.end(), v)!=c.end();
+			if(s){ untested();
+				return std::binary_search(c.begin(), c.end(), v);
+			}else{ untested();
+				return std::find(c.begin(), c.end(), v)!=c.end();
+			}
 		}
 
 		// incomplete: other sets? use sfinae.h...
 		template<class E>
-		bool is_in_edgeset(std::set<E> const& c, E v)
+		bool is_in_edgeset(std::set<E> const& c, E v, bool s)
 		{ untested();
+			assert(s);
 			return c.find(v)!=c.end();
 		}
 	}
@@ -574,19 +579,7 @@ namespace boost { //
 		assert(g.is_valid(u));
 
 		bool is_edge;
-#if 0
-		if(g.degree(u)<g.degree(v)){ untested();
-		//	std::swap(u,v); // does it really help?
-			auto i = g.out_edges(u).find(v);
-			is_edge = (i!=g.out_edges(u).end());
-		}else{ untested();
-			auto i = g.out_edges(v).find(u);
-			is_edge = (i!=g.out_edges(v).end());
-		}
-#else
-		is_edge = util::is_in_edgeset(g.out_edges(u),v);
-#endif
-
+		is_edge = util::is_in_edgeset(g.out_edges(u), v, g.is_ordered());
 
 		assert((!is_edge) || (u!=v));
 		

@@ -33,10 +33,15 @@ int main(int , char* [])
 	assert(h.is_ordered());
 	assert(!g.is_ordered());
 
-	boost::add_edge(0,4,g);
-	boost::add_edge(0,3,g);
-	boost::add_edge(0,2,g);
-	boost::add_edge(0,1,g);
+	boost::add_edge(0, 4, g);
+	boost::add_edge(0, 3, g);
+	boost::add_edge(0, 2, g);
+	boost::add_edge(0, 1, g);
+
+	assert(boost::edge(0, 1, g).second);
+	assert(boost::edge(0, 2, g).second);
+	assert(boost::edge(0, 3, g).second);
+	assert(boost::edge(0, 4, g).second);
 
 #if 0 // incomplete();
 	boost::add_edge(0,4,h);
@@ -45,7 +50,9 @@ int main(int , char* [])
 	boost::add_edge(0,1,h);
 #endif
 
-	h = g;
+	{ untested();
+		h = g;
+	}
 
 #if 1
 	auto b=boost::adjacent_vertices(0, h);
@@ -62,7 +69,9 @@ int main(int , char* [])
 	}
 #endif
 
-	h = std::move(g);
+	{ untested();
+		h = std::move(g);
+	}
 	// ...
 
 	h.hacksort();
@@ -79,5 +88,7 @@ int main(int , char* [])
 			assert(x<*b.first);
 		}
 	}
+
+	assert(boost::edge(0, 2, h).second);
 
 }

@@ -125,6 +125,29 @@ bool edge_insert(std::vector<short unsigned>& c, E e)
 	}
 }
 /*--------------------------------------------------------------------------*/
+// stub. maybe merge into some storage helper.
+template<bool s,
+         template<class T, typename... > class ECT,
+         class X=void>
+struct order_helper {
+	template<class V>
+	static void do_it(V&){ untested();
+		// nop
+	}
+};
+template<template<class T, typename... > class ECT>
+struct order_helper<true, ECT,
+	typename tovoid < typename std::enable_if<
+	 sfinae::is_seq_tpl<ECT>::value
+	>::type >::type > {
+	template<class V>
+	static void do_it(V& v){ untested();
+		for( auto& i : v){ untested();
+			std::sort(i.begin(), i.end());
+		}
+	}
+};
+/*--------------------------------------------------------------------------*/
 template<template<class T, typename... > class S, class X=void>
 struct outedge_helper {
 	template<class C, class V>
@@ -1560,6 +1583,7 @@ public:
 public:
 	// BUG. don't use
 	void hacksort(){
+		incomplete();
 		for( auto v : *this){
 			std::sort(_v[v].begin(), _v[v].end());
 		}
@@ -1778,7 +1802,7 @@ VCTtemplate
             class VDP2, \
             template<class G> class CFG2>
 graph<SGARGS>& graph<SGARGS>::operator=(graph<ECT2,VCT2,VDP2,CFG2> const& x)
-{
+{ untested();
 	typedef graph<ECT2,VCT2,VDP2,CFG2> Gsrc;
 	if((void*)&x==(void*)this){ untested();
 		return *this;
@@ -1792,11 +1816,9 @@ graph<SGARGS>& graph<SGARGS>::operator=(graph<ECT2,VCT2,VDP2,CFG2> const& x)
 		 Gsrc::is_nn_v, is_nn_v,
 	    Gsrc::is_ordered_v, is_ordered() >::assign(x, *this);
 
-	//detail::order_helper::...?
-	if (!x.is_ordered() && is_ordered()){ itested();
-		hacksort();
-	}else{ untested();
-	}
+	constexpr bool sortneeded=!x.is_ordered() && is_ordered();
+	trace1("op=", sortneeded);
+	bits::order_helper<sortneeded, ECT>::do_it(_v);
 	return *this;
 }
 /*--------------------------------------------------------------------------*/
@@ -1810,18 +1832,15 @@ graph<SGARGS>& graph<SGARGS>::operator=(graph<ECT2,VCT2,VDP2,CFG2> const&& x)
 	typedef graph<ECT2,VCT2,VDP2,CFG2> Gsrc;
 	if((void*)&x==(void*)this){ untested();
 		return *this;
-	}else{ itested();
+	}else{ untested();
 	}
 
 	trace2("op=", Gsrc::is_directed(), is_directed_v);
 
 	detail::move_helper<Gsrc, graph>::move(std::move(x), *this);
 
-	//detail::order_helper::...?
-	if (!x.is_ordered() && is_ordered()){ itested();
-		hacksort();
-	}else{ untested();
-	}
+	constexpr bool needed=!x.is_ordered() && is_ordered();
+	bits::order_helper<needed, ECT>::do_it(_v);
 	return *this;
 }
 /*--------------------------------------------------------------------------*/
