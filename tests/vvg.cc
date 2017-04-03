@@ -72,9 +72,6 @@ int main(int , char* [])
 	{
 		h = std::move(g);
 	}
-	// ...
-
-	h.hacksort();
 
 	b = boost::adjacent_vertices(0, h);
 	for(;;){
