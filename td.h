@@ -577,7 +577,7 @@ void check(gala::graph<SGARGS> const& g)
 
 #ifdef DEBUG
 			assert(boost::edge(*i,*aI,g).second);
-			if(g.is_directed()){ untested();
+			if(!g.is_directed()){ untested();
 				assert(boost::edge(*aI,*i,g).second);
 			}
 #endif
@@ -585,7 +585,7 @@ void check(gala::graph<SGARGS> const& g)
 		// if !multiedge
 		assert(X.size() == boost::out_degree(*i, g));
 #ifdef DEBUG
-		if(g.is_directed()){ untested();
+		if(!g.is_directed()){ untested();
 			for(boost::tie(I,E) = boost::vertices(g); I!=E; ++I){ itested();
 				assert(boost::edge(*I,*i,g).second == boost::edge(*i,*I,g).second);
 			}
