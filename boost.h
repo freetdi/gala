@@ -30,7 +30,7 @@
 
 
 namespace boost { //
-	struct simplegraph_traversal_category :
+	struct gala_graph_traversal_category :
 		public virtual bidirectional_graph_tag, // ?!
 		public virtual adjacency_graph_tag,
 		public virtual edge_list_graph_tag,
@@ -207,7 +207,7 @@ namespace boost { //
 		typedef typename gala::graph<SGARGS>::edge_type edge_descriptor;
 
 		typedef typename detail::galaboost_dir<G::is_directed()>::type directed_category;
-		typedef simplegraph_traversal_category traversal_category;
+		typedef gala_graph_traversal_category traversal_category;
 
 		typedef typename detail::galaboost_par<G::is_multiedge()>::type edge_parallel_category;
 
@@ -749,10 +749,10 @@ namespace boost {
 
 	// map stuff
 	VCTtemplate
-	class simplegraph_graph_index_map
+	class gala_graph_index_map
 	    : public put_get_helper<
 	        typename gala::bits::vertex_selector<ECT, VDP>::vertex_index_type,
-	        simplegraph_graph_index_map<SGARGS> >
+	        gala_graph_index_map<SGARGS> >
 	{ //
 		public:
 			typedef typename gala::bits::vertex_selector<ECT, VDP>::vertex_index_type vertex_index_type;
@@ -761,7 +761,7 @@ namespace boost {
 			typedef vertex_index_type value_type;
 			typedef vertex_index_type reference;
 			typedef vertex_descriptor key_type;
-			simplegraph_graph_index_map(gala::graph<SGARGS>const & g)
+			gala_graph_index_map(gala::graph<SGARGS>const & g)
 			    : _g(g)
 			{
 			}
@@ -771,8 +771,8 @@ namespace boost {
 //				assert(x == _g.position(x));
 				return _g.position(x);
 			}
-			simplegraph_graph_index_map& operator=(const simplegraph_graph_index_map& s)
-			{
+			gala_graph_index_map& operator=(const gala_graph_index_map& s)
+			{ untested();
 				assert(&s._g==&_g); (void)s;
 				return *this;
 			}
@@ -781,52 +781,52 @@ namespace boost {
 	};
 
 	// map stuff
-	class simplegraph_graph_eid_map
-		: public put_get_helper<int, simplegraph_graph_eid_map>
+	class gala_graph_eid_map
+		: public put_get_helper<int, gala_graph_eid_map>
 	{ //
 		public:
 			typedef readable_property_map_tag category;
 			typedef int value_type;
 			typedef int reference;
 			typedef std::pair<unsigned long, unsigned long> key_type; // ouch
-			simplegraph_graph_eid_map() { incomplete(); }
+			gala_graph_eid_map() { incomplete(); }
 			template <class T>
 			long operator[](T x) const { untested(); return x->id(); }
 	};
 
 	// property stuff.
 	template <class Tag>
-	struct simplegraph_property_map { };
+	struct gala_graph_property_map { };
 
 	template <>
-	struct simplegraph_property_map<vertex_index_t> {
+	struct gala_graph_property_map<vertex_index_t> {
 		VCTtemplate
 		struct bind_ {
-			typedef simplegraph_graph_index_map<SGARGS> type;
-			typedef simplegraph_graph_index_map<SGARGS> const_type;
+			typedef gala_graph_index_map<SGARGS> type;
+			typedef gala_graph_index_map<SGARGS> const_type;
 		};
 	};
 
 	template <>
-	struct simplegraph_property_map<edge_index_t> {
+	struct gala_graph_property_map<edge_index_t> {
 		VCTtemplate
 		struct bind_ {
-			typedef simplegraph_graph_eid_map type;
-			typedef simplegraph_graph_eid_map const_type;
+			typedef gala_graph_eid_map type;
+			typedef gala_graph_eid_map const_type;
 		};
 	};
 
 	template <class Data, class DataRef, class GraphPtr>
-	class simplegraph_graph_data_map
+	class gala_graph_data_map
 	    : public put_get_helper<
 	                  DataRef,
-	                  simplegraph_graph_data_map<Data, DataRef, GraphPtr> > { //
+	                  gala_graph_data_map<Data, DataRef, GraphPtr> > { //
 		public:
 			typedef Data value_type;
 			typedef DataRef reference;
 			typedef unsigned long key_type; // ouch
 			typedef lvalue_property_map_tag category;
-			simplegraph_graph_data_map(GraphPtr g) : m_g(g) { incomplete(); }
+			gala_graph_data_map(GraphPtr g) : m_g(g) { incomplete(); }
 			template <class NodeOrEdge>
 				DataRef operator[](NodeOrEdge x) const { incomplete(); return (*m_g)[x]; }
 		protected:
@@ -834,22 +834,23 @@ namespace boost {
 	};
 
 	template <>
-	struct simplegraph_property_map<vertex_all_t> {
+	struct gala_graph_property_map<vertex_all_t> {
 		VCTtemplate
 		struct bind_ {
 			typedef typename gala::graph<SGARGS>::vertex_type vtype;
-			typedef simplegraph_graph_data_map<vtype, vtype&, gala::graph<SGARGS>*> type;
-			typedef simplegraph_graph_data_map<vtype, const vtype&,
+			typedef gala_graph_data_map<vtype, const vtype&, gala::graph<SGARGS>*> type;
+			typedef gala_graph_data_map<vtype, const vtype&,
 					  const gala::graph<SGARGS>*> const_type;
 		};
 	};
+
 	template <>
-	struct simplegraph_property_map<edge_all_t> {
+	struct gala_graph_property_map<edge_all_t> {
 		VCTtemplate
 		struct bind_ {
 			typedef typename gala::graph<SGARGS>::edge_type etype;
-			typedef simplegraph_graph_data_map<etype, etype&, gala::graph<SGARGS>*> type;
-			typedef simplegraph_graph_data_map<etype, const etype&,
+			typedef gala_graph_data_map<etype, etype&, gala::graph<SGARGS>*> type;
+			typedef gala_graph_data_map<etype, const etype&,
 					  const gala::graph<SGARGS>*> const_type;
 		};
 	};
@@ -857,14 +858,14 @@ namespace boost {
   // g++ 'enumeral_type' in template unification not implemented workaround
 	template<galaPARMS, class Tag>
 	struct property_map<gala::graph<SGARGS>, Tag> {
-		typedef typename simplegraph_property_map<Tag>::template bind_<SGARGS> map_gen;
+		typedef typename gala_graph_property_map<Tag>::template bind_<SGARGS> map_gen;
 		typedef typename map_gen::type type;
 		typedef typename map_gen::const_type const_type;
 	};
 
 	VCTtemplate
 	struct property_map<gala::graph<SGARGS>, vertex_index_t>{ //
-		typedef simplegraph_graph_index_map<SGARGS> type;
+		typedef gala_graph_index_map<SGARGS> type;
 		typedef type const_type;
 	};
 
@@ -907,7 +908,7 @@ namespace boost {
 	get(vertex_index_t, const gala::graph<SGARGS> &g)
 	{
 //		return pmap_type(&g);
-		return simplegraph_graph_index_map<SGARGS>(g);
+		return gala_graph_index_map<SGARGS>(g);
 	}
 
 	VCTtemplate

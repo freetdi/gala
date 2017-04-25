@@ -6,6 +6,7 @@ pkgincludedir = ${includedir}/${package}
 
 HEADERS = \
 	boost_assign.h \
+	boost_copy.h \
 	boost_detail.h \
 	boost.h \
 	cbset.h \
