@@ -95,7 +95,7 @@ void my_push_back(std::vector<unsigned>& c, E e)
 }
 template<class E>
 void my_push_back(std::vector<short unsigned>& c, E e)
-{ untested();
+{
 	c.push_back(e);
 }
 /*--------------------------------------------------------------------------*/
@@ -151,7 +151,7 @@ struct order_helper<true, ECT,
 template<template<class T, typename... > class S, class X=void>
 struct outedge_helper {
 	template<class C, class V>
-	static void erase(C& s, V w){ untested();
+	static void erase(C& s, V w){
 		s.erase(w);
 	}
 	template<class C, class E>
@@ -174,7 +174,7 @@ struct outedge_helper<ECT, typename sfinae::is_vec_tpl<ECT>::type > {
 		}
 	}
 	template<class C, class E>
-	bool exists(C& c, E e)
+	bool exists(C&, E)
 	{ incomplete();
 		return false;
 	}
@@ -289,7 +289,7 @@ struct vertex_helper<vertex_ptr_tag>{ //
 		container_helper<VC>::add(v.n, wp);
 	}
 	template<class T, class V, class VC>
-	static bool remove(T& v, V&, VC* wp)
+	static bool remove(T&, V&, VC*)
 	{
 		incomplete();
 		return false;
@@ -339,7 +339,7 @@ struct iter_helper{ //
 			if(is_directed){ untested();
 			}else{
 				if(dups){
-				}else{ untested();
+				}else{
 				}
 			}
 		}else{
@@ -348,12 +348,14 @@ struct iter_helper{ //
 			}
 		}
 		auto nv=_v.size(); (void)nv;
+		trace1("fill_pos", nv);
 		assert(!dir); (void) dir;
 		size_t c=0;
 		for(;first!=last; ++first){
 			++all;
 			unsigned v=(*first).first;
 			unsigned w=(*first).second;
+			trace2("fill_pos", v, w);
 			assert(v<nv);
 			assert(w<nv);
 			// FIXME: use add_edge...
@@ -395,7 +397,7 @@ struct iter_helper<c_iter_tag, VDP, /*directed*/ true, is_multiedge> {
 	static size_t fill_pos(iter first, iter last, VL& _v, bool dir=false, bool dups=true)
 	{
 		if(dups){
-		}else{ untested();
+		}else{
 		}
 		assert(dir); (void) dir;
 		auto nv = _v.size();
@@ -420,6 +422,8 @@ struct iter_helper<std::bidirectional_iterator_tag, VDP, is_directed, is_multied
 template<class iter, class VL>
 static size_t fill_pos(iter first, iter last, /* size_t nv, */ VL& _v, bool dir, bool dup=false)
 { untested();
+	if(dup){incomplete();
+	}
 	if(dir){ incomplete();
 	}
 	typedef typename VL::value_type v_t;
@@ -553,7 +557,7 @@ struct storage : storage_base<STARGS>{ //
 		return ret;
 	}
 	static void clear_vertex(const VDP v, container_type& _v)
-	{ untested();
+	{
 		_v[v].clear();
 	}
 	static edge_container_type& out_edges(vertex_type& v, container_type& _v)
@@ -565,12 +569,12 @@ struct storage : storage_base<STARGS>{ //
 		return _v[v];
 	}
 	static const edge_container_type& out_edges(const_vertex_type& v, const container_type& _v)
-	{ untested();
+	{
 		return _v[v];
 	}
 	static void remove_edge_single(vertex_index_type v, vertex_index_type w,
 	                         container_type& _v)
-	{ untested();
+	{
 		outedge_helper<ECT>::erase(out_edges(v, _v), w);
 	}
 	static void add_pos_edge(vertex_index_type v, vertex_index_type w,
@@ -868,7 +872,7 @@ struct reverse_helper<ECT, VCT, VDP,
 
 #ifndef NDEBUG
 		trace3("make_symm", oriented, ebefore, e);
-		if(oriented){ untested();
+		if(oriented){
 			assert(ebefore*2==e);
 		}else{
 		}
@@ -1021,7 +1025,7 @@ struct iter<ECT, VCT, vertex_ptr_tag>{ //
 /*--------------------------------------------------------------------------*/
 template<class C>
 void prealloc(C const&, size_t /*howmany*/)
-{ untested();
+{
 }
 /*--------------------------------------------------------------------------*/
 // typedef vertex_ptr_tag use_pointers;
@@ -1144,8 +1148,11 @@ public:
 	typedef typename vs::const_type const_vertex_type;
 	typedef typename vs::stype vertex_;
 	typedef typename vs::vertices_size_type vertices_size_type;
+#if 0
 	typedef typename vs::edges_size_type edges_size_type;
-	// typedef size_t edges_size_type; // ??
+#else
+	typedef size_t edges_size_type; // ??
+#endif
 	typedef typename vs::vertex_index_type vertex_index_type;
 // private: hmm not yet.
 	using storage=bits::storage<STARGS>;
@@ -1254,7 +1261,7 @@ public: // move
 	graph(vertices_size_type n=0, edges_size_type m=0)
 	    : _v(n), _num_edges(0)
 	{
-		if(m){ untested();
+		if(m){
 			EL a;
 			prealloc(a, 2*m);
 		}
@@ -1409,7 +1416,7 @@ public:
 private:
 	//O(log d), where d is the degree of a
 	void remove_edge_single(vertex_type a, vertex_type b)
-	{ untested();
+	{
 		assert(a!=b);
 		storage::remove_edge_single(a, b, _v);
 		--_num_edges;
@@ -1448,7 +1455,8 @@ public:
 #ifdef DEBUG
 		auto ne=0;
 		for(auto& v:_v){ untested();
-			for(auto& w:v){ untested();
+			for(auto const& x : v){ untested();
+				(void)x;
 				++ne;
 			}
 		}
@@ -1592,10 +1600,10 @@ public:
 	// O(n + deg(v)*log(D)), where D is the maximum of the degrees of the
 	// neighbours of v
 	void clear_vertex(vertex_type v)
-	{ untested();
+	{
 		assert(is_valid(v));
 		unsigned c = 0;
-		for(auto& nIt : out_edges(v)){ untested();
+		for(auto& nIt : out_edges(v)){
 			remove_edge_single(nIt, v);
 			++c;
 		}
@@ -1692,7 +1700,7 @@ public: // experimental...?
 /*--------------------------------------------------------------------------*/
 template<class G>
 struct graph_cfg_default {
-	typedef default_DEGS<G> degs_type;
+	typedef default_DEGS<G> degs_type; // BUG
 	typedef typename G::edges_size_type edges_size_type;
 //	typedef size_t edges_size_type; // uuh
 	static edges_size_type num_edges(G const& g);
@@ -1741,7 +1749,7 @@ template <class EdgeIterator>
 graph<SGARGS>::graph(EdgeIterator first, EdgeIterator last,
                      vertices_size_type nv, edges_size_type ne)
     : graph(nv, ne)
-{ untested();
+{
 	_num_edges=0;
 
 	assert(_v.size()==nv);
@@ -1750,7 +1758,7 @@ graph<SGARGS>::graph(EdgeIterator first, EdgeIterator last,
 
 #ifndef NDEBUG
 	unsigned c = 0;
-	for(auto& i : _v){ untested();
+	for(auto& i : _v){ itested();
 		c += i.size();
 	}
 	assert(is_directed() || 2*num_edges() == c);
@@ -1760,7 +1768,7 @@ graph<SGARGS>::graph(EdgeIterator first, EdgeIterator last,
 VCTtemplate
 typename graph<SGARGS>::EL const&
     graph<SGARGS>::out_edges(const_vertex_type& v) const
-{ untested();
+{
 	assert(is_valid(v));
 	return storage::out_edges(v, _v);
 }
@@ -1867,7 +1875,7 @@ graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
 			is_nn_v, is_nn_v>::assign(x, *this);
 	}else if (num_vertices()!=x.num_vertices()){ incomplete();
 	// }else if( .. incomplete){ untested();
-	}else{ untested();
+	}else{
 // 		dead?. should not get here.
 		// why not assign_?
 		const_iterator b = begin();
@@ -1877,7 +1885,7 @@ graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
 		iterator v = begin();
 		iterator e = end();
 		_num_edges = x._num_edges;
-		for(; v!=e ; ++v){ untested();
+		for(; v!=e ; ++v){
 			vertex_type vd = iter::deref(v);
 			other_const_vertex_type sd = oG::iter::deref(s);
 			EL& E = out_edges(vd); // ?!

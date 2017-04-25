@@ -63,6 +63,7 @@ private:
 #endif
 
 // inspired by boost::container::flat_set
+// std::find on random access iterator should be fine...
 namespace boost_dissect{ //
    template <class RanIt, class key_type, typename size_type=size_t>
    inline RanIt priv_lower_bound(RanIt first, const RanIt last,
@@ -149,12 +150,12 @@ public: // types
 		}
 		edge_iterator(vertex_descriptor v, immvecgraph const& g)
 		    : _s(v), _t(g._vertices[v]), _g(&g)
-		{ untested();
+		{
 			skip();
 		}
 		edge_iterator(vertex_descriptor v, internal_out_edge_iterator w, immvecgraph const& g)
 		    : _s(v), _t(w), _g(&g)
-		{ untested();
+		{
 		}
 	public: // op
 		bool operator==(edge_iterator const& p) const
@@ -168,12 +169,12 @@ public: // types
 			return p._t!=_t;
 		}
 		void increment()
-		{ untested();
+		{
 			++_t;
 			skip();
 		}
 		void skip()
-		{ untested();
+		{
 			while( _t != _g->_vertices.back()){
 
 				if(*_t>_s){
@@ -191,7 +192,7 @@ public: // types
 			}
 		}
 		value_type operator*() const
-		{ untested();
+		{
 			return std::make_pair(_s, _t);
 		}
 		vertex_descriptor source() const
@@ -241,7 +242,7 @@ public: // types
 			++_t;
 		}
 		edge_descriptor operator*() const
-		{ untested();
+		{
 			return std::make_pair(_s, _t);
 		}
 	private:
@@ -288,7 +289,7 @@ public: // assign
 			S const& SRC, S const& SNK);
 
 	std::pair<edge_iterator, edge_iterator> edges() const
-	{ untested();
+	{
 		edge_iterator begin(0, *this);
 		edge_iterator end(num_vertices(), _vertices.back(), *this);
 		return std::make_pair(begin, end);
@@ -338,7 +339,7 @@ public:
 	}
 public: // boost interface
 	unsigned num_edges() const
-	{ untested();
+	{
 		return _edges.size() / 2;
 	}
 	unsigned degree(vertex_descriptor v) const
@@ -393,9 +394,10 @@ public:
 	std::vector<vertex_descriptor> _idxInverseMap;
 };
 
-namespace boost{ //
+namespace boost {
+
 	template<class G>
-	struct graph_traits<immvecgraph<G> >{ //
+	struct graph_traits<immvecgraph<G> >{
 		typedef typename immvecgraph<G>::vertex_descriptor vertex_descriptor;
 		typedef typename immvecgraph<G>::adjacency_iterator adjacency_iterator;
 		typedef typename immvecgraph<G>::edge_iterator edge_iterator;
@@ -427,7 +429,7 @@ namespace boost{ //
 	}
 	template<class G>
 	unsigned num_edges(immvecgraph<G> const& g)
-	{ untested();
+	{
 		return g.num_edges();
 	}
 	template<class G>
@@ -442,21 +444,21 @@ namespace boost{ //
 	}
 	template<class G>
 	unsigned out_degree(typename immvecgraph<G>::vertex_descriptor v, immvecgraph<G> const& g)
-	{ untested();
+	{
 		return g.degree(v);
 	}
 	template<class G>
 	inline std::pair<typename immvecgraph<G>::edge_iterator,
 	                 typename immvecgraph<G>::edge_iterator>
 	    edges(const immvecgraph<G>& g)
-	{ untested();
+	{
 		return g.edges();
 	}
 	template<class G>
 	inline typename immvecgraph<G>::vertex_descriptor source(
 			const typename immvecgraph<G>::edge_descriptor e,
 	      immvecgraph<G> const&)
-	{ untested();
+	{
 		return e.first;
 	}
 	template<class G>
@@ -532,6 +534,7 @@ namespace boost{ //
 	          typename immvecgraph<G>::vertex_iterator> vertices(const immvecgraph<G>& g){
 		return g.vertices();
 	}
+
 	class imm_vid_map : public put_get_helper<unsigned, imm_vid_map> {
 		public:
 			typedef readable_property_map_tag category;
@@ -548,8 +551,8 @@ namespace boost{ //
 	{
     return imm_vid_map();
 	}
-} // boost
 
+} // boost
 
 template<class G>
 	template<class S>
@@ -635,13 +638,13 @@ template<class G>
 #endif
 	}
 
-namespace treedec{
+namespace treedec {
+
 template<typename G_t>
 inline unsigned int get_pos(typename immvecgraph<G_t>::vertex_descriptor v, const immvecgraph<G_t>& G)
 {
     return boost::get(boost::vertex_index, G, v);
 }
-
 
 namespace draft {
 

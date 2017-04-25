@@ -43,7 +43,7 @@ namespace detail {
 			}else if(boost::is_directed(src)){
 				// edge counter ...
 				tgt.fill_in_edges(bw_t(E.first, src), bw_t(E.second, src), true);
-			}else{untested();
+			}else{
 				tgt.fill_in_edges(bw_t(E.first, src), bw_t(E.second, src), false);
 				incomplete();
 			}

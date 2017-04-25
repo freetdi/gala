@@ -191,7 +191,7 @@ struct ofhelp<nooffset_t>{
     return w;
   }
   template<class H>
-  static void set(nooffset_t&, H){ untested();
+  static void set(nooffset_t&, H){ itested();
   }
   static constexpr bool active=false;
 };
@@ -224,7 +224,7 @@ struct hmhelp{
     }
   }
   template<class D>
-  static void clear(D*, unsigned){ untested();
+  static void clear(D*, unsigned){
   }
   static constexpr bool active=true;
 };
@@ -281,10 +281,12 @@ public:
   BSET_DYNAMIC()
     : _howmany(0),
       _offset(0),
-      _size(0) {
+      _size(0)
+  {
+    detail::hmhelp<HMT>::clear(_d, W);
   }
   BSET_DYNAMIC(BSET_DYNAMIC const& o) :
-      _howmany(o._howmany), _offset(o._offset), _size(o._size) { untested();
+      _howmany(o._howmany), _offset(o._offset), _size(o._size) {
     memcpy(_d, o._d, howmany()*sizeof(CHUNK_T));
     assert(howmany()<=W); // for now.
     assert(size()==o.size()); // for now.
@@ -301,35 +303,35 @@ public:
 public:
   class const_iterator{
   public:
-    const_iterator() : _i(-1u), _s(NULL) { untested();
+    const_iterator() : _i(-1u), _s(NULL) {
     }
     const_iterator(const const_iterator& o)
       : _i(o._i), _c(o._c), _s(o._s)
-    { untested();
+    {
     }
     const_iterator(unsigned x, BSET_DYNAMIC const& s) :
       _i(x), _s(&s)
-    { untested();
+    {
       assert(x>=CHUNKBITS*s.offset());
 
-      if(_i==-1u){ untested();
+      if(_i==-1u){
 //      }else if(_i>=CHUNKBITS*(s._offset+s._howmany)){ untested();
 //	unreachable();
 //        _i = -1u; // CHUNKBITS*(s._offset+s._howmany);
 //	_c = 0;
-      }else if(s.howmany()==0){ untested();
+      }else if(s.howmany()==0){
 	// skip to end...
 	_i=-1u;
-      }else{ untested();
+      }else{
 	// assert(_i<CHUNKBITS*(s._offset+s._howmany));
 	_c = _s->_d[(x/CHUNKBITS)-_s->offset()] >> (x%CHUNKBITS);
-	if(_c){ untested();
+	if(_c){
 	  // newonb is not trimmed...
 	  // need to iterate anyway.
 	  unsigned ctz;
 	  if(CHUNKBITS>32){ untested();
 	    ctz = __builtin_ctzl(_c);
-	  }else{ untested();
+	  }else{
 	    ctz = __builtin_ctz(_c);
 	  }
 	  _i += ctz;
@@ -340,7 +342,7 @@ public:
       }
     }
 
-    bool operator==(const_iterator const& o) const{ untested();
+    bool operator==(const_iterator const& o) const{
       assert(_s);
       return _i==o._i;
     }
@@ -348,7 +350,7 @@ public:
       return !operator==(o);
     }
     unsigned operator*() const{return _i;}
-    const_iterator& operator++(){ untested();
+    const_iterator& operator++(){
       assert(_s);
       assert(_i!=-1u);
       _c = _c+0;
@@ -356,18 +358,18 @@ public:
       skip();
       return *this;
     }
-    const_iterator& operator=(const_iterator const& o){ untested();
+    const_iterator& operator=(const_iterator const& o){
       _i = o._i;
       _c = o._c;
       _s = o._s;
       return *this;
     }
 private:
-    void /*const_iterator::*/inc(){ untested();
+    void /*const_iterator::*/inc(){
       assert(_s);
       ++_i;
 //      assert(_i <= CHUNKBITS*(_s->_howmany+_s->offset()));
-      if(_i >= CHUNKBITS*(_s->howmany()+_s->offset())){ untested();
+      if(_i >= CHUNKBITS*(_s->howmany()+_s->offset())){
 	_i = -1u; // CHUNKBITS*(W+_s->offset());
       }else if(_i%CHUNKBITS){ itested();
         _c = _c >> 1;
@@ -577,7 +579,7 @@ private:
   unsigned size() const {
     return detail::cbshelp<BSDa>::get_size(*this, _size);
   }
-  unsigned empty() const { untested();
+  unsigned empty() const {
     return !size();
   }
   unsigned recount() const;
@@ -598,7 +600,7 @@ public: // modify
   void merge(BSET_DYNAMIC<BSDa2> const& t);
   value_type front() const;
   value_type back() const;
-  void clear(){ untested();
+  void clear(){
     _howmany = 0;
     _offset = 0;
     _size = 0;
@@ -620,7 +622,7 @@ public: // iter
     auto I=const_iterator(CHUNKBITS*offset(), *this);
     return I;
   }
-  const_iterator end() const{ untested();
+  const_iterator end() const{
     return const_iterator(-1u, *this);
     return const_iterator(CHUNKBITS*(offset()+W), *this);
     return const_iterator(CHUNKBITS*(offset()+howmany()), *this);
@@ -695,7 +697,7 @@ struct cbshelp<W, CHUNK_T, HMT, OST, nosize_t>{
     return n.recount();
   }
   static void set_size(nosize_t, unsigned)
-  { untested();
+  { itested();
   }
 };
 /*--------------------------------------------------------------------------*/
@@ -1563,6 +1565,7 @@ std::ostream& operator<<(std::ostream& o, BSET_DYNAMIC<BSDa> const& s)
 BSDt
 inline std::pair<unsigned, bool> BSET_DYNAMIC<BSDa>::insert(value_type i)
 {
+  trace3("insert", i, contains(i), size());
   if(!contains(i)){
     add(i);
     assert(contains(i));

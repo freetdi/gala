@@ -22,13 +22,7 @@
 
 #include "boost.h"
 #include "sfinae.h"
-
-// HACK
-// #include <tdlib/degree.hpp> // BUG. degree includes view stuff
-// #include <tdlib/graph.hpp>
 #include <tdlib/graph_traits.hpp>
-// #include <tdlib/platform.hpp>
-
 #include <boost/graph/iteration_macros.hpp>
 //hack
 #include <stx/btree_set.h>
@@ -60,7 +54,7 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, V
 #endif
 #endif
 
-namespace treedec{ // here??
+namespace treedec { // here??
 
 template<class CB, class G>
 class callback_proxy{ //

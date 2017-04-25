@@ -17,6 +17,10 @@
  * 02110-1301, USA.
  *------------------------------------------------------------------
  * identify container types ins template specialization.
+ *
+ * TODO: inherited types.
+ * http://stackoverflow.com/questions/15616730/cannot-trait-an-inherited-class-as-base-with-sfinae
+ *
  */
 
 #ifndef GALA_SFINAE_H

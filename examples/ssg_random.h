@@ -23,6 +23,7 @@
 
 #include <tdlib/graph_traits.hpp>
 #include <tdlib/degree_config.hpp>
+#include <tdlib/degree.hpp>
 namespace gala_rand{
 
 template<class G>
@@ -45,7 +46,7 @@ struct m_deg_config : public misc::detail::random_deg_config<G> {
 };
 
 template<class T, class...>
-using DEX = misc::DEGS<T, m_deg_config<T> >;
+using DEX = treedec::DEGS<T, m_deg_config >;
 
 template<class G>
 struct svbs_config : public gala::graph_cfg_default<G> {

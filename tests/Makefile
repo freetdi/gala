@@ -7,6 +7,7 @@ TESTS = \
 	bmd \
 	cbs \
 	cbsg \
+	cbsg_cp \
 	concepts \
 	copy \
 	copy2 \
