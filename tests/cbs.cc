@@ -16,11 +16,21 @@ int main(int , char* [])
 
 	S.insert(8);
 	assert(S.size()==1);
+	trace1("+8", S);
 
 	S.insert(0);
+	trace1("+0", S);
 	assert(S.size()==2);
 
 	S.insert(4);
+	trace1("+4", S);
 	S.insert(4);
+	trace1("+4", S);
 	assert(S.size()==3);
+
+	S.erase(4);
+	trace1("-4", S);
+	assert(S.size()==2);
+	trace1("", S);
+
 }

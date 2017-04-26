@@ -87,7 +87,7 @@ static inline void shiftBy(CT* s, unsigned dist, unsigned howmany=-1u)
 //static inline bool contains(S const& s, typename S::value_type i);
 template<class S>
 static inline bool contains(S const& s, typename S::value_type i)
-{ untested();
+{ itested();
   return s.contains(i);
 }
 /*--------------------------------------------------------------------------*/
@@ -591,6 +591,7 @@ public: // modify
   void add(value_type i);
   template<class S>
   void add_sorted_sequence(S const& s);
+  void erase(value_type i);
   template<class S>
   void remove_sorted_sequence(S const& s);
   void intersect(BSET_DYNAMIC const& t);
@@ -607,7 +608,8 @@ public: // modify
     detail::hmhelp<HMT>::clear(_d, W);
   }
 public: // dangerous
-  void erase(value_type i);
+  void erase_(value_type i);
+  void trim_above();
   void trim_below();
 public: // protect and friends?
   void set_offset(offset_type x){
@@ -693,7 +695,7 @@ template<unsigned W, typename CHUNK_T, typename HMT, typename OST>
 struct cbshelp<W, CHUNK_T, HMT, OST, nosize_t>{
   static unsigned get_size(
       BSET_DYNAMIC<W, CHUNK_T, HMT, OST, nosize_t> const& n, nosize_t)
-  { untested();
+  { itested();
     return n.recount();
   }
   static void set_size(nosize_t, unsigned)
@@ -708,11 +710,11 @@ struct cnt{
   static constexpr unsigned chunksize=sizeof(chunk_t);
 
   template<class D, class W, class H>
-  static unsigned count_bits(D const* dd, W& w, H h){ untested();
+  static unsigned count_bits(D const* dd, W& w, H h){ itested();
     unsigned k=0;
 
-    if(sizeof(chunk_t)<=size){ untested();
-      for (; w+(size/chunksize)<=h;){ untested();
+    if(sizeof(chunk_t)<=size){ itested();
+      for (; w+(size/chunksize)<=h;){ itested();
 	window_t d;
 	memcpy(&d, dd+w, size);
 	k += numberofones(d);
@@ -729,7 +731,7 @@ struct cnt{
 /*--------------------------------------------------------------------------*/
 BSDt
 inline unsigned BSET_DYNAMIC<BSDa>::recount() const
-{ untested();
+{ itested();
 // no, carve does not trim...
 //   if(_howmany){ untested();
 //     assert(_d[0]);
@@ -1188,8 +1190,12 @@ inline void BSET_DYNAMIC<BSDa>::remove_sorted_sequence(S const& s)
 }
 /*--------------------------------------------------------------------------*/
 BSDt
-inline void BSET_DYNAMIC<BSDa>::erase(value_type i)
+inline void BSET_DYNAMIC<BSDa>::erase_(value_type i)
 { untested();
+  assert(howmany()<=W);
+  assert(offset()<W);
+  assert(i<W*CHUNKBITS);
+
   assert(contains(i));
   assert(_howmany);
   assert(size());
@@ -1218,7 +1224,7 @@ inline void BSET_DYNAMIC<BSDa>::erase(value_type i)
 /*--------------------------------------------------------------------------*/
 BSDt
 inline void BSET_DYNAMIC<BSDa>::trim_below()
-{ untested();
+{
   if(!use_offset()){ untested();
     return;
   }
@@ -1243,7 +1249,7 @@ inline void BSET_DYNAMIC<BSDa>::trim_below()
     set_howmany(howmany() - shift);
     set_offset(offset() + shift);
 #endif
-  }else{ untested();
+  }else{
 
   }
 }
@@ -1549,10 +1555,10 @@ std::ostream& operator<<(std::ostream& o, BSET_DYNAMIC<BSDa> const& s)
     o << BLANK_CHAR;
   }
 
-  for(; i<B::CHUNKBITS*(s.howmany()+s.offset()); ++i){ untested();
-    if(contains(s, i)) { untested();
+  for(; i<B::CHUNKBITS*(s.howmany()+s.offset()); ++i){ itested();
+    if(contains(s, i)) { itested();
       o << '1';
-    }else{ untested();
+    }else{ itested();
       o << '0';
     }
   }
@@ -1604,6 +1610,45 @@ inline void BSET_DYNAMIC<BSDa>::add_sorted_sequence(S const& s)
     assert(contains(*i));
   }
   set_size(ns);
+}
+/*--------------------------------------------------------------------------*/
+BSDt
+inline void BSET_DYNAMIC<BSDa>::erase(value_type i)
+{
+  assert(howmany()<=W);
+  assert(offset()<W);
+  assert(i<W*CHUNKBITS);
+
+  unsigned chunk;
+  unsigned chunksize=CHUNKBITS;
+  assert(offset()<=W);
+
+  if(!contains(i)){
+    // not there...
+    return;
+  }else if(howmany()==0){ untested();
+    // nothing to erase.
+    return;
+  }else if(i/chunksize < offset()){ untested();
+    // too left
+    return;
+  }else{
+    chunk = i/CHUNKBITS - offset();
+  }
+  unsigned j = i % CHUNKBITS;
+
+  assert(chunk>=0);
+  assert(chunk<W);
+  if( _d[chunk] & ( 1llu << j ) ) {
+    set_size(size() - 1);
+    _d[chunk] &= ~ ( 1llu << j );
+    if(!chunk){
+      trim_below();
+    }else{
+    }
+  }else{
+  }
+  // trim_above(); not yet?
 }
 /*--------------------------------------------------------------------------*/
 BSDt
