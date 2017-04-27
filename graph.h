@@ -1496,7 +1496,7 @@ public:
 	void remove_out_edge_if(vertex_type a, PRED & p)
 	{ // vector only
 		auto& oa=out_edges(a);
-		assert(oa.size()<_num_edges);
+		assert(oa.size()<=_num_edges);
 		while(oa.size()){
 			if(p(std::make_pair(a,oa.back()))){
 				--_num_edges;
