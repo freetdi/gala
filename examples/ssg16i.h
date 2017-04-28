@@ -21,11 +21,10 @@
 #include <iostream>
 #include <iomanip>
 #include <map>
-#include <gala/graph.h>
+#include <tdlib/graph_traits.hpp>
 #include <boost/functional/hash.hpp> // BUG?!
 #include <boost/graph/adjacency_matrix.hpp>
-
-#include <gala/td.h>
+#include <gala/boost.h>
 
 template<class G>
 struct ssg16i_config : public gala::graph_cfg_default<G> {

@@ -23,6 +23,7 @@
 #include "boost.h"
 #include "sfinae.h"
 #include <tdlib/graph_traits.hpp>
+//#include <tdlib/treedec_traits.hpp>
 #include <boost/graph/iteration_macros.hpp>
 //hack
 #include <stx/btree_set.h>

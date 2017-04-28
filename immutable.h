@@ -29,6 +29,9 @@
 
 #include <tdlib/graph_traits.hpp> // hmmm
 
+// almost sure...
+#define GETPOS(a,b) boost::get(boost::vertex_index,b,a)
+
 // HACK HACK HACK
 #ifndef TD_DEFS_NETWORK_FLOW
 #define TD_DEFS_NETWORK_FLOW
@@ -577,7 +580,7 @@ template<class G>
 
 		unsigned vn=0;
 		for(;v!=vend;++v){ untested();
-			auto vpos=treedec::get_pos(*v, *_g);
+			auto vpos=boost::get(boost::vertex_index, *v, *_g);
 			if(disabled[vpos]){ untested();
 			}else{ untested();
 				idxMap[vn] = *v;
@@ -587,7 +590,7 @@ template<class G>
 				BOOST_AUTO(e, E.first);
 				BOOST_AUTO(eend, E.second);
 				for(;e!=eend;++e){ untested();
-					if(!disabled[treedec::get_pos(*e, *_g)]){ untested();
+					if(!disabled[boost::vertex_index(boost::vertex_index, *_g, *e)]){ untested();
 						_edges.push_back(*e);
 					}else{ untested();
 					}
@@ -603,7 +606,7 @@ template<class G>
 		}
 
 		for(auto s : SRC){ untested();
-			auto p=treedec::get_pos(s, *_g);
+			auto p=boost::get(boost::vertex_index, *_g, s);
 			assert(p<boost::num_vertices(*_g));
 			assert(!disabled[p]);
 			assert(_idxInverseMap[p] < vn);
@@ -640,11 +643,13 @@ template<class G>
 
 namespace treedec {
 
+#if 0
 template<typename G_t>
 inline unsigned int get_pos(typename immvecgraph<G_t>::vertex_descriptor v, const immvecgraph<G_t>& G)
 {
     return boost::get(boost::vertex_index, G, v);
 }
+#endif
 
 namespace draft {
 
@@ -704,11 +709,11 @@ inline immvecgraph<G_t> const& immutable_clone(
 		// FIXME: pos, vertex_index?
 		assert(i < vdMap->size());
 		(*vdMap)[i] = *bi;
-		auto pos=get_pos(*bi, G);
+		auto pos=GETPOS(*bi, G);
 		assert(!pos || pos>prevpos);
 		reverse_map[pos] = i;
 		++i;
-		prevpos = get_pos(*bi, G);
+		prevpos = GETPOS(*bi, G);
 	}
 	assert(i==bag_nv);
 
@@ -720,7 +725,7 @@ inline immvecgraph<G_t> const& immutable_clone(
 	for(; bi!=be; ++bi){
 		unsigned new_vertex=ig.add_vertex();
 		assert(new_vertex<bag_nv);
-		BOOST_AUTO(N, get_pos(*bi, G)); (void)N;
+		BOOST_AUTO(N, GETPOS(*bi, G)); (void)N;
 		assert(reverse_map[N] == new_vertex);
 
 		BOOST_AUTO(vi, bbegin);
@@ -732,8 +737,8 @@ inline immvecgraph<G_t> const& immutable_clone(
 			}else if(*vi<*bi){
 				// egde if the inverse edge exists
 				// inefficient?! yes.
-				BOOST_AUTO(s, get_pos(*vi, G)); (void) s;
-				BOOST_AUTO(t, get_pos(*bi, G)); (void) t;
+				BOOST_AUTO(s, GETPOS(*vi, G)); (void) s;
+				BOOST_AUTO(t, GETPOS(*bi, G)); (void) t;
 				assert(s<t);
 				assert(reverse_map[s] < new_vertex);
 				auto rs=boost::vertex(reverse_map[s], ig);
@@ -748,14 +753,14 @@ inline immvecgraph<G_t> const& immutable_clone(
 			}
 
 			if(edg){
-				BOOST_AUTO(s, get_pos(*bi, G)); (void)s;
-				BOOST_AUTO(t, get_pos(*vi, G));
+				BOOST_AUTO(s, GETPOS(*bi, G)); (void)s;
+				BOOST_AUTO(t, GETPOS(*vi, G));
 				assert(ig._vertices.size()==unsigned(reverse_map[s]+1));
 				ig.push_edge(reverse_map[t]);
 			}else if(s==-1u){ // ..  && t>s)
-				assert(get_pos(*bi, G)!=-1);
-				s = get_pos(*bi, G);
-				t = get_pos(*vi, G);
+				assert(GETPOS(*bi, G)!=-1);
+				s = GETPOS(*bi, G);
+				t = GETPOS(*vi, G);
 				assert(s!=t);
 			}else{
 			}
@@ -796,5 +801,7 @@ inline immvecgraph<G_t> const& immutable_clone(
 
 } // draft
 } // treedec
+
+#undef GETPOS
 
 #endif // guard
