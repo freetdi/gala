@@ -14,7 +14,7 @@ namespace detail {
 		public:
 			edge_iw(BEI& b, const GG& g ) : BEI(b), _g(g) {}
 			std::pair<size_t, size_t> operator*()
-			{ itested();
+			{
 				typedef typename graph_traits<SRC>::edge_descriptor edge_descriptor;
 				typedef typename graph_traits<SRC>::vertex_descriptor vertex_descriptor;
 				edge_descriptor e=BEI::operator*();
@@ -54,9 +54,9 @@ namespace detail {
 			if(num_vertices(tgt)==0){
 				// good idea?
 				tgt=std::move(SRC(nv));
-			}else{ itested();
+			}else{
 				tgt.clear(); // HACK, not supported by boost!
-				while(num_vertices(tgt)<nv){ itested();
+				while(num_vertices(tgt)<nv){
 					add_vertex(tgt);
 				}
 				while(num_vertices(tgt)>nv){ untested();
@@ -66,7 +66,7 @@ namespace detail {
 
 			// uuh, directed vs undirected?
 			auto V=edges(src);
-			for(;V.first!=V.second;++V.first){ itested();
+			for(;V.first!=V.second;++V.first){
 				auto v=source(*V.first, src);
 				auto w=target(*V.first, src);
 				auto vp=src.position(v);

@@ -277,7 +277,7 @@ namespace boost { //
 				return base == other.base;
 			}
 			void increment()
-			{ itested();
+			{
 				++base;
 			}
 			void decrement()
@@ -598,7 +598,7 @@ namespace boost { //
 	typename graph_traits<::gala::graph<SGARGS> >::degree_size_type
 	out_degree(typename graph_traits< ::gala::graph<SGARGS> >::vertex_descriptor u,
 			const ::gala::graph<SGARGS>&g)
-	{ itested();
+	{
 	   return g.degree(u);
 	}
 

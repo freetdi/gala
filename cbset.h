@@ -156,7 +156,7 @@ namespace detail{
 BSDt
 struct cbshelp{
   static unsigned get_size(BSET_DYNAMIC<BSDa> const&, unsigned size)
-  { itested();
+  {
     return size;
   }
   static void set_size(SCT& x, unsigned size)
@@ -371,7 +371,7 @@ private:
 //      assert(_i <= CHUNKBITS*(_s->_howmany+_s->offset()));
       if(_i >= CHUNKBITS*(_s->howmany()+_s->offset())){
 	_i = -1u; // CHUNKBITS*(W+_s->offset());
-      }else if(_i%CHUNKBITS){ itested();
+      }else if(_i%CHUNKBITS){
         _c = _c >> 1;
       }else{ itested();
         assert(_i/CHUNKBITS>=_s->offset());
@@ -388,11 +388,11 @@ private:
 	}
       }
     }
-    void /*const_iterator::*/skip(){ itested();
-      while(_i<CHUNKBITS*(_s->howmany()+_s->offset())){ itested();
-        if (_c & 1){ itested();
+    void /*const_iterator::*/skip(){
+      while(_i<CHUNKBITS*(_s->howmany()+_s->offset())){
+        if (_c & 1){
           break;
-        }else{ itested();
+        }else{
         }
 	_c = _c+0;
         inc();
@@ -619,7 +619,7 @@ public: // protect and friends?
     detail::cbshelp<BSDa>::set_size(_size, s);
   }
 public: // iter
-  const_iterator begin() const{ itested();
+  const_iterator begin() const{
     assert(offset()==offset());
     auto I=const_iterator(CHUNKBITS*offset(), *this);
     return I;
