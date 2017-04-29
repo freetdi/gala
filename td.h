@@ -232,12 +232,12 @@ template<galaPARMS, class CB>
 struct sghelp_hack< ECT, VCT, VDP, CFG, CB,
 	typename gala::sfinae::is_vec_tpl<ECT>::type > { //
 static size_t mcah(
-		typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor c,
-		gala::graph<SGARGS>& g,
+		typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor,
+		gala::graph<SGARGS>&,
 // 		typename treedec::graph_traits< gala::graph<SGARGS> >::bag_type& bag,
 		 typename treedec::treedec_traits<
-		   typename treedec::treedec_chooser<  gala::graph<SGARGS>  >::type>::bag_type& bag,
-		CB* cb)
+		   typename treedec::treedec_chooser<  gala::graph<SGARGS>  >::type>::bag_type&,
+		CB*)
 { untested();
 	incomplete();
 	assert(0);
