@@ -25,7 +25,7 @@ using namespace std;
 
 int main(int , char* [])
 {
-	assert(boost::is_multigraph<vvg>());
+	assert(!boost::is_multigraph<vvg>());
 
 	vvg g(5);
 	vvgo h(5);

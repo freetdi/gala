@@ -366,7 +366,7 @@ namespace boost { //
 			typedef std::input_iterator_tag iterator_category; // makes sense!?
 		public:
 			edge_iterator() : base()
-			{ untested();
+			{ itested();
 			}
 			edge_iterator(typename gala::graph<SGARGS>::iterator v,
 			              typename gala::graph<SGARGS>::out_vertex_iterator e,
@@ -697,7 +697,7 @@ namespace boost { //
 		if(!g.is_directed()){
 			size_t c=0;
 			auto p=vertices(g);
-			for(; p.first!=p.second; ++p.first){
+			for(; p.first!=p.second; ++p.first){ itested();
 				c+=degree(*p.first, g);
 			}
 			if(g.is_multiedge()){

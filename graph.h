@@ -99,13 +99,78 @@ void my_push_back(std::vector<short unsigned>& c, E e)
 	c.push_back(e);
 }
 /*--------------------------------------------------------------------------*/
+// TODO: move to bits header
+template<class S, class X=void>
+struct container_helper {
+	template<class C, class E>
+	static bool exists(C& c, E e) { itested();
+		return c.find(e) != c.end();
+	}
+	template<class C, class E>
+	static void add(C& c, E e) {
+		bool done=c.insert(e).second;
+		assert(done); (void)done;
+	}
+	template<class C, class E>
+	static bool insert(C& c, E e) {
+		bool done=c.insert(e).second;
+		return done;
+	}
+	template<class C, class E>
+	static bool remove(C& c, E e) { untested();
+		return c.erase(e);
+	}
+};
+template<class S>
+struct container_helper<S, typename sfinae::is_vector<S>::type > {
+	template<class C, class E>
+	static bool exists(C&, E) { incomplete();
+		return false;
+	}
+	template<class C, class E>
+	static void add(C& c, E e){ untested();
+		// not really, just TDLIB
+		// assert(std::find(c.begin(), c.end(), e)==c.end());
+		c.push_back(e);
+	}
+	template<class C, class E>
+	static bool insert(C& c, E e){
+		if(std::find(c.begin(), c.end(), e)==c.end()){
+			c.push_back(e);
+			return true;
+		}else{
+			return false;
+		}
+	}
+	template<class C, class E>
+	static bool remove(C& c, E e) {
+		BOOST_STATIC_WARNING(false); // inefficient.
+		auto what=std::find(c.begin(), c.end(), e);
+		if(what==c.end()){
+			return false;
+		}else{
+			c.erase(what);
+			return true;
+		}
+	}
+};
+template<class S>
+struct container_helper<S, typename sfinae::is_hash<S>::type > {
+	template<class C, class E>
+	static bool exists(C&, E)
+	{ incomplete();
+		return false;
+	}
+};
+/*--------------------------------------------------------------------------*/
 template<class C, class E>
 bool edge_insert(C& c, E e)
-{ itested();
-	return c.insert(e).second;
+{
+	return container_helper<C>::insert(c, e);
 }
-template<class E>
-bool edge_insert(std::vector<unsigned>& c, E e)
+#if 0
+template<class E, class C>
+bool edge_insert(C& c, E e, typename std::enable_if< sfinae::is_vector<C>::value, bool>::type=false)
 {
 	if(std::find(c.begin(), c.end(), e)==c.end()){
 		c.push_back(e);
@@ -114,16 +179,21 @@ bool edge_insert(std::vector<unsigned>& c, E e)
 		return false;
 	}
 }
-template<class E>
-bool edge_insert(std::vector<short unsigned>& c, E e)
-{
-	if(std::find(c.begin(), c.end(), e)==c.end()){
-		c.push_back(e);
-		return true;
-	}else{
-		return false;
-	}
+#endif
+/*--------------------------------------------------------------------------*/
+template<class C, class E>
+void edge_add(C& c, E e)
+{ untested();
+	container_helper<C>::add(c, e);
 }
+#if 0
+template<class E, class C>
+bool edge_add(C& c, E e, typename std::enable_if< sfinae::is_vector<C>::value, bool>::type=false)
+{
+	c.push_back(e);
+	return true;
+}
+#endif
 /*--------------------------------------------------------------------------*/
 // stub. maybe merge into some storage helper.
 template<bool s,
@@ -180,60 +250,6 @@ struct outedge_helper<ECT, typename sfinae::is_vec_tpl<ECT>::type > {
 	}
 };
 /*--------------------------------------------------------------------------*/
-// TODO: move to bits header
-template<class S, class X=void>
-struct container_helper {
-	template<class C, class E>
-	static bool exists(C& c, E e)
-	{ itested();
-		return c.find(e) != c.end();
-	}
-	template<class C, class E>
-	static void add(C& c, E e)
-	{
-		bool done=c.insert(e).second;
-		assert(done); (void)done;
-	}
-	template<class C, class E>
-	static bool remove(C& c, E e)
-	{ untested();
-		return c.erase(e);
-	}
-};
-template<class S>
-struct container_helper<S, typename sfinae::is_vector<S>::type > {
-	template<class C, class E>
-	static bool exists(C&, E)
-	{ incomplete();
-		return false;
-	}
-	template<class C, class E>
-	static void add(C& c, E e)
-	{
-		c.push_back(e);
-	}
-	template<class C, class E>
-	static bool remove(C& c, E e)
-	{
-		BOOST_STATIC_WARNING(false); // inefficient.
-		auto what=std::find(c.begin(), c.end(), e);
-		if(what==c.end()){
-			return false;
-		}else{
-			c.erase(what);
-			return true;
-		}
-	}
-};
-template<class S>
-struct container_helper<S, typename sfinae::is_hash<S>::type > {
-	template<class C, class E>
-	static bool exists(C&, E)
-	{ incomplete();
-		return false;
-	}
-};
-/*--------------------------------------------------------------------------*/
 template<class VDP>
 struct vertex_helper{ //
 	template<class T, class V, class VC>
@@ -244,6 +260,7 @@ struct vertex_helper{ //
 	template<class T, class V, class VC>
 	static void add(T& v, V& w, VC*)
 	{
+		// BUG? insert vs add.
 		return container_helper<VC>::add(v, w);
 	}
 	template<class T, class V, class VC>
@@ -363,7 +380,7 @@ struct iter_helper{ //
 			if(is_multiedge){
 				// use template arg!
 				doit=true;
-			}else if(!dups){ untested();
+			}else if(!dups){
 				doit=true;
 			}else if(vertex_helper<VDP>::contains(_v[v], w, &_v[w])){
 				doit=false;
@@ -397,7 +414,7 @@ struct iter_helper<c_iter_tag, VDP, /*directed*/ true, is_multiedge> {
 	static size_t fill_pos(iter first, iter last, VL& _v, bool dir=false, bool dups=true)
 	{
 		if(dups){
-		}else{
+		}else{ untested();
 		}
 		assert(dir); (void) dir;
 		auto nv = _v.size();
@@ -686,8 +703,12 @@ public:
 }; //storage<vertex_ptr_tag>
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-template< STPARMS, bool is_directed >
-struct edge_helper : public storage<STARGS> { //
+template<STPARMS, bool is_directed, bool is_simple>
+struct edge_helper : public storage<STARGS> {
+};
+/*--------------------------------------------------------------------------*/
+template<STPARMS, bool is_simple>
+struct edge_helper<STARGS, false, is_simple> : public storage<STARGS>{
 	// undirected implementation.
 	using typename storage<STARGS>::edge_type;
 	using typename storage<STARGS>::vertex_type;
@@ -696,7 +717,8 @@ struct edge_helper : public storage<STARGS> { //
 	template<class N, class VC>
 	static std::pair<edge_type, bool> add_edge(vertex_type a, vertex_type b,
 	                                           N& num_edges, VC& vc)
-	{
+	{ untested();
+
 		// trace0("undiredted add_edge");
 		vertex_type* A=&a;
 		vertex_type* B=&b;
@@ -707,6 +729,14 @@ struct edge_helper : public storage<STARGS> { //
 		}else{untested();
 		}
 #endif
+		if(!is_simple){ untested();
+			// don't attempt to avoid dups
+			edge_add(out_edges(*B, vc), *A);
+			edge_add(out_edges(*A, vc), *B);
+			++num_edges;
+			return std::make_pair(edge_type(*A, *B), true);
+		}else{ untested();
+		}
 		size_t s = out_edges(*A, vc).size();
 		edge_insert(out_edges(*A, vc), (*B));
 		// since the graph is undirected,
@@ -714,6 +744,7 @@ struct edge_helper : public storage<STARGS> { //
 		bool added=false;
 		if(s == out_edges(*A, vc).size()){
 		}else{
+			// edge_add(out_edges(*B, vc), *A);
 			edge_insert(out_edges(*B, vc), *A);
 			++num_edges;
 			added = true;
@@ -728,8 +759,8 @@ struct edge_helper : public storage<STARGS> { //
 	}
 };
 /*--------------------------------------------------------------------------*/
-template<STPARMS>
-struct edge_helper<STARGS, true>
+template<STPARMS, bool is_simple>
+struct edge_helper<STARGS, true, is_simple>
 	// directed implementation.
     : public storage<STARGS>{ //
 	typedef typename storage<STARGS>::container_type vertex_container_type;
@@ -830,6 +861,7 @@ struct reverse_helper<ECT, VCT, VDP,
 	template<class E>
 	static void make_symmetric(vertex_container_type& _v, E& e, bool oriented)
 	{
+		// oriented: "there is only one edge {u,v}"
 		trace3("make_symmetric", oriented, e, _v.size());
 #ifndef NDEBUG
 		auto ebefore=e;
@@ -842,7 +874,7 @@ struct reverse_helper<ECT, VCT, VDP,
 			howmany[i++] = vertex.size();
 			checksum+= vertex.size();
 		}
-		trace3("make_symmetric", oriented, e, checksum);
+		trace4("make_symmetric", oriented, e, checksum, _v.size());
 		assert(checksum==e || !oriented);
 		// ssg only. for now.
 		if(oriented){ untested();
@@ -1064,9 +1096,25 @@ struct is_ordered_select<CFG, ECT,
 		CFG::force_ordering || sfinae::is_set_tpl<ECT>::value;
 };
 /*--------------------------------------------------------------------------*/
+template<class CFG, template<class x, class ...> class ECT, class X=void>
+struct is_simple_select {
+	// static constexpr bool value=sfinae::is_set_tpl<ECT>::value; FUTURE DEFAULT
+	static constexpr bool value=true;
+	operator bool() const {return value;}
+};
+template<class CFG, template<class x, class ...> class ECT>
+struct is_simple_select<CFG, ECT,
+	typename tovoid < typename std::enable_if<CFG::force_simple> >::type >
+{ //
+	static constexpr bool value=
+		CFG::force_simple || sfinae::is_set_tpl<ECT>::value;
+	operator bool() const {return value;}
+};
+/*--------------------------------------------------------------------------*/
 template<template<class T, typename... > class ECT,
          class X=void>
 struct is_multiedge_select {
+	// BUG, contradicts add_edge...
 	static constexpr bool value=true;
 };
 template<template<class T, typename... > class ECT>
@@ -1134,6 +1182,9 @@ public: // BUG. private & helper friends..
 	typedef CFG<this_type> myCFG;
 	static constexpr bool is_directed_v=detail::is_directed_select<myCFG>::value;
 	static constexpr bool is_ordered_v=detail::is_ordered_select<myCFG, ECT>::value;
+	static constexpr bool is_simple_v=detail::is_simple_select<myCFG, ECT>::value;
+	static constexpr bool is_multiedge_v=!detail::is_simple_select<myCFG, ECT>::value;
+
 public:
 	static constexpr bool is_directed() {
 		return is_directed_v;
@@ -1142,6 +1193,15 @@ public:
 	static constexpr bool is_ordered() {
 		return is_ordered_v;
 	}
+	// indicate that there are no parallel edges
+	static constexpr bool is_simple() { //
+		return is_simple_v;
+	}
+	// is_multiGRAPH?!
+	static constexpr bool is_multiedge() { //
+		return !is_simple_v;
+	}
+
 	static constexpr bool is_nn_v=detail::is_nn<ECT, VCT, VDP>::value;
 
 	typedef typename vs::type vertex_type;
@@ -1156,15 +1216,12 @@ public:
 	typedef typename vs::vertex_index_type vertex_index_type;
 // private: hmm not yet.
 	using storage=bits::storage<STARGS>;
-	using edge_helper=bits::edge_helper<STARGS, is_directed_v>;
+	using edge_helper=bits::edge_helper<STARGS, is_directed_v, is_simple_v>;
+
 	typedef typename bits::reverse_helper<STARGS> reverse_helper;
 	typedef typename bits::iter<STARGS> iter;
 	typedef edgecontainer<vertex_type> EL;
 
-	static constexpr bool is_multiedge_v=detail::is_multiedge_select<ECT>::value;
-	static constexpr bool is_multiedge() {
-		return is_multiedge_v;
-	}
 public: // reconfig
 	template<template<class G> class new_config>
 	struct reconfig{
@@ -1203,7 +1260,8 @@ public: // move
 						pdummy >::type=pdummy())
 	    : _v(std::move(x._v)),
 	      _num_edges(x._num_edges)
-	{
+	{ untested();
+
 		if(is_directed()){
 			_num_edges*=2;
 		}else{untested();
@@ -1246,7 +1304,9 @@ public: // move
 	graph(graph&& x)
 	    : _v(std::move(x._v)),
 	      _num_edges(x._num_edges)
-	{
+	{ untested();
+
+
 //		assert(nonvoid)
 		// assert(num_vertices()==x.num_vertices()); no. _v has gone ...
 		for(auto i = begin(); i!=end(); ++i){
@@ -1454,8 +1514,8 @@ public:
 	size_t num_edges_debug(){
 #ifdef DEBUG
 		auto ne=0;
-		for(auto& v:_v){ untested();
-			for(auto const& x : v){ untested();
+		for(auto& v:_v){ itested();
+			for(auto const& x : v){ itested();
 				(void)x;
 				++ne;
 			}
@@ -2318,17 +2378,40 @@ template<class SRC, class TGT>
 struct move_helper<SRC, TGT,
                    typename tovoid < typename std::enable_if<
                         TGT::is_ordered() && !SRC::is_ordered()
+           &&   TGT::is_simple() && !SRC::is_simple()
                     >::type >::type
                   >
-                   {
-	static void move(SRC const&& src, TGT& tgt){
+{ //
+	static void move(SRC const&& src, TGT& tgt){ untested();
+		incomplete(); // need to remove dups!
+		if ((void*)&tgt==(void*)&src){ untested();
+		}else{ itested();
+			tgt._num_edges = src._num_edges;
+			tgt._v = std::move(src._v);
+//			x._v.clear(); // hmm, does not work for sl
+//			tgt._num_edges = 0;
+			tgt.hacksort();
+		}
+	}
+};
+/*--------------------------------------------------------------------------*/
+template<class SRC, class TGT>
+struct move_helper<SRC, TGT,
+                   typename tovoid < typename std::enable_if<
+                        TGT::is_ordered() && !SRC::is_ordered()
+           && (  TGT::is_simple() == SRC::is_simple() )
+                    >::type >::type
+                  >
+{
+
+	static void move(SRC const&& src, TGT& tgt){ untested();
 		// BUG: check the other flags?!
 		if ((void*)&tgt==(void*)&src){ untested();
 		}else{ itested();
 			tgt._num_edges = src._num_edges;
 			tgt._v = std::move(src._v);
 //			x._v.clear(); // hmm, does not work for sl
-			tgt._num_edges = 0;
+//			tgt._num_edges = 0;
 			tgt.hacksort();
 		}
 	}

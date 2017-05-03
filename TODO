@@ -1,6 +1,7 @@
 - all types should end with _type
 - assigning undirected graph to directed creates symmetric graph
-	this is an old HACK...
+	this is an old HACK... (fixed?)
+- force_simple is on by default. should be off.
 
   to get a symmetric directed graph from an undirected, you should do
   undirected_graph_t U(...);

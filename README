@@ -1,7 +1,49 @@
-gala is a C++ graph implementation inspired by boost/BGL.
+gala is a C++ graph implementation inspired by boost/BGL, but with low level
+access. you choose the containers and data types and get full access -- at
+your own risk.
 
 some parts of the code and some decisions are under construction. the example
 graphs, used as boost graphs, are meant to be safe.
 
 the treedec graph interface is following tdlib and might be subject to future
 changes.
+
+a gala graph has 4 template args, two of which are container types. the third
+is the (internal) vertex representation, the fourth is a configuration.
+
+CONTAINER TYPES
+
+.. are STL style containers, but with one argument only. if you
+want to use custom allocators, you will have to wrap the type such as in
+
+  template<class T>
+  using some_container_type=std::vector<T, my_own_allocator>;
+
+and then pass some_container_type to gala::graph.
+
+INTERNAL VERTEX REPRESENTATION
+
+is an unsigned integer type, or gala::vertex_ptr_tag (default). the latter
+meaning that only pointers (to the edgesets) are used internally. saving one
+indirection.
+
+CONFIGURATION
+
+a gala::graph configuration is a struct that defines the graph behaviour. it
+holds variables of type static constexpr bool, such as
+
+  force_simple    the graph does not allow multiple edges
+                  (currently, this is on by default)
+
+  force_ordering  outedges are stored so iteration will be ascending
+                  (default off)
+
+  is_directed     edges are tuples, not sets.
+
+  force_symmetric (directed graphs only), (a,b) is tied to (b,a)
+                  (not yet)
+
+  is_loopless     not yet...
+
+these may affect the complexity of add_edge, copy and move (assignment)
+operations, depending on the chosen containers.
