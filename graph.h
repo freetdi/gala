@@ -757,8 +757,7 @@ struct edge_helper<STARGS, false, true> : public storage<STARGS>{
 		bool added=false;
 		if(s == out_edges(*A, vc).size()){
 		}else{
-			// edge_add(out_edges(*B, vc), *A);
-			edge_insert(out_edges(*B, vc), *A);
+			edge_add(out_edges(*B, vc), *A);
 			++num_edges;
 			added = true;
 		}
