@@ -128,7 +128,7 @@ struct container_helper<S, typename sfinae::is_vector<S>::type > {
 		return false;
 	}
 	template<class C, class E>
-	static void add(C& c, E e){ untested();
+	static void add(C& c, E e){
 		// not really, just TDLIB
 		// assert(std::find(c.begin(), c.end(), e)==c.end());
 		c.push_back(e);
@@ -183,7 +183,7 @@ bool edge_insert(C& c, E e, typename std::enable_if< sfinae::is_vector<C>::value
 /*--------------------------------------------------------------------------*/
 template<class C, class E>
 void edge_add(C& c, E e)
-{ untested();
+{
 	container_helper<C>::add(c, e);
 }
 #if 0
@@ -745,7 +745,7 @@ struct edge_helper<STARGS, false, true> : public storage<STARGS>{
 	template<class N, class VC>
 	static std::pair<edge_type, bool> add_edge(vertex_type a, vertex_type b,
 	                                           N& num_edges, VC& vc)
-	{ untested();
+	{
 
 		// trace0("undiredted add_edge");
 		vertex_type* A=&a;
@@ -1272,7 +1272,7 @@ public: // move
 						pdummy >::type=pdummy())
 	    : _v(std::move(x._v)),
 	      _num_edges(x._num_edges)
-	{ untested();
+	{
 
 		if(is_directed()){
 			_num_edges*=2;
@@ -1316,7 +1316,7 @@ public: // move
 	graph(graph&& x)
 	    : _v(std::move(x._v)),
 	      _num_edges(x._num_edges)
-	{ untested();
+	{
 
 
 //		assert(nonvoid)
@@ -2416,7 +2416,7 @@ struct move_helper<SRC, TGT,
                   >
 {
 
-	static void move(SRC const&& src, TGT& tgt){ untested();
+	static void move(SRC const&& src, TGT& tgt){
 		// BUG: check the other flags?!
 		if ((void*)&tgt==(void*)&src){ untested();
 		}else{ itested();
