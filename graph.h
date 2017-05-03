@@ -707,8 +707,36 @@ template<STPARMS, bool is_directed, bool is_simple>
 struct edge_helper : public storage<STARGS> {
 };
 /*--------------------------------------------------------------------------*/
-template<STPARMS, bool is_simple>
-struct edge_helper<STARGS, false, is_simple> : public storage<STARGS>{
+template<STPARMS>
+struct edge_helper<STARGS, false, false> : public storage<STARGS>{
+	// undirected implementation.
+	using typename storage<STARGS>::edge_type;
+	using typename storage<STARGS>::vertex_type;
+	using storage<STARGS>::out_edges;
+	// to storage base?!
+	template<class N, class VC>
+	static std::pair<edge_type, bool> add_edge(vertex_type a, vertex_type b,
+	                                           N& num_edges, VC& vc)
+	{ untested();
+		// trace0("undiredted add_edge");
+		vertex_type* A=&a;
+		vertex_type* B=&b;
+		// don't attempt to avoid dups
+		edge_add(out_edges(*B, vc), *A);
+		edge_add(out_edges(*A, vc), *B);
+		++num_edges;
+		return std::make_pair(edge_type(*A, *B), true);
+	}
+
+	typedef typename storage<STARGS>::container_type vertex_container_type;
+	template<class E>
+	static void add_reverse_edges(vertex_container_type& /*_v*/, E& )
+	{ unreachable();
+	}
+};
+/*--------------------------------------------------------------------------*/
+template<STPARMS>
+struct edge_helper<STARGS, false, true> : public storage<STARGS>{
 	// undirected implementation.
 	using typename storage<STARGS>::edge_type;
 	using typename storage<STARGS>::vertex_type;
@@ -722,21 +750,6 @@ struct edge_helper<STARGS, false, is_simple> : public storage<STARGS>{
 		// trace0("undiredted add_edge");
 		vertex_type* A=&a;
 		vertex_type* B=&b;
-#ifdef ADDEDGESWAP
-		// does not really help...
-		if(out_edges(a).size()>out_edges(b).size()){ untested();
-			std::swap(A,B);
-		}else{untested();
-		}
-#endif
-		if(!is_simple){ untested();
-			// don't attempt to avoid dups
-			edge_add(out_edges(*B, vc), *A);
-			edge_add(out_edges(*A, vc), *B);
-			++num_edges;
-			return std::make_pair(edge_type(*A, *B), true);
-		}else{ untested();
-		}
 		size_t s = out_edges(*A, vc).size();
 		edge_insert(out_edges(*A, vc), (*B));
 		// since the graph is undirected,
