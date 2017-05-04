@@ -26,6 +26,7 @@ TESTS = \
 	pmap \
 	rewire \
 	sfinae \
+	symm \
 	view \
 	vvg
 

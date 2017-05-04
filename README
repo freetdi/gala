@@ -35,13 +35,16 @@ holds variables of type static constexpr bool, such as
   force_simple    the graph does not allow multiple edges
                   (currently, this is on by default)
 
+  force_multigraph the graph does allow multiple edges
+                   (not implemented for sets)
+
   force_ordering  outedges are stored so iteration will be ascending
                   (default off)
 
   is_directed     edges are tuples, not sets.
 
-  force_symmetric (directed graphs only), (a,b) is tied to (b,a)
-                  (not yet)
+  force_symmetric (directed graphs only), (a,b) and (b,a) have the same
+                  multiplicity (incomplete)
 
   is_loopless     not yet...
 

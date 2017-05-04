@@ -1227,7 +1227,7 @@ public:
 	}
 	// is_multiGRAPH?!
 	static constexpr bool is_multiedge() { //
-		return !is_simple_v;
+		return is_multiedge_v;
 	}
 
 	static constexpr bool is_nn_v=detail::is_nn<ECT, VCT, VDP>::value;
@@ -1327,12 +1327,98 @@ public: // construct
 public: // move
    template<template<class G> class CFG2>
 	graph( graph<ECT, VCT, VDP, CFG2> const&&x,
-			typename std::enable_if< !graph<ECT, VCT, VDP, CFG2>::is_directed_v,
-						pdummy >::type=pdummy())
+			typename std::enable_if<
+			     this_type::is_simple_v
+			  && this_type::is_directed_v
+			  && this_type::is_symmetric_v
+			//  &&!graph<ECT, VCT, VDP, CFG2>::is_simple_v
+			  && graph<ECT, VCT, VDP, CFG2>::is_directed_v
+			  &&!graph<ECT, VCT, VDP, CFG2>::is_symmetric_v
+			  &&!graph<ECT, VCT, VDP, CFG2>::is_ordered_v,
+				 pdummy>::type=pdummy())
+	    : _v(std::move(x._v)),
+	      _num_edges(0)
+	{ untested();
+		// add (b,a) for (a,b)
+		// then check if all edges are simple,
+		// sets? hmm x is not ordered...
+		size_t i=0;
+		for(auto& x : _v){ untested();
+			for(auto y : x){ untested();
+				// HACK
+				assert(i!=y); // no self loops.
+				trace2("rev", y, i);
+				_v[y].push_back(i);
+			}
+			++i;
+		}
+		for(auto& x : _v){ untested();
+			std::sort(x.begin(), x.end()); // for now.
+			x.erase( unique( x.begin(), x.end() ), x.end() );
+			_num_edges += x.size();
+			trace1("", x.size());
+		}
+
+		if(is_directed()){ untested();
+		}else{untested();
+			_num_edges/=2;
+		}
+	}
+#if 1
+   template<template<class G> class CFG2>
+	graph( graph<ECT, VCT, VDP, CFG2> const&&x,
+			typename std::enable_if<
+			     this_type::is_simple_v
+			  && this_type::is_directed_v
+			  && this_type::is_symmetric_v
+			  && graph<ECT, VCT, VDP, CFG2>::is_simple_v
+			  && graph<ECT, VCT, VDP, CFG2>::is_directed_v
+			  &&!graph<ECT, VCT, VDP, CFG2>::is_symmetric_v
+			  && graph<ECT, VCT, VDP, CFG2>::is_ordered_v,
+				 pdummy>::type=pdummy())
 	    : _v(std::move(x._v)),
 	      _num_edges(x._num_edges)
-	{
+	{ untested();
+		static_assert(sfinae::is_set_tpl<ECT>::value);
+		size_t i=0;
+		for(auto& x : _v){ untested();
+			for(auto y : x){ untested();
+				// HACK
+				assert(i!=y); // no self loops.
+				trace2("rev", y, i);
+				_num_edges+=_v[y].insert(i).second;
+			}
+			++i;
+		}
 
+		if(is_directed()){ untested();
+		}else{untested();
+			_num_edges/=2;
+		}
+	}
+#endif
+   template<template<class G> class CFG2>
+	graph( graph<ECT, VCT, VDP, CFG2> const&&x,
+			typename std::enable_if<
+			     graph<ECT, VCT, VDP, CFG2>::is_simple_v
+			  &&!graph<ECT, VCT, VDP, CFG2>::is_directed_v
+			  &&!graph<ECT, VCT, VDP, CFG2>::is_symmetric_v,
+				 pdummy>::type=pdummy())
+	    : _v(std::move(x._v)),
+	      _num_edges(x._num_edges)
+	{ untested();
+		unreachable(); // undirected graphs are symmetric.
+	}
+   template<template<class G> class CFG2>
+	graph( graph<ECT, VCT, VDP, CFG2> const&& x,
+			typename std::enable_if<
+			     graph<ECT, VCT, VDP, CFG2>::is_simple_v
+			  &&!graph<ECT, VCT, VDP, CFG2>::is_directed_v
+			  && graph<ECT, VCT, VDP, CFG2>::is_symmetric_v,
+				 pdummy>::type=pdummy())
+	    : _v(std::move(x._v)),
+	      _num_edges(x._num_edges)
+	{ untested();
 		if(is_directed()){
 			_num_edges*=2;
 		}else{untested();
