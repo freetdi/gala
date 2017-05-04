@@ -1123,6 +1123,18 @@ struct is_simple_select<CFG, ECT,
 	operator bool() const {return value;}
 };
 /*--------------------------------------------------------------------------*/
+template<class CFG, class X=void>
+struct is_symmetric_select {
+	static constexpr bool value=false;
+	operator bool() const {return value;}
+};
+template<class CFG>
+struct is_symmetric_select<CFG,
+	typename tovoid < typename std::enable_if< CFG::force_symmetric >::type >::type >
+{ //
+	static constexpr bool value=CFG::force_symmetric;
+};
+/*--------------------------------------------------------------------------*/
 template<template<class T, typename... > class ECT,
          class X=void>
 struct is_multiedge_select {
@@ -1193,6 +1205,7 @@ public: // types
 public: // BUG. private & helper friends..
 	typedef CFG<this_type> myCFG;
 	static constexpr bool is_directed_v=detail::is_directed_select<myCFG>::value;
+	static constexpr bool is_symmetric_v=!is_directed_v || detail::is_symmetric_select<myCFG>::value;
 	static constexpr bool is_ordered_v=detail::is_ordered_select<myCFG, ECT>::value;
 	static constexpr bool is_simple_v=detail::is_simple_select<myCFG, ECT>::value;
 	static constexpr bool is_multiedge_v=!detail::is_simple_select<myCFG, ECT>::value;
@@ -1208,6 +1221,9 @@ public:
 	// indicate that there are no parallel edges
 	static constexpr bool is_simple() { //
 		return is_simple_v;
+	}
+	static constexpr bool is_symmetric() { //
+		return is_symmetric_v;
 	}
 	// is_multiGRAPH?!
 	static constexpr bool is_multiedge() { //
@@ -1240,10 +1256,21 @@ public: // reconfig
 		typedef graph<ECT, VCT, VDP, new_config> type;
 	};
 	template<class GG>
-	struct my_undirected_config : public CFG<GG> { //
+	struct my_undirected_config : public CFG<GG> {
 		static constexpr bool is_directed=false;
 	};
+	template<class GG>
+	struct my_symmetric_config : public CFG<GG> {
+		static constexpr bool force_symmetric=true;
+	};
+	template<class GG>
+	struct my_unsymmetric_config : public CFG<GG> {
+		static constexpr bool force_symmetric=false;
+	};
+
 	typedef typename reconfig<my_undirected_config>::type undirected_type;
+	typedef typename reconfig<my_symmetric_config>::type symmetric_type;
+	typedef typename reconfig<my_unsymmetric_config>::type unsymmetric_type;
 public:
 	typedef typename storage::container_type VL;
 	typedef typename storage::container_type vertex_container_type;
@@ -1265,20 +1292,6 @@ public: // range-based loops support aliases
 	typedef std::pair<iterator, out_vertex_iterator> edge_iterator;
 private: // inacessible sfinae
 	struct pdummy{};
-public: // move
-   template<template<class G> class CFG2>
-	graph( graph<ECT, VCT, VDP, CFG2> const&&x,
-			typename std::enable_if< !graph<ECT, VCT, VDP, CFG2>::is_directed_v,
-						pdummy >::type=pdummy())
-	    : _v(std::move(x._v)),
-	      _num_edges(x._num_edges)
-	{
-
-		if(is_directed()){
-			_num_edges*=2;
-		}else{untested();
-		}
-	}
 public: // construct
 	graph(const graph& x) : _num_edges(0)
 	{
@@ -1312,12 +1325,24 @@ public: // construct
 #endif
 	}
 public: // move
-	// move self.
-	graph(graph&& x)
+   template<template<class G> class CFG2>
+	graph( graph<ECT, VCT, VDP, CFG2> const&&x,
+			typename std::enable_if< !graph<ECT, VCT, VDP, CFG2>::is_directed_v,
+						pdummy >::type=pdummy())
 	    : _v(std::move(x._v)),
 	      _num_edges(x._num_edges)
 	{
 
+		if(is_directed()){
+			_num_edges*=2;
+		}else{untested();
+		}
+	}
+	// move self.
+	graph(graph&& x)
+	    : _v(std::move(x._v)),
+	      _num_edges(x._num_edges)
+	{ untested();
 
 //		assert(nonvoid)
 		// assert(num_vertices()==x.num_vertices()); no. _v has gone ...
@@ -1364,8 +1389,7 @@ public: //assign
 	graph& assign_same(graph<SGARGS> const& x);
 
 public: // move assign
-	graph& operator=(graph&& x)
-	{
+	graph& operator=(graph&& x) { untested();
 		trace2("move assign_same", size_t(num_vertices()), size_t(num_edges()));
 		trace2("move assign", size_t(x.num_vertices()), size_t(x.num_edges()));
 		trace2("move assign", is_directed(), x.is_directed());
@@ -1405,44 +1429,27 @@ public: // move assign
             class VDP2, \
             template<class G> class CFG2>
 	graph& operator=(graph<ECT2,VCT2,VDP2,CFG2> const&&);
-private:
-
 public: // construct
-#if 0 // does not work
-	// construct a graph from a boost graph
-	// warning: assuming vertex_descriptors are 0,1,2 ...
-	template <typename G_t>
-	explicit graph(G_t const &G)
-	    : _num_edges(0)
-	{ untested();
-		assign(G);
-	}
-#endif
+// private:??
 	template <typename G_t>
 	void assign(G_t const& G);
 public: // iterators
-	iterator begin()
-	{
+	iterator begin() {
 		return iter::vbegin(_v);
 	}
-	iterator end()
-	{
+	iterator end() {
 		return iter::vend(_v);
 	}
-	const_iterator cbegin() const
-	{
+	const_iterator cbegin() const {
 		return iter::vbegin(_v);
 	}
-	const_iterator cend() const
-	{
+	const_iterator cend() const {
 		return iter::vend(_v);
 	}
-	const_iterator begin() const
-	{
+	const_iterator begin() const {
 		return iter::vbegin(_v);
 	}
-	const_iterator end() const
-	{
+	const_iterator end() const {
 		return iter::vend(_v);
 	}
 	// will not work for non-vector VCT...
@@ -1452,24 +1459,22 @@ public: // iterators
 		return iter::pos(v, _v);
 	}
 public: // BUG: should not expose this...?
-	vertex_container_type& vertices()
-	{ // incomplete(); later
+	vertex_container_type& vertices() {
+		// incomplete(); later
 		return _v;
 	}
-	const vertex_container_type& vertices() const
-	{ // incomplete(); later
+	const vertex_container_type& vertices() const {
+	  	// incomplete(); later
 		return _v;
 	}
 public:
-	void clear()
-	{
+	void clear() {
 		// inefficient (maybe not, with proper allocator...)
 		_v.resize(0);
 		_num_edges = 0;
 	}
 	// "reserve" maybe?!
-	void reshape(size_t nv, size_t ne=0, bool directed_edges=false)
-	{
+	void reshape(size_t nv, size_t ne=0, bool directed_edges=false) {
 		(void)directed_edges;
 		if(ne) {
 			// inefficient.
@@ -1481,27 +1486,23 @@ public:
 		}
 		_num_edges = 0;
 	}
-	bool is_edge(const_vertex_type a, const_vertex_type b) const
-	{ untested();
+	bool is_edge(const_vertex_type a, const_vertex_type b) const { untested();
 		return a->n.find(const_cast<vertex_type>(b)) != a->n.end();
 	}
 private:
 	//O(log d), where d is the degree of a
-	void remove_edge_single(vertex_type a, vertex_type b)
-	{
+	void remove_edge_single(vertex_type a, vertex_type b) {
 		assert(a!=b);
 		storage::remove_edge_single(a, b, _v);
 		--_num_edges;
 	}
 private: // required by contruct from iterator
 	// add edge from vertex positions \in [0, nv)
-	void add_pos_edge(vertex_index_type a, vertex_index_type b)
-	{ untested();
+	void add_pos_edge(vertex_index_type a, vertex_index_type b) { untested();
 		storage::add_pos_edge(a, b, _v);
 	}
 	// same, but from strings.
-	void add_pos_edge(const char* a, const char* b)
-	{ untested();
+	void add_pos_edge(const char* a, const char* b) { untested();
 		storage::add_pos_edge(a, b, _v);
 	}
 public:
@@ -1514,8 +1515,7 @@ public:
 	EL& out_edges(const_vertex_type& /*v*/);
 	const EL& out_edges(const_vertex_type& /*v*/) const;
 	//O(1)
-	vertex_index_type num_vertices() const
-	{
+	vertex_index_type num_vertices() const {
 		return _v.size();
 	}
 	//O(1)
@@ -1557,8 +1557,7 @@ public:
 		return make_symmetric(oriented);
 	}
 	//O(log max{d_1, d_2}), where d_1 is the degree of a and d_2 is the degree of b
-	std::pair<edge_type, bool> add_edge(vertex_type a, vertex_type b)
-	{
+	std::pair<edge_type, bool> add_edge(vertex_type a, vertex_type b) {
 		assert(is_valid(a));
 		assert(is_valid(b));
 		return edge_helper::add_edge(a, b, _num_edges, _v);
@@ -1736,11 +1735,13 @@ public: // experimental...?
 		typedef size_t edges_size_type;
 		static edges_size_type num_edges(GG const &g)
 		{
+			incomplete(); // staged for removal.
 			return 2*g._num_edges; // BUG
 			return 2*reinterpret_cast<base_type const&>(g).num_edges();
 		}
 		static void set_num_edges(edges_size_type e, GG &g)
 		{ untested();
+			incomplete(); // staged for removal.
 			assert(! (e%2) );
 			g._num_edges = e/2; // BUG/incomplete
 //			reinterpret_cast<base_type const&>(g).set_num_edges();
@@ -1763,9 +1764,9 @@ public: // experimental...?
 		return reinterpret_cast<directed_self_type const&>(*this);
 	}
 	// more dangerous...
-	// private & friends?
-	directed_self_type& directed_view()
-	{
+	// this is OBSOLETE, don't use.
+	directed_self_type& directed_view() {
+		unreachable();
 		return reinterpret_cast<directed_self_type&>(*this);
 	}
 }; // class graph
@@ -1821,7 +1822,7 @@ template <class EdgeIterator>
 graph<SGARGS>::graph(EdgeIterator first, EdgeIterator last,
                      vertices_size_type nv, edges_size_type ne)
     : graph(nv, ne)
-{
+{ untested();
 	_num_edges=0;
 
 	assert(_v.size()==nv);
@@ -1941,7 +1942,7 @@ graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
 	typedef typename oG::const_vertex_type other_const_vertex_type;
 
 	if (intptr_t(&x) == intptr_t(this)) { untested();
-	}else if (num_vertices()==0){ itested();
+	}else if (num_vertices()==0){ untested();
 		detail::copy_helper<graph, graph,
 			is_directed_v, is_directed_v,
 			is_nn_v, is_nn_v>::assign(x, *this);
@@ -2001,12 +2002,12 @@ bool srcOrd, bool tgtOrd>
 void copy_helper<oG, G, X, Y,
                  srcCont, tgtCont,
 					  srcOrd, tgtOrd>::assign(oG const& src, G& tgt)
-{
+{ untested();
 	auto& g=src;
 //	typedef graph<ECT2, VCT2, VDP2, CFG2> oG; // source graph
 	size_t nv = g.num_vertices();
 	size_t ne = g.num_edges();
-	trace6("assign_",nv, ne, tgt.num_vertices(), tgt.num_edges(), srcCont, tgtCont);
+	trace6("assign_", nv, ne, tgt.num_vertices(), tgt.num_edges(), srcCont, tgtCont);
 	assert(!tgt.is_directed() || src.is_directed()); // use other helper
 //	auto psize=tgt._v.size();
 	tgt._v.resize(nv);
