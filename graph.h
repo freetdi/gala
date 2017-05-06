@@ -1178,7 +1178,47 @@ struct copy_helper{
 /*--------------------------------------------------------------------------*/
 template<class Gsrc, class Gtgt, class X=void>
 struct move_helper{
-	static void move(Gsrc const&&, Gtgt&){ incomplete(); }
+	static void move(Gsrc const&& s, Gtgt& t){ untested();
+
+		t._v=std::move(s._v);
+
+		if(!s.is_symmetric() && t.is_symmetric()){ untested();
+			if(t.is_simple){ untested();
+				t._num_edges=0;
+				symmetrify(t);
+			}else{ incomplete();
+			}
+		}else{untested();
+			t._num_edges = s._num_edges;
+		}
+	}
+	static void symmetrify(Gtgt& g){ untested();
+		// add (b,a) for (a,b)
+		// then check if all edges are simple,
+		// sets? hmm x is not ordered...
+		size_t i=0;
+		for(auto& x : g._v){ itested();
+			for(auto y : x){ itested();
+				// HACK
+				assert(i!=y); // no self loops.
+				trace2("rev", y, i);
+				g._v[y].push_back(i);
+			}
+			++i;
+		}
+		for(auto& x : g._v){ itested();
+			std::sort(x.begin(), x.end()); // for now.
+			x.erase( unique( x.begin(), x.end() ), x.end() );
+			g._num_edges += x.size();
+			trace1("", x.size());
+		}
+
+		if(g.is_directed()){ untested();
+		}else{untested();
+			trace1("correcting edgecount", g._num_edges);
+			g._num_edges/=2;
+		}
+	}
 };
 /*--------------------------------------------------------------------------*/
 } // namespace detail
@@ -1339,30 +1379,7 @@ public: // move
 	    : _v(std::move(x._v)),
 	      _num_edges(0)
 	{ untested();
-		// add (b,a) for (a,b)
-		// then check if all edges are simple,
-		// sets? hmm x is not ordered...
-		size_t i=0;
-		for(auto& x : _v){ untested();
-			for(auto y : x){ untested();
-				// HACK
-				assert(i!=y); // no self loops.
-				trace2("rev", y, i);
-				_v[y].push_back(i);
-			}
-			++i;
-		}
-		for(auto& x : _v){ untested();
-			std::sort(x.begin(), x.end()); // for now.
-			x.erase( unique( x.begin(), x.end() ), x.end() );
-			_num_edges += x.size();
-			trace1("", x.size());
-		}
-
-		if(is_directed()){ untested();
-		}else{untested();
-			_num_edges/=2;
-		}
+		detail::move_helper<graph<ECT, VCT, VDP, CFG2>, this_type >::symmetrify(*this);
 	}
 #if 1
    template<template<class G> class CFG2>
@@ -1378,11 +1395,11 @@ public: // move
 				 pdummy>::type=pdummy())
 	    : _v(std::move(x._v)),
 	      _num_edges(x._num_edges)
-	{ untested();
+	{ itested();
 		static_assert(sfinae::is_set_tpl<ECT>::value);
 		size_t i=0;
-		for(auto& x : _v){ untested();
-			for(auto y : x){ untested();
+		for(auto& x : _v){ itested();
+			for(auto y : x){ itested();
 				// HACK
 				assert(i!=y); // no self loops.
 				trace2("rev", y, i);
@@ -1391,7 +1408,7 @@ public: // move
 			++i;
 		}
 
-		if(is_directed()){ untested();
+		if(is_directed()){ itested();
 		}else{untested();
 			_num_edges/=2;
 		}
@@ -1632,9 +1649,12 @@ public:
 	//
 	//O(num_edges+num_vertices)
 	void make_symmetric(bool oriented=false)
-	{
+	{ untested();
 		assert(is_directed());
-		reverse_helper::make_symmetric(_v, _num_edges, oriented);
+		if(is_symmetric()){ itested();
+		}else{ untested();
+			reverse_helper::make_symmetric(_v, _num_edges, oriented);
+		}
 		num_edges_debug(); // will notice if you were lying.
 	}
 	void add_reverse_edges(bool oriented=true)
@@ -1969,14 +1989,14 @@ VCTtemplate
             class VDP2, \
             template<class G> class CFG2>
 graph<SGARGS>& graph<SGARGS>::operator=(graph<ECT2,VCT2,VDP2,CFG2> const& x)
-{
+{ untested();
 	typedef graph<ECT2,VCT2,VDP2,CFG2> Gsrc;
 	if((void*)&x==(void*)this){ untested();
 		return *this;
 	}else{
 	}
 
-	trace2("op=", Gsrc::is_directed(), is_directed_v);
+	trace2("op=&", Gsrc::is_directed(), is_directed_v);
 
 	detail::copy_helper<Gsrc, graph,
 		 Gsrc::is_directed_v, is_directed_v,
@@ -1999,12 +2019,14 @@ graph<SGARGS>& graph<SGARGS>::operator=(graph<ECT2,VCT2,VDP2,CFG2> const&& x)
 	typedef graph<ECT2,VCT2,VDP2,CFG2> Gsrc;
 	if((void*)&x==(void*)this){ untested();
 		return *this;
-	}else{
+	}else{ untested();
 	}
 
-	trace2("op=", Gsrc::is_directed(), is_directed_v);
+	trace2("op=&&", Gsrc::is_directed(), is_directed_v);
 
+	untested();
 	detail::move_helper<Gsrc, graph>::move(std::move(x), *this);
+	untested();
 
 	constexpr bool needed=!x.is_ordered() && is_ordered();
 	bits::order_helper<needed, ECT>::do_it(_v);
@@ -2190,8 +2212,7 @@ void copy_helper<oG, G, X, Y,
 		//   		}
 	}
 #endif
-}
-// ; // copy_helper
+} // copy_helper
 //
 #if 0 // use default
 template<class Gsrc, class Gtgt>
@@ -2202,7 +2223,7 @@ struct copy_helper<Gsrc, Gtgt,  boost::mpl::true_,  boost::mpl::false_ >
 template<class Gsrc, class Gtgt>
 struct copy_helper<Gsrc, Gtgt, false, true > {
 	static void assign(Gsrc const& src, Gtgt& tgt)
-	{
+	{ untested();
 		trace2("assigning undirected to directed", src.num_edges(), tgt.num_edges());
 		tgt = src.directed_view();
 		trace2("done undirected to directed", src.num_edges(), tgt.num_edges());
@@ -2323,7 +2344,7 @@ struct copy_helper<Gsrc, Gtgt, boost::mpl::true_, boost::mpl::true_>
 }; // copy_helper
 #endif
 /*--------------------------------------------------------------------------*/
-} // namespace detail
+} // detail
 /*--------------------------------------------------------------------------*/
 // TODO: runtime info?
 VCTtemplate
@@ -2492,7 +2513,10 @@ struct move_helper<SRC, TGT,
 			tgt.hacksort();
 		}
 	}
-};
+	static void symmetrify(TGT& g){ untested();
+		incomplete();
+	}
+}; // move_helper
 /*--------------------------------------------------------------------------*/
 template<class SRC, class TGT>
 struct move_helper<SRC, TGT,
@@ -2502,17 +2526,19 @@ struct move_helper<SRC, TGT,
                     >::type >::type
                   >
 {
-
-	static void move(SRC const&& src, TGT& tgt){
+	static void move(SRC const&& src, TGT& tgt){ untested();
 		// BUG: check the other flags?!
 		if ((void*)&tgt==(void*)&src){ untested();
-		}else{ itested();
+		}else{ untested();
 			tgt._num_edges = src._num_edges;
 			tgt._v = std::move(src._v);
 //			x._v.clear(); // hmm, does not work for sl
 //			tgt._num_edges = 0;
 			tgt.hacksort();
 		}
+	}
+	static void symmetrify(TGT& x){ untested();
+		incomplete();
 	}
 };
 } // detail

@@ -35,6 +35,11 @@ int main(int , char* [])
 	Ps ps(2);
 	Gs gs;
 
+	assert(!p.is_symmetric());
+	assert(!ps.is_symmetric());
+	assert(g.is_symmetric());
+	assert(gs.is_symmetric());
+
 	assert(!p.is_simple());
 	assert(g.is_simple());
 
@@ -47,6 +52,8 @@ int main(int , char* [])
 	boost::add_edge(0,1,ps);
 	boost::add_edge(0,1,ps);
 	boost::add_edge(0,1,ps);
+
+	g.make_symmetric();
 
 	G h=std::move(p);
 	std::cout << h.num_edges() << "\n";
