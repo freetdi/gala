@@ -209,7 +209,7 @@ template<template<class T, typename... > class ECT>
 struct order_helper<true, ECT,
 	typename tovoid < typename std::enable_if<
 	 sfinae::is_seq_tpl<ECT>::value
-	>::type >::type > {
+	>::type >::type > { //
 	template<class V>
 	static void do_it(V& v){
 		for( auto& i : v){
@@ -2525,7 +2525,7 @@ struct move_helper<SRC, TGT,
            && (  TGT::is_simple() == SRC::is_simple() )
                     >::type >::type
                   >
-{
+{ //
 	static void move(SRC const&& src, TGT& tgt){ untested();
 		// BUG: check the other flags?!
 		if ((void*)&tgt==(void*)&src){ untested();
