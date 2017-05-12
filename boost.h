@@ -389,7 +389,7 @@ namespace boost { //
 				typename G::vertex_type s = G::iter::deref(i);
 				typename G::vertex_type t = *base.second;
 
-				return std::make_pair(s,t);
+				return reference(s,t);
 			}
 			bool equal(const edge_iterator& other) const
 			{
@@ -441,6 +441,7 @@ namespace boost { //
 			    typename gala::graph<SGARGS>::out_vertex_iterator> value_type;
 		   typedef intptr_t difference_type; // why?
 			typedef typename gala::graph<SGARGS>::edge_type reference;
+			typedef typename gala::graph<SGARGS>::edge_type edge_type;
 
 		public: // construct
 			out_edge_iterator()
@@ -456,7 +457,7 @@ namespace boost { //
 		private:
 			reference dereference() const
 			{
-				return std::make_pair(base.first, *base.second);
+				return edge_type(base.first, *base.second);
 			}
 			bool equal(const out_edge_iterator& other) const
 			{
