@@ -595,7 +595,7 @@ struct storage : storage_base<STARGS>{ //
 		return _v[v];
 	}
 	static const edge_container_type& out_edges(const_vertex_type& v, const container_type& _v)
-	{ untested();
+	{ itested();
 		return _v[v];
 	}
 	static void remove_edge_single(vertex_index_type v, vertex_index_type w,
@@ -1374,11 +1374,20 @@ public: // construct
 #endif
 	}
 public: // move
+#if 0
+   template<template<class G> class CFG2>
+	graph( graph<ECT, VCT, VDP, CFG2> const&& )
+	{
+		incomplete();
+	}
+#endif
+
    template<template<class G> class CFG2>
 	graph( graph<ECT, VCT, VDP, CFG2> const&&x,
 			typename std::enable_if<
-			     this_type::is_simple_v
+			    !std::is_same< graph<ECT, VCT, VDP, CFG2>, this_type>::value
 			  && this_type::is_directed_v
+			  && this_type::is_simple_v
 			  && this_type::is_symmetric_v
 			//  &&!graph<ECT, VCT, VDP, CFG2>::is_simple_v
 			  && graph<ECT, VCT, VDP, CFG2>::is_directed_v
@@ -1426,6 +1435,20 @@ public: // move
    template<template<class G> class CFG2>
 	graph( graph<ECT, VCT, VDP, CFG2> const&&x,
 			typename std::enable_if<
+			    !std::is_same< graph<ECT, VCT, VDP, CFG2>, this_type>::value
+			  &&!this_type::is_symmetric_v
+			  && graph<ECT, VCT, VDP, CFG2>::is_directed_v
+			  &&!graph<ECT, VCT, VDP, CFG2>::is_simple_v
+			  &&!graph<ECT, VCT, VDP, CFG2>::is_symmetric_v,
+				 pdummy>::type=pdummy())
+	    : _v(std::move(x._v)),
+	      _num_edges(x._num_edges)
+	{ untested();
+		incomplete();
+	}
+   template<template<class G> class CFG2>
+	graph( graph<ECT, VCT, VDP, CFG2> const&&x,
+			typename std::enable_if<
 			     graph<ECT, VCT, VDP, CFG2>::is_simple_v
 			  &&!graph<ECT, VCT, VDP, CFG2>::is_directed_v
 			  &&!graph<ECT, VCT, VDP, CFG2>::is_symmetric_v,
@@ -1438,7 +1461,8 @@ public: // move
    template<template<class G> class CFG2>
 	graph( graph<ECT, VCT, VDP, CFG2> const&& x,
 			typename std::enable_if<
-			     graph<ECT, VCT, VDP, CFG2>::is_simple_v
+			    !std::is_same< graph<ECT, VCT, VDP, CFG2>, this_type>::value
+			  && graph<ECT, VCT, VDP, CFG2>::is_simple_v
 			  &&!graph<ECT, VCT, VDP, CFG2>::is_directed_v
 			  && graph<ECT, VCT, VDP, CFG2>::is_symmetric_v,
 				 pdummy>::type=pdummy())
@@ -1958,7 +1982,7 @@ graph<SGARGS>::graph(EdgeIterator first, EdgeIterator last,
 VCTtemplate
 typename graph<SGARGS>::EL const&
     graph<SGARGS>::out_edges(const_vertex_type& v) const
-{ untested();
+{ itested();
 	assert(is_valid(v));
 	return storage::out_edges(v, _v);
 }

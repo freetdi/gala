@@ -544,6 +544,7 @@ namespace boost { //
 	void remove_out_edge_if(
 			typename graph_traits<gala::graph<SGARGS> >::vertex_descriptor u, PRED& p, gala::graph<SGARGS>& g)
 	{
+		// wrap P?
 		g.remove_out_edge_if(u, p);
 	}
 
