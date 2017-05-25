@@ -1414,7 +1414,7 @@ public: // move
 	    : _v(std::move(x._v)),
 	      _num_edges(x._num_edges)
 	{ itested();
-		static_assert(sfinae::is_set_tpl<ECT>::value);
+		static_assert(sfinae::is_set_tpl<ECT>::value, "must be a set");
 		size_t i=0;
 		for(auto& x : _v){ itested();
 			for(auto y : x){ itested();

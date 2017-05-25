@@ -92,7 +92,7 @@ static inline bool contains(S const& s, typename S::value_type i)
 }
 /*--------------------------------------------------------------------------*/
 template<class T>
-unsigned numberofones(T x)
+inline unsigned numberofones(T x)
 { untested();
 #if 1 // GCC
   return __builtin_popcount(x);
@@ -107,7 +107,7 @@ unsigned numberofones(T x)
 }
 /*--------------------------------------------------------------------------*/
 template<>
-unsigned numberofones(uint64_t x)
+inline unsigned numberofones(uint64_t x)
 { itested();
 #if 1 // GCC
   return __builtin_popcountl(x);
