@@ -500,7 +500,7 @@ namespace boost { //
 	                 typename graph_traits<::gala::graph<SGARGS> >::adjacency_iterator>
 	      adjacent_vertices(typename graph_traits<::gala::graph<SGARGS> >::vertex_descriptor u,
 	                        const gala::graph<SGARGS>& g)
-	{ itested();
+	{
 		typedef typename graph_traits<::gala::graph<SGARGS> >::adjacency_iterator Iter;
 		auto& o = g.out_edges(u);
 		return std::make_pair( Iter(o.begin()), Iter(o.end()));
@@ -699,7 +699,7 @@ namespace boost { //
 		if(!g.is_directed()){
 			size_t c=0;
 			auto p=vertices(g);
-			for(; p.first!=p.second; ++p.first){ itested();
+			for(; p.first!=p.second; ++p.first){
 				c+=degree(*p.first, g);
 			}
 			if(g.is_multiedge()){
@@ -959,7 +959,7 @@ namespace boost {
 	}
 	VCTtemplate
 	bool is_undirected(gala::graph<SGARGS> const& g)
-	{ untested();
+	{
 		return !g.is_directed();
 	}
 

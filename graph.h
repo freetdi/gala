@@ -134,8 +134,8 @@ struct container_helper<S, typename sfinae::is_vector<S>::type > {
 		c.push_back(e);
 	}
 	template<class C, class E>
-	static bool insert(C& c, E e){ itested();
-		if(std::find(c.begin(), c.end(), e)==c.end()){ itested();
+	static bool insert(C& c, E e){
+		if(std::find(c.begin(), c.end(), e)==c.end()){
 			c.push_back(e);
 			return true;
 		}else{
@@ -265,7 +265,7 @@ struct vertex_helper{ //
 	}
 	template<class T, class V, class VC>
 	static void insert(T& v, V& w, VC*)
-	{ itested();
+	{
 		edge_insert(v, w);
 	}
 	template<class T, class V, class VC>
@@ -275,7 +275,7 @@ struct vertex_helper{ //
 	}
 	template<class VL>
 	static bool is_valid(VDP const& v, VL const& _v)
-	{ itested();
+	{
 		return v<_v.size();
 	}
 	template<class E, class S>
@@ -414,12 +414,12 @@ struct iter_helper<c_iter_tag, VDP, /*directed*/ true, is_multiedge> {
 	static size_t fill_pos(iter first, iter last, VL& _v, bool dir=false, bool dups=true)
 	{
 		if(dups){
-		}else{ untested();
+		}else{
 		}
 		assert(dir); (void) dir;
 		auto nv = _v.size();
 		size_t c=0;
-		for(;first!=last; ++first){ itested();
+		for(;first!=last; ++first){
 			unsigned v=source(*first);
 			unsigned w=target(*first);
 			assert(v<nv);
@@ -570,7 +570,8 @@ struct storage : storage_base<STARGS>{ //
 		return s;
 	}
 	static VDP degree(const VDP v, container_type const& _v)
-	{ itested();
+	{
+		assert(v<_v.size());
 		return _v[v].size();
 	}
 	static VDP degree(container_type const& _v)
@@ -587,7 +588,7 @@ struct storage : storage_base<STARGS>{ //
 		_v[v].clear();
 	}
 	static edge_container_type& out_edges(vertex_type& v, container_type& _v)
-	{ itested();
+	{
 		return _v[v];
 	}
 	static edge_container_type& out_edges(const_vertex_type& v, container_type& _v)
@@ -791,7 +792,7 @@ struct edge_helper<STARGS, true, is_simple>
 	template<class N, class VC>
 	static std::pair<edge_type, bool> add_edge(vertex_type a, vertex_type b,
 															 N& num_edges, VC& vc)
-	{ itested();
+	{
 		vertex_type* A=&a;
 		vertex_type* B=&b;
 		size_t s = out_edges(*A, vc).size();
@@ -799,7 +800,7 @@ struct edge_helper<STARGS, true, is_simple>
 
 		bool added=false;
 		if(s == out_edges(*A, vc).size()){ itested();
-		}else{ itested();
+		}else{
 			++num_edges; // BUG, multiplier?
 			added = true;
 		}
@@ -1003,7 +1004,7 @@ struct iter{ //
 		return vertex_iterator(v.size());
 	}
 	static VDP deref(vertex_iterator v)
-	{ itested();
+	{
 		return *v;
 	}
 	// FIXME: is this "iter"?
@@ -1187,12 +1188,12 @@ struct copy_helper{
 /*--------------------------------------------------------------------------*/
 template<class Gsrc, class Gtgt, class X=void>
 struct move_helper{
-	static void move(Gsrc const&& s, Gtgt& t){ untested();
+	static void move(Gsrc const&& s, Gtgt& t){
 
 		t._v=std::move(s._v);
 
-		if(!s.is_symmetric() && t.is_symmetric()){ untested();
-			if(t.is_simple){ untested();
+		if(!s.is_symmetric() && t.is_symmetric()){
+			if(t.is_simple){
 				t._num_edges=0;
 				symmetrify(t);
 			}else{ incomplete();
@@ -1206,24 +1207,24 @@ struct move_helper{
 		// then check if all edges are simple,
 		// sets? hmm x is not ordered...
 		size_t i=0;
-		for(auto& x : g._v){ itested();
-			for(auto y : x){ itested();
+		for(auto& x : g._v){
+			for(auto y : x){
 				// HACK
 				assert(i!=y); // no self loops.
-				trace2("rev", y, i);
+//				trace2("rev", y, i);
 				g._v[y].push_back(i);
 			}
 			++i;
 		}
-		for(auto& x : g._v){ itested();
+		for(auto& x : g._v){
 			std::sort(x.begin(), x.end()); // for now.
 			x.erase( unique( x.begin(), x.end() ), x.end() );
 			g._num_edges += x.size();
-			trace1("", x.size());
+//			trace1("", x.size());
 		}
 
 		if(g.is_directed()){
-		}else{untested();
+		}else{
 			trace1("correcting edgecount", g._num_edges);
 			g._num_edges/=2;
 		}
@@ -1342,7 +1343,8 @@ public: // range-based loops support aliases
 private: // inacessible sfinae
 	struct pdummy{};
 public: // construct
-	graph(const graph& x) : _num_edges(0)
+	explicit graph(const graph& x)
+	    : _num_edges(0)
 	{
 		assign_same(x); // FIXME op=?
 	}
@@ -1350,10 +1352,9 @@ public: // construct
             template<class T, typename... > class VCT2, \
             class VDP2, \
             template<class G> class CFG2>
-	graph(graph<ECT2, VCT2, VDP2, CFG2> const& x)
-	: _num_edges(0)
+	explicit graph(graph<ECT2, VCT2, VDP2, CFG2> const& x)
+	    : _num_edges(0)
 	{
-
 		detail::copy_helper<graph<ECT2,VCT2,VDP2,CFG2>, graph,
 			  graph<ECT2,VCT2,VDP2,CFG2>::is_directed_v, is_directed_v
 			>::assign(x, *this);
@@ -1420,7 +1421,7 @@ public: // move
 			for(auto y : x){ itested();
 				// HACK
 				assert(i!=y); // no self loops.
-				trace2("rev", y, i);
+//				trace2("rev", y, i);
 				_num_edges+=_v[y].insert(i).second;
 			}
 			++i;
@@ -1479,8 +1480,6 @@ public: // move
 	    : _v(std::move(x._v)),
 	      _num_edges(x._num_edges)
 	{
-
-//		assert(nonvoid)
 		// assert(num_vertices()==x.num_vertices()); no. _v has gone ...
 		for(auto i = begin(); i!=end(); ++i){
 			assert(is_valid(iter::deref(i)));
@@ -1498,6 +1497,9 @@ public: // move
 			EL a;
 			prealloc(a, 2*m);
 		}
+	}
+	~graph(){
+		trace2("destroying graph", _num_edges, _v.size());
 	}
 public: // Required by Iterator Constructible Graph
 	template <class EdgeIterator>
@@ -1788,7 +1790,7 @@ public:
 	}
 	void contract(vertex_type& vd, vertex_type into);
 	vertex_index_type degree(const_vertex_type who) const
-	{ itested();
+	{
 		return storage::degree(who, _v);
 	}
 	vertex_index_type out_degree(const_vertex_type who) const
@@ -1827,7 +1829,7 @@ public:
 //			_v.erase(*v);
 	}
 	bool is_valid(const_vertex_type v) const
-	{ itested();
+	{
 		return bits::vertex_helper<VDP>::is_valid(v,_v);
 	}
 	void remove_vertex(iterator v);
@@ -1926,7 +1928,7 @@ struct graph_cfg_default {
 VCTtemplate
 typename graph<SGARGS>::edges_size_type
 graph<SGARGS>::num_edges() const
-{ itested();
+{
 	return CFG<graph<SGARGS> >::num_edges(*this);
 }
 /*--------------------------------------------------------------------------*/
@@ -1972,7 +1974,7 @@ graph<SGARGS>::graph(EdgeIterator first, EdgeIterator last,
 
 #ifndef NDEBUG
 	unsigned c = 0;
-	for(auto& i : _v){ itested();
+	for(auto& i : _v){
 		c += i.size();
 	}
 	assert(is_directed() || 2*num_edges() == c);
@@ -1998,14 +2000,14 @@ typename graph<SGARGS>::EL&
 VCTtemplate
 typename graph<SGARGS>::EL&
 	graph<SGARGS>::out_edges(vertex_type& v)
-{ itested();
+{
 	return storage::out_edges(v, _v);
 }
 /*--------------------------------------------------------------------------*/
 VCTtemplate
 typename graph<SGARGS>::EL& // const?!
 	graph<SGARGS>::out_edges(vertex_type& v) const
-{ itested();
+{
 	assert(is_valid(v));
 	auto&_V = const_cast<graph<SGARGS>*>(this)->_v;
 	return storage::out_edges(v, _V);
@@ -2099,7 +2101,7 @@ graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
 		iterator v = begin();
 		iterator e = end();
 		_num_edges = x._num_edges;
-		for(; v!=e ; ++v){ untested();
+		for(; v!=e ; ++v){ itested();
 			vertex_type vd = iter::deref(v);
 			other_const_vertex_type sd = oG::iter::deref(s);
 			EL& E = out_edges(vd); // ?!
@@ -2166,11 +2168,11 @@ void copy_helper<oG, G, X, Y,
 	tgt._num_edges = 0;
 
 	// not necessary for vector...
-	for(auto v=tgt.begin(); v!=tgt.end(); ++v){ itested();
+	for(auto v=tgt.begin(); v!=tgt.end(); ++v){
+		assert(i<nv);
 		// for(auto& v : vertices())
 		map[i] = G::iter::deref(v);
 		++i;
-		assert(i<=nv);
 	}
 //	trace2("resize v", i, nv);
 	assert(i==nv);
@@ -2178,7 +2180,7 @@ void copy_helper<oG, G, X, Y,
 	oG* GG = const_cast<oG*>(&g);
 	i=0;
 	// FIXME: use const_iter
-	for(auto v=GG->cbegin(); v!=GG->cend(); ++v){ itested();
+	for(auto v=GG->cbegin(); v!=GG->cend(); ++v){
 		typename oG::const_vertex_type ov=oG::iter::deref(v);
 		reverse_map[ov] = i;
 		++i;
@@ -2192,9 +2194,9 @@ void copy_helper<oG, G, X, Y,
 
 	assert(tgt._num_edges == 0);
 	auto num_og_edges=0;
-	for(typename oG::iterator V=GG->begin(); V!=GG->end(); ++V){ itested();
+	for(typename oG::iterator V=GG->begin(); V!=GG->end(); ++V){
 		typename oG::vertex_type v=oG::iter::deref(V);
-		for(typename oG::vertex_type w : g.out_edges(v)){ itested();
+		for(typename oG::vertex_type w : g.out_edges(v)){
 			assert(w!=v);
 			assert(reverse_map[v]<tgt.num_vertices());
 			assert(reverse_map[w]<tgt.num_vertices());
@@ -2516,7 +2518,7 @@ inline void storage<GALA_DEFAULT_SET, GALA_DEFAULT_VECTOR, vertex_ptr_tag>::add_
 /*--------------------------------------------------------------------------*/
 template<class G>
 typename G::edges_size_type graph_cfg_default<G>::num_edges(G const& g)
-{ itested();
+{
 	return g._num_edges;
 }
 template<class G>

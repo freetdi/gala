@@ -520,7 +520,7 @@ size_t degree(gala::graph<SGARGS> const& g)
 
 VCTtemplate
 void check(gala::graph<SGARGS> const& g)
-{itested();
+{
 	typedef gala::graph<SGARGS> G;
 	typedef typename boost::graph_traits<G>::vertex_descriptor vertex_descriptor;
 	using adjacency_iterator = typename boost::graph_traits<G>::adjacency_iterator;
@@ -564,9 +564,9 @@ void check(gala::graph<SGARGS> const& g)
 	adjacency_iterator aI, aE;
 
 	std::set<vertex_descriptor> X;
-	for(boost::tie(i,e) = boost::vertices(g); i!=e; ++i){ itested();
+	for(boost::tie(i,e) = boost::vertices(g); i!=e; ++i){
 		X.clear();
-		for(boost::tie(aI,aE) = boost::adjacent_vertices(*i,g); aI!=aE; ++aI){ itested();
+		for(boost::tie(aI,aE) = boost::adjacent_vertices(*i,g); aI!=aE; ++aI){
 			assert(*aI!=*i);
 			X.insert(*aI);
 

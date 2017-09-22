@@ -136,10 +136,10 @@ inline bool contains(C const& c, typename C::value_type const& v)
 }
 template <class X>
 inline bool contains(std::vector<X> const& c, X const& v)
-{ itested();
+{
 	typedef typename std::vector<X>::const_iterator it;
 
-	for(it i=c.begin(); i!=c.end(); ++i){ itested();
+	for(it i=c.begin(); i!=c.end(); ++i){
 		if(v == *i) return true;
 	}
 	return false;
