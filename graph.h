@@ -1917,12 +1917,12 @@ public: // experimental...?
 template<class G>
 struct graph_cfg_default {
 	typedef default_DEGS<G> degs_type; // BUG
-	typedef typename G::edges_size_type edges_size_type;
+//	typedef typename G::edges_size_type edges_size_type;
 //	typedef size_t edges_size_type; // uuh
-	static edges_size_type num_edges(G const& g);
+	static size_t num_edges(G const& g); // BUG
 
 	// private&friends...
-	static void set_num_edges(edges_size_type, G& g);
+	static void set_num_edges(size_t, G& g);
 };
 /*--------------------------------------------------------------------------*/
 VCTtemplate
@@ -2040,7 +2040,8 @@ graph<SGARGS>& graph<SGARGS>::operator=(graph<ECT2,VCT2,VDP2,CFG2> const& x)
 		 Gsrc::is_nn_v, is_nn_v,
 	    Gsrc::is_ordered_v, is_ordered() >::assign(x, *this);
 
-	constexpr bool sortneeded=!x.is_ordered() && is_ordered();
+	constexpr bool xio=Gsrc::is_ordered();
+	constexpr bool sortneeded=!xio && is_ordered();
 	trace1("op=", sortneeded);
 	bits::order_helper<sortneeded, ECT>::do_it(_v);
 	return *this;
@@ -2063,7 +2064,8 @@ graph<SGARGS>& graph<SGARGS>::operator=(graph<ECT2,VCT2,VDP2,CFG2> const&& x)
 
 	detail::move_helper<Gsrc, graph>::move(std::move(x), *this);
 
-	constexpr bool needed=!x.is_ordered() && is_ordered();
+	constexpr bool xio=Gsrc::is_ordered();
+	constexpr bool needed=!xio && is_ordered();
 	bits::order_helper<needed, ECT>::do_it(_v);
 	return *this;
 }
@@ -2517,15 +2519,19 @@ inline void storage<GALA_DEFAULT_SET, GALA_DEFAULT_VECTOR, vertex_ptr_tag>::add_
 } // bits
 /*--------------------------------------------------------------------------*/
 template<class G>
-typename G::edges_size_type graph_cfg_default<G>::num_edges(G const& g)
+size_t graph_cfg_default<G>::num_edges(G const& g)
 {
+	incomplete(); // obsolete.
 	return g._num_edges;
 }
+#if 0
 template<class G>
 void graph_cfg_default<G>::set_num_edges(typename G::edges_size_type x, G& g)
 { untested();
+	incomplete(); // obsolete
 	g._num_edges = x;
 }
+#endif
 /*--------------------------------------------------------------------------*/
 namespace detail{
 /*--------------------------------------------------------------------------*/
@@ -2548,7 +2554,7 @@ struct move_helper<SRC, TGT,
 			tgt.hacksort();
 		}
 	}
-	static void symmetrify(TGT& g){ untested();
+	static void symmetrify(TGT& /*g*/){ untested();
 		incomplete();
 	}
 }; // move_helper
@@ -2572,7 +2578,7 @@ struct move_helper<SRC, TGT,
 			tgt.hacksort();
 		}
 	}
-	static void symmetrify(TGT& x){ untested();
+	static void symmetrify(TGT& /*x*/){ untested();
 		incomplete();
 	}
 };
