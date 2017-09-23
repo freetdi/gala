@@ -40,7 +40,8 @@ int main(int , char* [])
 	trace1("G", (G.num_edges()));
 
 	assert(G.num_edges()==5);
-	assert(G.directed_view().num_edges()==10);
-	assert(G.directed_view().directed_view().num_edges()==10);
+	incomplete(); // do we need views at all?
+//	assert(G.directed_view().num_edges()==10);
+//	assert(G.directed_view().directed_view().num_edges()==10);
 }
 

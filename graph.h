@@ -1252,7 +1252,7 @@ public: // types
 	
 	using vs = bits::vertex_selector<ECT,VDP>;
 
-public: // BUG. private & helper friends..
+private: // BUG. private & helper friends..
 	typedef CFG<this_type> myCFG;
 	static constexpr bool is_directed_v=detail::is_directed_select<myCFG>::value;
 	static constexpr bool is_symmetric_v=!is_directed_v || detail::is_symmetric_select<myCFG>::value;
@@ -1875,10 +1875,10 @@ public: // experimental...?
 
 		typedef graph base_type;
 //		typedef typename GG::edges_size_type edges_size_type;
+#if 0
 		typedef size_t edges_size_type;
 		static edges_size_type num_edges(GG const &g)
 		{
-			incomplete(); // staged for removal.
 			return 2*g._num_edges; // BUG
 			return 2*reinterpret_cast<base_type const&>(g).num_edges();
 		}
@@ -1889,6 +1889,7 @@ public: // experimental...?
 			g._num_edges = e/2; // BUG/incomplete
 //			reinterpret_cast<base_type const&>(g).set_num_edges();
 		}
+#endif
 	};
 
 	template<class self, bool dir>
@@ -1902,16 +1903,20 @@ public: // experimental...?
 	typedef typename directed_self<this_type, is_directed_v>::type directed_self_type;
 	typedef typename reconfig<my_directed_config>::type directed_type;
 
-	directed_self_type const& directed_view() const
-	{
+private: // not yet
+	directed_self_type const& directed_view() const {
 		return reinterpret_cast<directed_self_type const&>(*this);
 	}
-	// more dangerous...
-	// this is OBSOLETE, don't use.
 	directed_self_type& directed_view() {
-		incomplete(); // use move operators instead
 		return reinterpret_cast<directed_self_type&>(*this);
 	}
+public: // friends
+	template<class X, class Y, bool b0, bool b1, bool b2, bool b3, bool b4, bool b5>
+	friend struct detail::copy_helper; // ::assign(X const&, Y&);
+	template< template<class T, typename... > class ECT_,
+	          template<class T, typename... > class VCT_,
+	          typename VDP_, template<class G> class CFG_ >
+	friend class graph;
 }; // class graph
 /*--------------------------------------------------------------------------*/
 template<class G>
@@ -1919,17 +1924,17 @@ struct graph_cfg_default {
 	typedef default_DEGS<G> degs_type; // BUG
 //	typedef typename G::edges_size_type edges_size_type;
 //	typedef size_t edges_size_type; // uuh
-	static size_t num_edges(G const& g); // BUG
+	static size_t _num_edges(G const& g); // do not use.
 
 	// private&friends...
-	static void set_num_edges(size_t, G& g);
+//	static void set_num_edges(size_t, G& g);
 };
 /*--------------------------------------------------------------------------*/
 VCTtemplate
 typename graph<SGARGS>::edges_size_type
 graph<SGARGS>::num_edges() const
 {
-	return CFG<graph<SGARGS> >::num_edges(*this);
+	return _num_edges;
 }
 /*--------------------------------------------------------------------------*/
 VCTtemplate
@@ -1966,7 +1971,7 @@ graph<SGARGS>::graph(EdgeIterator first, EdgeIterator last,
                      vertices_size_type nv, edges_size_type ne)
     : graph(nv, ne)
 {
-	_num_edges=0;
+	_num_edges = 0;
 
 	assert(_v.size()==nv);
 	fill_in_edges(first, last, false);
@@ -2073,9 +2078,6 @@ graph<SGARGS>& graph<SGARGS>::operator=(graph<ECT2,VCT2,VDP2,CFG2> const&& x)
 VCTtemplate
 graph<SGARGS>& graph<SGARGS>::operator=(graph<SGARGS> const& x)
 {
-// 
-// detail::copy_helper<graph<SGARGS>, graph<SGARGS> >::merge(x, *this, IGNOREDUPS)
-// return *this
 	return assign_same(x);
 }
 /*--------------------------------------------------------------------------*/
@@ -2329,7 +2331,6 @@ struct copy_helper<Gsrc, Gtgt, true, false > {
 		assert( bool(tgt._num_edges) == bool(src._num_edges));
 		trace1("assigned directed to undirected", src.num_edges());
 		trace3("assigned directed to undirected", tgt._num_edges, tgt.num_edges(), tgt.directed_view().num_edges());
-		// HACK tgt.directed_view() is inconsistent...
 		tgt.directed_view().make_symmetric();
 		trace2("symmetrified", tgt._num_edges, tgt.num_edges());
 		tgt._num_edges /= 2;
@@ -2519,9 +2520,8 @@ inline void storage<GALA_DEFAULT_SET, GALA_DEFAULT_VECTOR, vertex_ptr_tag>::add_
 } // bits
 /*--------------------------------------------------------------------------*/
 template<class G>
-size_t graph_cfg_default<G>::num_edges(G const& g)
+size_t graph_cfg_default<G>::_num_edges(G const& g)
 {
-	incomplete(); // obsolete.
 	return g._num_edges;
 }
 #if 0
