@@ -1252,7 +1252,7 @@ public: // types
 	
 	using vs = bits::vertex_selector<ECT,VDP>;
 
-private: // BUG. private & helper friends..
+private: // internal flags
 	typedef CFG<this_type> myCFG;
 	static constexpr bool is_directed_v=detail::is_directed_select<myCFG>::value;
 	static constexpr bool is_symmetric_v=!is_directed_v || detail::is_symmetric_select<myCFG>::value;
@@ -1657,9 +1657,9 @@ public:
 		return _v.size();
 	}
 	//O(1)
-	edges_size_type num_edges() const;
-// private: ... friends
-	void set_num_edges(edges_size_type);
+	edges_size_type num_edges() const {
+		return _num_edges;
+	}
 public:
 	size_t num_edges_debug(){
 #ifdef DEBUG
@@ -1922,27 +1922,16 @@ public: // friends
 template<class G>
 struct graph_cfg_default {
 	typedef default_DEGS<G> degs_type; // BUG
-//	typedef typename G::edges_size_type edges_size_type;
-//	typedef size_t edges_size_type; // uuh
-	static size_t _num_edges(G const& g); // do not use.
-
-	// private&friends...
-//	static void set_num_edges(size_t, G& g);
 };
 /*--------------------------------------------------------------------------*/
-VCTtemplate
-typename graph<SGARGS>::edges_size_type
-graph<SGARGS>::num_edges() const
-{
-	return _num_edges;
-}
-/*--------------------------------------------------------------------------*/
+#if 0
 VCTtemplate
 void
 graph<SGARGS>::set_num_edges(typename graph<SGARGS>::edges_size_type e)
 { untested();
 	return CFG<graph<SGARGS> >::set_num_edges(e, *this);
 }
+#endif
 /*--------------------------------------------------------------------------*/
 // construct from iterator...
 VCTtemplate
@@ -2367,7 +2356,6 @@ struct copy_helper<Gsrc, Gtgt, true, true, true, true > {
 			new_edges += g.out_edges(v).size();
 		}
 		tgt._num_edges = new_edges; // HACK!
-		// tgt.set_num_edges(new_edges);
 	}
 }; // copy_helper
 
@@ -2519,11 +2507,6 @@ inline void storage<GALA_DEFAULT_SET, GALA_DEFAULT_VECTOR, vertex_ptr_tag>::add_
 /*--------------------------------------------------------------------------*/
 } // bits
 /*--------------------------------------------------------------------------*/
-template<class G>
-size_t graph_cfg_default<G>::_num_edges(G const& g)
-{
-	return g._num_edges;
-}
 #if 0
 template<class G>
 void graph_cfg_default<G>::set_num_edges(typename G::edges_size_type x, G& g)
