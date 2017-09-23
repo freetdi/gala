@@ -27,7 +27,10 @@
 #include <boost/iterator/counting_iterator.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 
-#include <tdlib/graph_traits.hpp> // hmmm
+#ifdef PACKAGE_NAME
+// HACK (fix later)
+#include <tdlib/graph_traits.hpp>
+#endif
 
 // almost sure...
 #define GETPOS(a,b) boost::get(boost::vertex_index,b,a)
@@ -35,6 +38,8 @@
 // HACK HACK HACK
 #ifndef TD_DEFS_NETWORK_FLOW
 #define TD_DEFS_NETWORK_FLOW
+
+#ifdef TD_GRAPH_TRAITS_HPP
 namespace treedec{
 
 struct Vertex_NF{
@@ -49,6 +54,7 @@ struct Edge_NF{
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Vertex_NF, Edge_NF> digraph_t;
 
 }
+#endif
 #endif
 
 #if 0
@@ -478,6 +484,7 @@ namespace boost {
 	{
 		return g.out_edges(v);
 	}
+#ifdef TD_GRAPH_TRAITS_HPP
 	template<class G>
 	bool get(bool treedec::Edge_NF::*, const immvecgraph<G>& g,
 	    typename immvecgraph<G>::edge_descriptor e)
@@ -513,6 +520,7 @@ namespace boost {
 	{ untested();
 		return g.predecessor(v);
 	}
+#endif
 	template<class G>
 	typename immvecgraph<G>::vertex_descriptor vertex(
 			size_t t, immvecgraph<G> const&)
@@ -641,6 +649,7 @@ template<class G>
 #endif
 	}
 
+#ifdef TD_GRAPH_TRAITS_HPP
 namespace treedec {
 
 #if 0
@@ -801,6 +810,7 @@ inline immvecgraph<G_t> const& immutable_clone(
 
 } // draft
 } // treedec
+#endif
 
 #undef GETPOS
 

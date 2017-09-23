@@ -53,6 +53,7 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, V
 #include <gala/digraph.h>
 #include <gala/immutable.h>
 
+#ifdef TD_GRAPH_TRAITS_HPP
 namespace treedec{
 
 // FIXME: get rid of these traits.
@@ -88,3 +89,4 @@ std::pair<typename boost::graph_traits<typename ssg16i_traits::directed_overlay>
 }
 
 } // treedec
+#endif
