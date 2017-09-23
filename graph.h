@@ -1909,7 +1909,7 @@ public: // experimental...?
 	// more dangerous...
 	// this is OBSOLETE, don't use.
 	directed_self_type& directed_view() {
-		unreachable();
+		incomplete(); // use move operators instead
 		return reinterpret_cast<directed_self_type&>(*this);
 	}
 }; // class graph

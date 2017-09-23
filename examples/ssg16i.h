@@ -21,7 +21,7 @@
 #include <iostream>
 #include <iomanip>
 #include <map>
-#include <tdlib/graph_traits.hpp>
+// #include <tdlib/graph_traits.hpp>
 #include <boost/functional/hash.hpp> // BUG?!
 #include <boost/graph/adjacency_matrix.hpp>
 #include <gala/boost.h>
