@@ -1631,6 +1631,7 @@ private:
 	//O(log d), where d is the degree of a
 	void remove_edge_single(vertex_type a, vertex_type b) { untested();
 		assert(a!=b);
+		assert(_num_edges);
 		storage::remove_edge_single(a, b, _v);
 		--_num_edges;
 	}
@@ -1811,6 +1812,11 @@ public:
 		}
 	}
 public:
+	void clear_out_edges(vertex_type v)
+	{ untested();
+		_num_edges -= degree(v);
+		storage::clear_vertex(v, _v);
+	}
 	// O(n + deg(v)*log(D)), where D is the maximum of the degrees of the
 	// neighbours of v
 	void clear_vertex(vertex_type v)
@@ -1822,6 +1828,10 @@ public:
 			++c;
 		}
 		assert(c==out_edges(v).size());
+		if(is_directed()){ untested();
+			_num_edges -= degree(v);
+		}else{
+		}
 		storage::clear_vertex(v, _v);
 	}
 	void remove_vertex(vertex_type)
