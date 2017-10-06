@@ -761,6 +761,11 @@ namespace boost {
 			typedef vertex_index_type value_type;
 			typedef vertex_index_type reference;
 			typedef vertex_descriptor key_type;
+			gala_graph_index_map(gala::graph<SGARGS>const & g, boost::vertex_index_t)
+			    : _g(g)
+			{
+			}
+			// bug?
 			gala_graph_index_map(gala::graph<SGARGS>const & g)
 			    : _g(g)
 			{

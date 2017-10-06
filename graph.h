@@ -121,10 +121,17 @@ struct container_helper {
 		return c.erase(e);
 	}
 };
+// TODO:: exploit forced ordering?
 template<class S>
 struct container_helper<S, typename sfinae::is_vector<S>::type > {
 	template<class C, class E>
-	static bool exists(C&, E) { incomplete();
+	static bool exists(C const& c, E e) {
+		for(auto i : c){ untested();
+			if(e==i){ untested();
+				return true;
+			}else{ untested();
+			}
+		}
 		return false;
 	}
 	template<class C, class E>
@@ -1190,13 +1197,14 @@ template<class Gsrc, class Gtgt, class X=void>
 struct move_helper{
 	static void move(Gsrc const&& s, Gtgt& t){
 
-		t._v=std::move(s._v);
+		t._v = std::move(s._v);
 
 		if(!s.is_symmetric() && t.is_symmetric()){
-			if(t.is_simple){
+			if(t.is_simple()){ untested();
 				t._num_edges=0;
 				symmetrify(t);
-			}else{ incomplete();
+			}else{ untested();
+				incomplete();
 			}
 		}else{untested();
 			t._num_edges = s._num_edges;
@@ -1823,6 +1831,7 @@ public:
 	{ untested();
 		assert(is_valid(v));
 		unsigned c = 0;
+		// this is not entirely correct for directed graphs
 		for(auto& nIt : out_edges(v)){ untested();
 			remove_edge_single(nIt, v);
 			++c;

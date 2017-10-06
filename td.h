@@ -23,15 +23,17 @@
 #include "boost.h"
 #include "sfinae.h"
 #include <tdlib/graph_traits.hpp>
+#include <tdlib/graph_impl.hpp>
 //#include <tdlib/treedec_traits.hpp>
 #include <boost/graph/iteration_macros.hpp>
 //hack
-#include <stx/btree_set.h>
+#include <stx/btree_set.h> // BUG?
 #include <unordered_set>
 
 #include "sethack.h"
 //#include "parallel.h"
 // #include "degs.h"
+#include <tdlib/container.hpp>
 
 #define q_in_cb
 
@@ -226,35 +228,8 @@ typedef typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor ve
 			g.out_edges(vd).clear();
 		}
 	}
-}; // sghelp_hack
+}; // sghelp_hack base
 
-template<galaPARMS, class CB>
-struct sghelp_hack< ECT, VCT, VDP, CFG, CB,
-	typename gala::sfinae::is_vec_tpl<ECT>::type > { //
-static size_t mcah(
-		typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor,
-		gala::graph<SGARGS>&,
-// 		typename treedec::graph_traits< gala::graph<SGARGS> >::bag_type& bag,
-		 typename treedec::treedec_traits<
-		   typename treedec::treedec_chooser<  gala::graph<SGARGS>  >::type>::bag_type&,
-		CB*)
-{ untested();
-	incomplete();
-	assert(0);
-	// BOOST_STATIC_ASSERT(0);
-	return 0;
-}
-typedef typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor vertex_descriptor;
-	static void ce(vertex_descriptor vd, vertex_descriptor into,
-	                   gala::graph<SGARGS> &g,
-							 bool erase=true,
-	                   treedec::vertex_callback<typename gala::graph<SGARGS>::vertex_type >* cb=NULL)
-{ untested();
-	incomplete();
-	assert(0);
-	// BOOST_STATIC_ASSERT(0);
-}
-};
 
 } //treedec
 
@@ -381,21 +356,23 @@ namespace treedec{
 // FIXME: always hijack like this, if
 // :outedge_set<gala::graph<SGARGS> >::type is treedec_chooser::bag_type?
 	VCTtemplate
-	typename outedge_set<gala::graph<SGARGS> >::type detach_neighborhood(
+	void detach_neighborhood(
 			  typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor& c,
 			  gala::graph<SGARGS> & g,
-			  typename outedge_set<gala::graph<SGARGS> >::type* N)
+			  typename outedge_set<gala::graph<SGARGS> >::type* bag)
 	{ untested();
-		assert(N==nullptr); // for now..
-		incomplete(); //	unreachable...
-		 typename treedec::outedge_set<gala::graph<SGARGS> >::type bag;
+		//assert(N==nullptr); // for now..
+		//incomplete(); //	unreachable...
 		 typename boost::graph_traits<gala::graph<SGARGS> >::adjacency_iterator nIt1, nIt2, nEnd;
 		 // inefficient.
 		 for(boost::tie(nIt1, nEnd) = boost::adjacent_vertices(c, g);
-					nIt1 != nEnd; nIt1++){ // untested();
-			  bag.insert(treedec::get_vd(g, *nIt1));
+					nIt1 != nEnd; nIt1++){ untested();
+			 if(bag){
+				 treedec::insert(*bag, treedec::get_vd(g, *nIt1));
+			 }else{
+			 }
 		 }
-		 return bag;
+		 trace1("detached", bag->size());
 	}
 
 	template<galaPARMS>
@@ -437,7 +414,10 @@ namespace treedec{
 	struct treedec_chooser< gala::graph<SGARGS> >{
 		typedef vertex_descriptor< gala::graph<SGARGS> > value_type;
 		typedef typename outedge_set< gala::graph<SGARGS> >::type bag_type;
-		typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, bag_type> type;
+		//typedef boost::adjacency_list<boost::setS, boost::vecS,
+		//boost::undirectedS, bag_type> type;
+		typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS,
+				 boost::property<treedec::bag_t, bag_type> > type;
 	};
 
 #if 0
@@ -687,6 +667,43 @@ struct graph_traits<gala::graph<SGARGS> >{
 	//                                 for now. ^^^^^
 	typedef typename gala::graph<SGARGS>::directed_type directed_type;
 };
+
+// TODO: specialize for directed vs undirected
+template<galaPARMS, class CB>
+struct sghelp_hack< ECT, VCT, VDP, CFG, CB,
+	typename gala::sfinae::is_vec_tpl<ECT>::type > { //
+static size_t mcah(
+		typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor c,
+		gala::graph<SGARGS>& g,
+// 		typename treedec::graph_traits< gala::graph<SGARGS> >::bag_type& bag,
+		 typename treedec::treedec_traits<
+		   typename treedec::treedec_chooser<  gala::graph<SGARGS>  >::type>::bag_type& bag,
+		CB* cb)
+{ untested();
+	if(boost::is_directed(g)){ untested();
+		incomplete();
+	}else{ untested();
+	}
+	detach_neighborhood(c, g, &bag);
+	trace1("detached2", bag.size());
+	treedec::impl::make_clique(bag.begin(), bag.end(), g, cb);
+
+	return 0; // is this still needed?
+} //mcah
+
+typedef typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor vertex_descriptor;
+	static void ce(vertex_descriptor vd, vertex_descriptor into,
+	                   gala::graph<SGARGS> &g,
+							 bool erase=true,
+	                   treedec::vertex_callback<typename gala::graph<SGARGS>::vertex_type >* cb=NULL)
+{ untested();
+	incomplete();
+	assert(0);
+	// BOOST_STATIC_ASSERT(0);
+}
+
+}; // sghelp_hack for vec ECT
+
 } // treedec
 
 #endif
