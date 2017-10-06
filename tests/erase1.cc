@@ -6,6 +6,7 @@
 #include "../boost_copy.h"
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/copy.hpp>
+#include <boost/graph/graph_utility.hpp>
 
 template<class G>
 struct dvv_config : public gala::graph_cfg_default<G> {
@@ -58,7 +59,10 @@ int main(int , char* [])
 
 	std::cout << "undirected...\n";
 	sg_dvu GG;
+	assert(!GG.is_multiedge());
 	assert(boost::num_edges(GD)==4);
+	boost::print_graph(GD);
 	boost::copy_graph(GD, GG);
-	assert(boost::num_edges(GG)==4);
+	boost::print_graph(GG);
+	assert(boost::num_edges(GG)==3);
 }
