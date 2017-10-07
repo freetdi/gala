@@ -373,6 +373,7 @@ namespace treedec{
 			 }
 		 }
 		 trace1("detached", bag->size());
+		 g.clear_vertex(c);
 	}
 
 	template<galaPARMS>
@@ -383,7 +384,9 @@ namespace treedec{
 			typename treedec::graph_callback<gala::graph<SGARGS> >* cb=NULL)
 	{ untested();
 		typedef typename treedec::graph_callback<gala::graph<SGARGS> > CB;
+		auto d=boost::degree(c, g); (void) d;
 		return treedec::sghelp_hack<ECT, VCT, VDP, CFG, CB>::mcah(c, g, bag, cb);
+		assert(bag.size()==d);
 	}
 
 	// theres no Vertex. use the position instead
