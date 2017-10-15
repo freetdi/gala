@@ -59,4 +59,5 @@ TESTS
 $ make check
 
 will compile and run some tests. tests are not phony (yet). make clean or use
-make -B to recheck.
+make -B to recheck. test status is the return code. anything printed is for
+orientation only.
