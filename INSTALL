@@ -1,3 +1,7 @@
-don't install (yet).
+INSTALLATION
 
-pass -I<path_to_parentdir>/gala to your cpp
+$ make install
+
+default prefix is /usr/local, to override
+
+$ make install prefix=/some/other/prefix

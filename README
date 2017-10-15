@@ -53,3 +53,10 @@ holds variables of type static constexpr bool, such as
 
 these may affect the complexity of add_edge, copy and move (assignment)
 operations, depending on the chosen containers.
+
+TESTS
+
+$ make check
+
+will compile and run some tests. tests are not phony (yet). make clean or use
+make -B to recheck.

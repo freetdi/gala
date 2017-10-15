@@ -27,9 +27,9 @@ check:
 	$(MAKE) -C tests
 
 install:
-	-$(INSTALL) -d ${includedir}
-	-$(INSTALL) -d ${pkgincludedir}
-	$(INSTALL) $(HEADERS) ${pkgincludedir}
+	-$(INSTALL) -d ${DESTDIR}${includedir}
+	-$(INSTALL) -d ${DESTDIR}${pkgincludedir}
+	$(INSTALL) $(HEADERS) ${DESTDIR}${pkgincludedir}
 
 Makefile.settings:
 	@echo run configure first && false
