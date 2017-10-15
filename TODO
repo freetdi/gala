@@ -1,6 +1,6 @@
 - all types should end with _type
 - assigning undirected graph to directed creates symmetric graph
-	this is an old HACK... (fixed?)
+	this is an old HACK... is this fixed?
 - force_simple is on by default. should be off.
 
   to get a symmetric directed graph from an undirected, you should do
@@ -9,3 +9,5 @@
   D = U.directed_view(); // <= will assign both directions, naturally
   (this is untested)
 - some assignments are inefficient, preallocation is incomplete
+- somethings wrong/incomplete with clear_vertex in directed case
+- what about oriented (directed) graphs?

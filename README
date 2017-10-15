@@ -48,5 +48,8 @@ holds variables of type static constexpr bool, such as
 
   is_loopless     not yet...
 
+  is_oriented     not yet... only for directed. if theres an edge (a,b), then
+                  there is no edge (b,a)
+
 these may affect the complexity of add_edge, copy and move (assignment)
 operations, depending on the chosen containers.

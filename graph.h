@@ -1233,8 +1233,8 @@ struct move_helper{
 
 		if(g.is_directed()){
 		}else{
-			trace1("correcting edgecount", g._num_edges);
 			g._num_edges/=2;
+			trace1("correcting edgecount", g._num_edges);
 		}
 	}
 };

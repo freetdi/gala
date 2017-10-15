@@ -4,6 +4,7 @@ CXXFLAGS=-std=c++11 -O0 -g -Wall -Wextra $(LOCAL_CXXFLAGS)
 all: check
 
 TESTS = \
+	bidir \
 	bmd \
 	cbs \
 	cbsg \
