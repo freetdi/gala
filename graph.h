@@ -1250,6 +1250,7 @@ class graph{ //
 	                 && !std::numeric_limits<VDP>::is_signed )
 						  || std::is_same<VDP, vertex_ptr_tag>::value );
 public: // types
+	typedef void vertex_bundled;
 	using this_type = graph<SGARGS>;
 
 	template<class T>

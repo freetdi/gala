@@ -999,7 +999,6 @@ void gala::graph<SGARGS>::assign(H const& g)
 
 	// not necessary for vector...
 //	vertex_iterator v=begin();
-	// for(unsigned i=0; i<nv; ++i){ //  v=begin(); v!=end(); ++v)
 	for(iterator v=begin(); v!=end(); ++v) { untested();
 		// for(auto& v : vertices())
 		map[i] = G::iter::deref(v);
@@ -1047,7 +1046,7 @@ void gala::graph<SGARGS>::assign(H const& g)
 		}
 	}
 #endif
-}
+} // graph::assign
 
 
 #endif
