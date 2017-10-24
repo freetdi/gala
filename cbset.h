@@ -376,11 +376,11 @@ private:
       }else{ itested();
         assert(_i/CHUNKBITS>=_s->offset());
         _c = _s->_d[_i/CHUNKBITS-_s->offset()];
-	if(_c){ untested();
+	if(_c){
 	  unsigned ctz;
 	  if(CHUNKBITS>32){ untested();
 	    ctz = __builtin_ctzl(_c);
-	  }else{ untested();
+	  }else{
 	    ctz = __builtin_ctz(_c);
 	  }
 	  _i += ctz;
@@ -1274,7 +1274,7 @@ inline bool BSET_DYNAMIC<BSDa>::contains(value_type i) const
     w-=offset();
   }
 
-  if(w>=howmany()){ untested();
+  if(w>=howmany()){
     return false;
   }else{
   }

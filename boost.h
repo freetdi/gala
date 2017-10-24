@@ -30,8 +30,16 @@
 
 
 namespace boost { //
+
+	template<bool directed>
 	struct gala_graph_traversal_category :
-		public virtual bidirectional_graph_tag, // ?!
+		public virtual bidirectional_graph_tag,
+		public virtual adjacency_graph_tag,
+		public virtual edge_list_graph_tag,
+		public virtual vertex_list_graph_tag { };
+
+	template<>
+	struct gala_graph_traversal_category<true> :
 		public virtual adjacency_graph_tag,
 		public virtual edge_list_graph_tag,
 		public virtual vertex_list_graph_tag { };
@@ -207,7 +215,7 @@ namespace boost { //
 		typedef typename gala::graph<SGARGS>::edge_type edge_descriptor;
 
 		typedef typename detail::galaboost_dir<G::is_directed()>::type directed_category;
-		typedef gala_graph_traversal_category traversal_category;
+		typedef gala_graph_traversal_category<G::is_directed()> traversal_category;
 
 		typedef typename detail::galaboost_par<G::is_multiedge()>::type edge_parallel_category;
 
