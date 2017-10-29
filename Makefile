@@ -26,6 +26,10 @@ all:
 check:
 	$(MAKE) -C tests
 
+clean:
+	rm *~
+	$(MAKE) -C tests clean
+
 install:
 	-$(INSTALL) -d ${DESTDIR}${includedir}
 	-$(INSTALL) -d ${DESTDIR}${pkgincludedir}

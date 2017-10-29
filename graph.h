@@ -27,7 +27,9 @@
 #include <vector>
 #include <map>
 #include <forward_list>
+#ifdef HAVE_STX_BTREE_SET_H
 #include <stx/btree_set.h>
+#endif
 #include <type_traits>
 		
 #include <boost/serialization/static_warning.hpp>
@@ -1206,7 +1208,7 @@ struct move_helper{
 			}else{ untested();
 				incomplete();
 			}
-		}else{untested();
+		}else{
 			t._num_edges = s._num_edges;
 		}
 	}
