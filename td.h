@@ -27,7 +27,6 @@
 //#include <tdlib/treedec_traits.hpp>
 #include <boost/graph/iteration_macros.hpp>
 //hack
-#include <stx/btree_set.h> // BUG?
 #include <unordered_set>
 
 #include "sethack.h"
