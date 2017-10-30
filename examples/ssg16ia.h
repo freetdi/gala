@@ -3,7 +3,6 @@
 #include <iomanip>
 #include <map>
 // #include <boost/graph/adjacency_list.hpp>
-#include <stx/btree_set.h>
 #include <gala/td.h>
 #include "alloc.hpp"
 #include <gala/digraph.h>
