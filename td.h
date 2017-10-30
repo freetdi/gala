@@ -24,14 +24,11 @@
 #include "sfinae.h"
 #include <tdlib/graph_traits.hpp>
 #include <tdlib/graph_impl.hpp>
-//#include <tdlib/treedec_traits.hpp>
 #include <boost/graph/iteration_macros.hpp>
 //hack
 #include <unordered_set>
 
 #include "sethack.h"
-//#include "parallel.h"
-// #include "degs.h"
 #include <tdlib/container.hpp>
 
 #define q_in_cb
@@ -571,22 +568,9 @@ void check(gala::graph<SGARGS> const& g)
 	}
 }
 
-	VCTtemplate
-	struct deg_chooser<gala::graph<SGARGS> >{
-		typedef gala::graph<SGARGS> G;
-		typedef CFG<G> cfg;
-		typedef typename cfg::degs_type type;
-		typedef typename G::vertex_type vd_type;
-
-#if __cplusplus < 201103L
-		typedef std::set<vd_type> bag_type;
-#else
-		typedef std::unordered_set<vd_type> bag_type;
-#endif
-	};
 }
 
-namespace treedec{ //
+namespace treedec{
 
 VCTtemplate
 inline size_t count_missing_edges(

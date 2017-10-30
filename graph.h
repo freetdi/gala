@@ -36,7 +36,6 @@
 #include <boost/iterator/counting_iterator.hpp>
 #include <boost/tuple/tuple.hpp>
 
-#include "degs.h"
 #include "sfinae.h"
 #include <assert.h>
 #include <boost/mpl/bool.hpp>
@@ -1943,17 +1942,7 @@ public: // friends
 /*--------------------------------------------------------------------------*/
 template<class G>
 struct graph_cfg_default {
-	typedef default_DEGS<G> degs_type; // BUG
 };
-/*--------------------------------------------------------------------------*/
-#if 0
-VCTtemplate
-void
-graph<SGARGS>::set_num_edges(typename graph<SGARGS>::edges_size_type e)
-{ untested();
-	return CFG<graph<SGARGS> >::set_num_edges(e, *this);
-}
-#endif
 /*--------------------------------------------------------------------------*/
 // construct from iterator...
 VCTtemplate
