@@ -1518,8 +1518,8 @@ public: // Required by Iterator Constructible Graph
 
 	template <class EI1, class EI2>
 	void fill_in_edges(EI1 first, EI2 last, bool checkdups);
-	template <class RANGE>
-	void fill_in_edges(const RANGE& r)
+	template <class RANG_E>
+	void fill_in_edges(const RANG_E& r)
 	{ untested();
 		return fill_in_edges(r.first, r.second, true);
 	}
