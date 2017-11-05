@@ -951,7 +951,7 @@ namespace boost {
 	typename boost::graph_traits<gala::graph<SGARGS > >::vertices_size_type
 	get(vertex_index_t t, const gala::graph<SGARGS>& g,
 			typename boost::graph_traits< gala::graph<SGARGS> >::vertex_descriptor v)
-	{ itested();
+	{
 		return get(get(t, g), v);
 	}
 

@@ -288,7 +288,7 @@ struct vertex_helper{ //
 	}
 	template<class E, class S>
 	static void rebase(E& e, S const& s, intptr_t /*delta*/)
-	{ itested();
+	{
 		e=s;
 	}
 };
@@ -604,7 +604,7 @@ struct storage : storage_base<STARGS>{ //
 		return _v[v];
 	}
 	static const edge_container_type& out_edges(const_vertex_type& v, const container_type& _v)
-	{ itested();
+	{
 		return _v[v];
 	}
 	static void remove_edge_single(vertex_index_type v, vertex_index_type w,
@@ -807,7 +807,7 @@ struct edge_helper<STARGS, true, is_simple>
 		edge_insert(out_edges(*A, vc), *B);
 
 		bool added=false;
-		if(s == out_edges(*A, vc).size()){ itested();
+		if(s == out_edges(*A, vc).size()){
 		}else{
 			++num_edges; // BUG, multiplier?
 			added = true;
@@ -1543,7 +1543,7 @@ public: // move assign
 		trace2("move assign", is_directed(), x.is_directed());
 #ifndef NDEBUG
 		unsigned c=0;
-		for(auto& i : x._v){ itested();
+		for(auto& i : x._v){
 			c += i.size();
 		}
 		if(x.is_directed()){ untested();
@@ -1739,7 +1739,7 @@ public:
 		if(nn!=oa.end())
 		for(++nn; nn!=oa.end();ii=nn++) {
 			edge_type e(a, *ii);
-			if(p(e)){ itested();
+			if(p(e)){
 				--_num_edges;
 				*ii=oa.back();
 				oa.pop_back();
@@ -1989,7 +1989,7 @@ graph<SGARGS>::graph(EdgeIterator first, EdgeIterator last,
 VCTtemplate
 typename graph<SGARGS>::EL const&
     graph<SGARGS>::out_edges(const_vertex_type& v) const
-{ itested();
+{
 	assert(is_valid(v));
 	return storage::out_edges(v, _v);
 }
@@ -2095,7 +2095,7 @@ graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
 			is_nn_v, is_nn_v>::assign(x, *this);
 	}else if (num_vertices()!=x.num_vertices()){ incomplete();
 	// }else if( .. incomplete){ untested();
-	}else{ untested();
+	}else{
 // 		dead?. should not get here.
 		// why not assign_?
 		const_iterator b = begin();
@@ -2105,7 +2105,7 @@ graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
 		iterator v = begin();
 		iterator e = end();
 		_num_edges = x._num_edges;
-		for(; v!=e ; ++v){ itested();
+		for(; v!=e ; ++v){
 			vertex_type vd = iter::deref(v);
 			other_const_vertex_type sd = oG::iter::deref(s);
 			EL& E = out_edges(vd); // ?!
@@ -2166,7 +2166,7 @@ void copy_helper<oG, G, X, Y,
 	}
 
 	assert(tgt._v.size()==nv);
-	typename G::vertex_type map[nv];
+	std::vector<typename G::vertex_type> map(nv);
 	std::map<typename oG::const_vertex_type, size_t> reverse_map;
 	size_t i=0;
 	tgt._num_edges = 0;
@@ -2358,7 +2358,7 @@ struct copy_helper<Gsrc, Gtgt, true, true, true, true > {
 			}
 		}
 		typename Gtgt::edges_size_type new_edges=0;
-		for(typename Gsrc::iterator V=src.begin(); V!=src.end(); ++V){ itested();
+		for(typename Gsrc::iterator V=src.begin(); V!=src.end(); ++V){
 			typename Gsrc::vertex_type v=Gsrc::iter::deref(V);
 
 			detail::set_hlp<typename Gsrc::edge_container_type,
