@@ -20,6 +20,12 @@
 #ifndef GALA_TREEDEC_H
 #define GALA_TREEDEC_H
 
+#include "examples/ssg32i.h"
+#include "examples/ssg16i.h"
+#include "examples/ssg16ia.h"
+#include "examples/svbs.h"
+#include "examples/svbs_random.h"
+
 #include "boost.h"
 #include "sfinae.h"
 #include <tdlib/graph_traits.hpp>
