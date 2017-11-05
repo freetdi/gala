@@ -31,9 +31,10 @@ clean:
 	$(MAKE) -C tests clean
 
 install:
-	-$(INSTALL) -d ${DESTDIR}${includedir}
-	-$(INSTALL) -d ${DESTDIR}${pkgincludedir}
-	$(INSTALL) $(HEADERS) ${DESTDIR}${pkgincludedir}
+	-$(INSTALL) -d ${DESTDIR}/${includedir}
+	-$(INSTALL) -d ${DESTDIR}/${pkgincludedir}
+	$(INSTALL) $(HEADERS) ${DESTDIR}/${pkgincludedir}
+	$(MAKE) -C examples pkgincludedir="${pkgincludedir}" INSTALL="${INSTALL}" install
 
 Makefile.settings:
 	@echo run configure first && false
