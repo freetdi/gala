@@ -43,6 +43,12 @@ dep.mk: $(TESTS:%=%.cc)
 
 include dep.mk
 
+$(TESTS:%=%.o): %.o: %.cc
+	$(CXX) -c $(CXXFLAGS) ${CPPFLAGS} $< -o $@
+
+$(TESTS): %: %.o
+	$(CXX) $(LDFLAGS) ${LIBS} $< -o $@
+
 $(TESTS): | gala
 
 SHELL = /bin/bash
