@@ -33,12 +33,12 @@ TESTS = \
 
 LOGS = ${TESTS:%=%.log}
 
-CLEANFILES = ${TESTS} ${LOGS} gala
+CLEANFILES = ${TESTS} ${LOGS} gala ${TESTS:%=%.o}
 
 check: $(LOGS)
 
 dep: dep.mk
-dep.mk: $(TESTS:%=%.cc)
+dep.mk: $(TESTS:%=%.cc) | gala
 	$(CXX) -c -MM $(CXXFLAGS) ${CPPFLAGS} $+ > $@
 
 include dep.mk

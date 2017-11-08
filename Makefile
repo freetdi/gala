@@ -27,7 +27,7 @@ check:
 	$(MAKE) -C tests
 
 clean:
-	rm *~
+	rm -f *~
 	$(MAKE) -C tests clean
 
 install:
