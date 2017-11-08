@@ -48,7 +48,7 @@ holds variables of type static constexpr bool, such as
 
   is_loopless     not yet...
 
-  is_oriented     not yet... only for directed. if theres an edge (a,b), then
+  force_antisymm  not yet... only for directed. if theres an edge (a,b), then
                   there is no edge (b,a)
 
 these may affect the complexity of add_edge, copy and move (assignment)
@@ -58,6 +58,5 @@ TESTS
 
 $ make check
 
-will compile and run some tests. tests are not phony (yet). make clean or use
-make -B to recheck. test status is the return code. anything printed is for
-orientation only.
+will compile and run some tests. dependencys only work locally.  test status
+is the return code. anything printed is for orientation only.

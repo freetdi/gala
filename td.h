@@ -33,26 +33,6 @@
 
 #define q_in_cb
 
-#if 0 // now in tdlib/graph_traits.hpp
-// HACK HACK HACK
-#ifndef TD_DEFS_NETWORK_FLOW
-#define TD_DEFS_NETWORK_FLOW
-namespace treedec{
-
-struct Vertex_NF{
-    bool visited;
-    int predecessor;
-};
-
-struct Edge_NF{
-    bool path; //true if a path uses the edge
-};
-
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Vertex_NF, Edge_NF> digraph_t;
-}
-#endif
-#endif
-
 namespace treedec { // here??
 
 template<class CB, class G>
@@ -678,7 +658,7 @@ static size_t mcah(
 } //mcah
 
 typedef typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor vertex_descriptor;
-	static void ce(vertex_descriptor vd, vertex_descriptor into,
+	static void ce(vertex_descriptor, vertex_descriptor,
 	                   gala::graph<SGARGS> &g,
 							 bool erase=true,
 	                   treedec::vertex_callback<typename gala::graph<SGARGS>::vertex_type >* cb=NULL)

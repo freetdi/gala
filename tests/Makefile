@@ -37,6 +37,12 @@ CLEANFILES = ${TESTS} ${LOGS} gala
 
 check: $(LOGS)
 
+dep: dep.mk
+dep.mk: $(TESTS:%=%.cc)
+	$(CXX) -c -MM $(CXXFLAGS) ${CPPFLAGS} $+ > $@
+
+include dep.mk
+
 $(TESTS): | gala
 
 SHELL = /bin/bash

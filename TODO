@@ -10,4 +10,5 @@
   (this is untested)
 - some assignments are inefficient, preallocation is incomplete
 - somethings wrong/incomplete with clear_vertex in directed case
-- what about oriented (directed) graphs?
+- what about oriented/antisymmetric (directed) graphs?
+- properties? anybody?

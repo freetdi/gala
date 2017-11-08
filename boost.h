@@ -1001,7 +1001,7 @@ void gala::graph<SGARGS>::assign(H const& g)
 	}else{ untested();
 	}
 	_v.resize(nv);
-	vertex_type map[nv];
+	std::vector<vertex_type> map(nv);
 	size_t i=0;
 	_num_edges = 0;
 
