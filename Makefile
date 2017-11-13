@@ -36,5 +36,10 @@ install:
 	$(INSTALL) $(HEADERS) ${DESTDIR}/${pkgincludedir}
 	$(MAKE) -C examples pkgincludedir="${pkgincludedir}" INSTALL="${INSTALL}" install
 
+uninstall:
+	for i in $(HEADERS); do rm ${DESTDIR}/${pkgincludedir}/$$i; done
+	$(MAKE) -C examples pkgincludedir="${pkgincludedir}" INSTALL="${INSTALL}" uninstall
+	rmdir ${DESTDIR}/${pkgincludedir}
+
 Makefile.settings:
 	@echo run configure first && false
