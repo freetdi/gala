@@ -21,9 +21,9 @@
  *
  */
 
-#include <tdlib/graph_traits.hpp>
-#include <tdlib/degree_config.hpp>
-#include <tdlib/degree.hpp>
+#include <treedec/graph_traits.hpp>
+#include <treedec/degree_config.hpp>
+#include <treedec/degree.hpp>
 namespace gala_rand{
 
 template<class G>

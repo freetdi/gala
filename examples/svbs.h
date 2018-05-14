@@ -19,7 +19,8 @@
  *
  */
 
-#include <tdlib/degree_config.hpp>
+#include <treedec/degree_config.hpp>
+#include <stx/btree_set.h>
 
 template<class G>
 struct m_deg_config : public misc::detail::deg_config<G> {

@@ -29,7 +29,7 @@
 
 #ifdef PACKAGE_NAME
 // HACK (fix later)
-#include <tdlib/graph_traits.hpp>
+#include <treedec/graph_traits.hpp>
 #endif
 
 // almost sure...

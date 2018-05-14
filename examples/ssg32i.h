@@ -28,7 +28,7 @@
 typedef gala::graph<std::set, std::vector, uint32_t> ssg_32i;
 
 // HACK HACK HACK
-#include <tdlib/graph_traits.hpp>
+#include <treedec/graph_traits.hpp>
 #include <gala/td.h>
 #ifndef TD_DEFS_NETWORK_FLOW
 #define TD_DEFS_NETWORK_FLOW

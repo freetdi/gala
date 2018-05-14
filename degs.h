@@ -17,7 +17,7 @@
 //
 // prototype implementation for deg tracking.
 // TODO: much simpler prototype.
-// TODO: use from tdlib.
+// TODO: use from treedec.
 //
 #ifndef DEGS_H
 #define DEGS_H

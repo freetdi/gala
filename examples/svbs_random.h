@@ -23,13 +23,13 @@
 
 // uuh. the order matters...
 // (cleanup later)
-#include <tdlib/graph_traits.hpp>
-#include <tdlib/degree_config.hpp>
+#include <treedec/graph_traits.hpp>
+#include <treedec/degree_config.hpp>
 #include <gala/graph.h>
 #include <gala/td.h>
 #include <gala/immutable.h>
 #include <gala/digraph.h>
-#include <tdlib/graph.hpp>
+#include <treedec/graph.hpp>
 #include <gala/boost.h>
 
 namespace svbsr{ // HOWTO: anonymous ns here?!

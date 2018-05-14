@@ -22,14 +22,14 @@
 
 #include "boost.h"
 #include "sfinae.h"
-#include <tdlib/graph_traits.hpp>
-#include <tdlib/graph_impl.hpp>
+#include <treedec/graph_traits.hpp>
+#include <treedec/graph_impl.hpp>
 #include <boost/graph/iteration_macros.hpp>
 //hack
 #include <unordered_set>
 
 #include "sethack.h"
-#include <tdlib/container.hpp>
+#include <treedec/container.hpp>
 
 #define q_in_cb
 
