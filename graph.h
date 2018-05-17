@@ -128,9 +128,9 @@ struct container_helper<S, typename sfinae::is_vector<S>::type > {
 	template<class C, class E>
 	static bool exists(C const& c, E e) {
 		for(auto i : c){ untested();
-			if(e==i){ untested();
+			if(e==i){ itested();
 				return true;
-			}else{ untested();
+			}else{ itested();
 			}
 		}
 		return false;

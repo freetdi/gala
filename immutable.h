@@ -168,7 +168,7 @@ public: // types
 		}
 	public: // op
 		bool operator==(edge_iterator const& p) const
-		{ untested();
+		{ itested();
 			assert( _s!=p._s || p._t==_t);
 			return p._t==_t;
 		}
