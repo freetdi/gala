@@ -127,7 +127,7 @@ template<class S>
 struct container_helper<S, typename sfinae::is_vector<S>::type > {
 	template<class C, class E>
 	static bool exists(C const& c, E e) {
-		for(auto i : c){ untested();
+		for(auto i : c){ itested();
 			if(e==i){ itested();
 				return true;
 			}else{ itested();
@@ -1201,7 +1201,7 @@ struct move_helper{
 		t._v = std::move(s._v);
 
 		if(!s.is_symmetric() && t.is_symmetric()){
-			if(t.is_simple()){ untested();
+			if(t.is_simple()){ itested();
 				t._num_edges=0;
 				symmetrify(t);
 			}else{ untested();
