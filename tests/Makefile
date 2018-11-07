@@ -28,6 +28,7 @@ TESTS = \
 	rewire \
 	sfinae \
 	symm \
+	symm2 \
 	view \
 	vvg
 

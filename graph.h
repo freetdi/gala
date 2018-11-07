@@ -127,7 +127,7 @@ template<class S>
 struct container_helper<S, typename sfinae::is_vector<S>::type > {
 	template<class C, class E>
 	static bool exists(C const& c, E e) {
-		for(auto i : c){ itested();
+		for(auto i : c){
 			if(e==i){ itested();
 				return true;
 			}else{ itested();
@@ -295,7 +295,7 @@ struct vertex_helper{ //
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 template<>
-struct vertex_helper<vertex_ptr_tag>{ //
+struct vertex_helper<vertex_ptr_tag>{
 	template<class T, class V, class VC>
 	static bool contains(T& v, V&, VC* wp)
 	{ itested();
@@ -305,7 +305,7 @@ struct vertex_helper<vertex_ptr_tag>{ //
 	}
 	template<class T, class V, class VC>
 	static void insert(T& v, V&, VC* wp)
-	{ itested();
+	{ untested();
 		v.n.insert(wp);
 	}
 	template<class T, class V, class VC>
@@ -721,12 +721,12 @@ public:
 }; //storage<vertex_ptr_tag>
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-template<STPARMS, bool is_directed, bool is_simple>
+template<STPARMS, bool is_directed, bool is_simple, bool is_symmetric>
 struct edge_helper : public storage<STARGS> {
 };
 /*--------------------------------------------------------------------------*/
-template<STPARMS>
-struct edge_helper<STARGS, false, false> : public storage<STARGS>{
+template<STPARMS, bool is_symmetric>
+struct edge_helper<STARGS, false, false, is_symmetric> : public storage<STARGS>{
 	// undirected implementation.
 	using typename storage<STARGS>::edge_type;
 	using typename storage<STARGS>::vertex_type;
@@ -753,8 +753,8 @@ struct edge_helper<STARGS, false, false> : public storage<STARGS>{
 	}
 };
 /*--------------------------------------------------------------------------*/
-template<STPARMS>
-struct edge_helper<STARGS, false, true> : public storage<STARGS>{
+template<STPARMS, bool is_symmetric>
+struct edge_helper<STARGS, false, true, is_symmetric> : public storage<STARGS>{
 	// undirected implementation.
 	using typename storage<STARGS>::edge_type;
 	using typename storage<STARGS>::vertex_type;
@@ -789,8 +789,8 @@ struct edge_helper<STARGS, false, true> : public storage<STARGS>{
 	}
 };
 /*--------------------------------------------------------------------------*/
-template<STPARMS, bool is_simple>
-struct edge_helper<STARGS, true, is_simple>
+template<STPARMS, bool is_simple, bool is_symmetric>
+struct edge_helper<STARGS, true, is_simple, is_symmetric>
 	// directed implementation.
     : public storage<STARGS>{ //
 	typedef typename storage<STARGS>::container_type vertex_container_type;
@@ -804,13 +804,37 @@ struct edge_helper<STARGS, true, is_simple>
 		vertex_type* A=&a;
 		vertex_type* B=&b;
 		size_t s = out_edges(*A, vc).size();
-		edge_insert(out_edges(*A, vc), *B);
-
 		bool added=false;
-		if(s == out_edges(*A, vc).size()){
+
+		// TODO: use more overrides
+		if(is_symmetric){
+			size_t s = out_edges(*B, vc).size();
+			if(is_simple){
+				edge_insert(out_edges(*B, vc), *A);
+			}else{ untested();
+				edge_add(out_edges(*B, vc), *A);
+			}
+
+			if(s == out_edges(*B, vc).size()){
+			}else{
+				++num_edges; // BUG, multiplier?
+				added = true;
+			}
 		}else{
-			++num_edges; // BUG, multiplier?
-			added = true;
+		}
+
+		{
+			if(is_simple){
+				edge_insert(out_edges(*A, vc), *B);
+			}else{
+				edge_add(out_edges(*A, vc), *B);
+			}
+
+			if(s == out_edges(*A, vc).size()){
+			}else{
+				++num_edges; // BUG, multiplier?
+				added = true;
+			}
 		}
 		return std::make_pair(edge_type(*A, *B), added);
 	}
@@ -1304,7 +1328,8 @@ public:
 	typedef typename vs::vertex_index_type vertex_index_type;
 // private: hmm not yet.
 	using storage=bits::storage<STARGS>;
-	using edge_helper=bits::edge_helper<STARGS, is_directed_v, is_simple_v>;
+	using edge_helper=bits::edge_helper<STARGS, is_directed_v,
+	                                    is_simple_v, is_symmetric_v>;
 
 	typedef typename bits::reverse_helper<STARGS> reverse_helper;
 	typedef typename bits::iter<STARGS> iter;
@@ -1372,8 +1397,9 @@ public: // construct
 
 		if( !is_directed() && x.is_directed() ){
 			// anything.
+		}else if(_num_edges==x._num_edges){
+			incomplete();
 		}else{
-			assert(_num_edges==x._num_edges);
 		}
 #ifndef NDEBUG
 		for(auto i = begin(); i!=end(); ++i){
@@ -2225,7 +2251,7 @@ void copy_helper<oG, G, X, Y,
 //		tgt._num_edges = 1; // HACK
 		// this is dangerous?!
 		if(tgt._num_edges !=  tgt.num_edges()){
-		}else{ untested();
+		}else{
 		}
 
 		// OUCH. this does not work. must amend edgecount later.
