@@ -260,8 +260,7 @@ namespace boost { //
 					return std::move(a);
 				}
 #else
-			vertex_iterator operator+(size_t n)
-			{ untested();
+			vertex_iterator operator+(size_t n) {
 				vertex_iterator a=*this;
 				a.advance(n);
 				return a;
@@ -833,7 +832,7 @@ namespace boost {
 	class gala_graph_data_map
 	    : public put_get_helper<
 	                  DataRef,
-	                  gala_graph_data_map<Data, DataRef, GraphPtr> > { //
+	                  gala_graph_data_map<Data, DataRef, GraphPtr> > {
 		public:
 			typedef Data value_type;
 			typedef DataRef reference;
@@ -842,6 +841,23 @@ namespace boost {
 			gala_graph_data_map(GraphPtr g) : m_g(g) { incomplete(); }
 			template <class NodeOrEdge>
 				DataRef operator[](NodeOrEdge x) const { incomplete(); return (*m_g)[x]; }
+		protected:
+			GraphPtr m_g;
+	};
+
+	template <class Data, class DataRef, class GraphPtr>
+	class gala_graph_degree_map
+	    : public put_get_helper<
+	                  DataRef,
+	                  gala_graph_degree_map<Data, DataRef, GraphPtr> > {
+		public:
+			typedef Data value_type;
+			typedef DataRef reference;
+			typedef unsigned long key_type; // ouch
+			typedef lvalue_property_map_tag category;
+			gala_graph_degree_map(GraphPtr g) : m_g(g) { incomplete(); }
+			template <class Node>
+				value_type operator[](Node x) const { return boost::degree(x, *m_g); }
 		protected:
 			GraphPtr m_g;
 	};
@@ -864,6 +880,17 @@ namespace boost {
 			typedef typename gala::graph<SGARGS>::edge_type etype;
 			typedef gala_graph_data_map<etype, etype&, gala::graph<SGARGS>*> type;
 			typedef gala_graph_data_map<etype, const etype&,
+					  const gala::graph<SGARGS>*> const_type;
+		};
+	};
+
+	template <>
+	struct gala_graph_property_map<vertex_degree_t> {
+		VCTtemplate
+		struct bind_ {
+			typedef typename gala::graph<SGARGS>::vertex_index_type dtype;
+			typedef gala_graph_degree_map<dtype, dtype&, gala::graph<SGARGS>*> type;
+			typedef gala_graph_degree_map<dtype, const dtype&,
 					  const gala::graph<SGARGS>*> const_type;
 		};
 	};
@@ -905,6 +932,15 @@ namespace boost {
 	inline typename property_map<::gala::graph<SGARGS>, vertex_all_t>::const_type
 	get(vertex_all_t, const gala::graph<SGARGS>& g) { incomplete();
 		typedef typename property_map<::gala::graph<SGARGS>, vertex_all_t>::const_type
+			pmap_type;
+		incomplete();
+		return pmap_type(&g);
+	}
+
+	VCTtemplate
+	inline typename property_map<::gala::graph<SGARGS>, vertex_degree_t>::const_type
+	get(vertex_degree_t, const gala::graph<SGARGS>& g) { incomplete();
+		typedef typename property_map<::gala::graph<SGARGS>, vertex_degree_t>::const_type
 			pmap_type;
 		incomplete();
 		return pmap_type(&g);

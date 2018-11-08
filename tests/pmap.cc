@@ -40,4 +40,16 @@ int main(int , char* [])
 	}
 	assert(T=="testpmap!");
 
+	auto degreemap=boost::get(boost::vertex_degree, g);
+	auto E=boost::vertices(g);
+	auto f=*E.first;
+	auto s=*(E.first+1);
+	auto t=*(E.first+2);
+
+	boost::add_edge(s, f, g);
+	boost::add_edge(s, t, g);
+
+	for(; E.first!=E.second; ++ E.first){
+		std::cout << degreemap[*E.first] << "\n";
+	}
 }
