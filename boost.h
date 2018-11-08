@@ -21,7 +21,7 @@
 #ifndef GALA_BOOST_H
 #define GALA_BOOST_H
 
-#include <gala/graph.h>
+#include "graph.h"
 #include <boost/graph/graph_traits.hpp> // bidirectional_graph_tag
 #include <boost/graph/properties.hpp>
 
