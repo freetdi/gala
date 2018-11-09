@@ -288,7 +288,7 @@ struct vertex_helper{ //
 	}
 	template<class E, class S>
 	static void rebase(E& e, S const& s, intptr_t /*delta*/)
-	{
+	{ untested();
 		e=s;
 	}
 };
@@ -422,7 +422,7 @@ struct iter_helper<c_iter_tag, VDP, /*directed*/ true, is_multiedge> {
 	static size_t fill_pos(iter first, iter last, VL& _v, bool dir=false, bool dups=true)
 	{
 		if(dups){
-		}else{
+		}else{ untested();
 		}
 		assert(dir); (void) dir;
 		auto nv = _v.size();
@@ -604,7 +604,7 @@ struct storage : storage_base<STARGS>{ //
 		return _v[v];
 	}
 	static const edge_container_type& out_edges(const_vertex_type& v, const container_type& _v)
-	{
+	{ untested();
 		return _v[v];
 	}
 	static void remove_edge_single(vertex_index_type v, vertex_index_type w,
@@ -958,7 +958,7 @@ struct reverse_helper<ECT, VCT, VDP,
 
 #ifndef NDEBUG
 		trace3("make_symm", oriented, ebefore, e);
-		if(oriented){
+		if(oriented){ untested();
 			assert(ebefore*2==e);
 		}else{
 		}
@@ -1220,18 +1220,18 @@ struct copy_helper{
 /*--------------------------------------------------------------------------*/
 template<class Gsrc, class Gtgt, class X=void>
 struct move_helper{
-	static void move(Gsrc const&& s, Gtgt& t){
+	static void move(Gsrc const&& s, Gtgt& t){ untested();
 
 		t._v = std::move(s._v);
 
-		if(!s.is_symmetric() && t.is_symmetric()){
+		if(!s.is_symmetric() && t.is_symmetric()){ untested();
 			if(t.is_simple()){ itested();
 				t._num_edges=0;
 				symmetrify(t);
 			}else{ untested();
 				incomplete();
 			}
-		}else{
+		}else{ untested();
 			t._num_edges = s._num_edges;
 		}
 	}
@@ -1257,7 +1257,7 @@ struct move_helper{
 		}
 
 		if(g.is_directed()){
-		}else{
+		}else{ untested();
 			g._num_edges/=2;
 			trace1("correcting edgecount", g._num_edges);
 		}
@@ -1390,10 +1390,22 @@ public: // construct
 	explicit graph(graph<ECT2, VCT2, VDP2, CFG2> const& x)
 	    : _num_edges(0)
 	{
+
+		// works in symm2.cc
+//		static_assert(sfinae::is_set_tpl<ECT>::value
+//			        ||   sfinae::is_set_tpl<ECT2>::value
+//					  	  || x.is_simple() || !is_simple(), "not implemented");
 		detail::copy_helper<graph<ECT2,VCT2,VDP2,CFG2>, graph,
 			  graph<ECT2,VCT2,VDP2,CFG2>::is_directed_v, is_directed_v
 			>::assign(x, *this);
 		assert(num_vertices()==x.num_vertices());
+
+		if(!is_simple()){
+			incomplete();
+		}else if(x.is_simple()){
+		}else{
+			// bits::order_helper<true, ECT>::do_it(_v);
+		}
 
 		if( !is_directed() && x.is_directed() ){
 			// anything.
@@ -1414,8 +1426,27 @@ public: // move
 #if 0
    template<template<class G> class CFG2>
 	graph( graph<ECT, VCT, VDP, CFG2> const&& )
-	{
+	{ untested();
 		incomplete();
+	}
+#endif
+
+#if 0
+   template<template<class T, typename... > class ECT2, \
+            template<class T, typename... > class VCT2, \
+            class VDP2, \
+            template<class G> class CFG2>
+	graph( graph<ECT2, VCT2, VDP2, CFG2> const&&x,
+			typename std::enable_if<
+			    !std::is_same< graph<ECT2, VCT2, VDP2, CFG2>, this_type>::value
+			  && this_type::is_simple_v
+		     &&!sfinae::is_set_tpl<ECT>::value
+			  &&!graph<ECT2, VCT2, VDP2, CFG2>::is_simple_v,
+				 pdummy>::type=pdummy())
+	    : _v(0),
+	      _num_edges(0)
+	{
+		static_assert(false, "not implemented");
 	}
 #endif
 
@@ -1722,7 +1753,7 @@ public:
 	//O(num_edges+num_vertices)
 	void make_symmetric(bool oriented=false)
 	{
-		if(!is_directed()){
+		if(!is_directed()){ untested();
 		}else if(is_symmetric()){ itested();
 		}else{
 			reverse_helper::make_symmetric(_v, _num_edges, oriented);
@@ -1867,7 +1898,7 @@ public:
 		assert(c==out_edges(v).size());
 		if(is_directed()){ untested();
 			_num_edges -= degree(v);
-		}else{
+		}else{ untested();
 		}
 		storage::clear_vertex(v, _v);
 	}
@@ -1925,7 +1956,7 @@ public: // experimental...?
 #if 0
 		typedef size_t edges_size_type;
 		static edges_size_type num_edges(GG const &g)
-		{
+		{ untested();
 			return 2*g._num_edges; // BUG
 			return 2*reinterpret_cast<base_type const&>(g).num_edges();
 		}
@@ -2015,7 +2046,7 @@ graph<SGARGS>::graph(EdgeIterator first, EdgeIterator last,
 VCTtemplate
 typename graph<SGARGS>::EL const&
     graph<SGARGS>::out_edges(const_vertex_type& v) const
-{
+{ untested();
 	assert(is_valid(v));
 	return storage::out_edges(v, _v);
 }
@@ -2059,7 +2090,7 @@ VCTtemplate
 graph<SGARGS>& graph<SGARGS>::operator=(graph<ECT2,VCT2,VDP2,CFG2> const& x)
 {
 	typedef graph<ECT2,VCT2,VDP2,CFG2> Gsrc;
-	if((void*)&x==(void*)this){
+	if((void*)&x==(void*)this){ untested();
 		return *this;
 	}else{
 	}
@@ -2121,7 +2152,7 @@ graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
 			is_nn_v, is_nn_v>::assign(x, *this);
 	}else if (num_vertices()!=x.num_vertices()){ incomplete();
 	// }else if( .. incomplete){ untested();
-	}else{
+	}else{ untested();
 // 		dead?. should not get here.
 		// why not assign_?
 		const_iterator b = begin();
@@ -2131,7 +2162,7 @@ graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
 		iterator v = begin();
 		iterator e = end();
 		_num_edges = x._num_edges;
-		for(; v!=e ; ++v){
+		for(; v!=e ; ++v){ untested();
 			vertex_type vd = iter::deref(v);
 			other_const_vertex_type sd = oG::iter::deref(s);
 			EL& E = out_edges(vd); // ?!
@@ -2250,7 +2281,7 @@ void copy_helper<oG, G, X, Y,
 //		trace2("assign...",GG->_num_edges, tgt._num_edges);
 //		tgt._num_edges = 1; // HACK
 		// this is dangerous?!
-		if(tgt._num_edges !=  tgt.num_edges()){
+		if(tgt._num_edges !=  tgt.num_edges()){ untested();
 		}else{
 		}
 
@@ -2324,8 +2355,9 @@ namespace detail{
 		}
 	};
 	template<class S, class T>
-	struct set_hlp<S, T, typename tovoid<typename sfinae::is_set<T>::type>::type> {
-
+	struct set_hlp<S, T,
+		typename std::enable_if< !std::is_same<S,T>::value,
+		   typename tovoid<typename sfinae::is_set<T>::type>::type>::type> {
 		typedef typename sfinae::is_set<T>::type hmm;
 
 		typedef T hmm2;
@@ -2353,7 +2385,17 @@ struct copy_helper<Gsrc, Gtgt, true, false > {
 	{
 //		must weed out double edges?
 		trace2("assigning directed to undirected", src.num_edges(), tgt.num_edges());
+		// src not simple?
 		tgt.directed_view() = src;
+
+		if(!tgt.is_simple()){
+			incomplete();
+		}else if(src.is_simple()){
+		}else{
+
+	//bits::order_helper<sortneeded, ECT>::do_it(_v);
+			incomplete();
+		}
 		assert( bool(tgt._num_edges) == bool(src._num_edges));
 		trace1("assigned directed to undirected", src.num_edges());
 		trace3("assigned directed to undirected", tgt._num_edges, tgt.num_edges(), tgt.directed_view().num_edges());
@@ -2371,7 +2413,7 @@ struct copy_helper<Gsrc, Gtgt, true, true, true, true > {
 	//	typedef graph<ECT2, VCT2, VDP2, CFG2> oG; // source graph
 		size_t nv = g.num_vertices();
 		size_t ne = g.num_edges();
-		trace4("assign_",nv, ne, tgt.num_vertices(), tgt.num_edges());
+		trace4("assign2",nv, ne, tgt.num_vertices(), tgt.num_edges());
 		assert(!tgt.is_directed() || g.is_directed()); // use other helper
 	//	auto psize=tgt._v.size();
 		tgt._v.resize(nv);

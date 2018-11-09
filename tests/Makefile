@@ -20,6 +20,7 @@ TESTS = \
 	edg \
 	erase1 \
 	fbsg \
+	flatset \
 	idmap \
 	iter \
 	move \
