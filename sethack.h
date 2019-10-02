@@ -23,8 +23,8 @@
 
 #define likely(x)       __builtin_expect((x),1)
 #define unlikely(x)     __builtin_expect((x),0)
-#ifdef HAVE_STX_BTREE_SET_H
-#include <stx/btree_set.h>
+#ifdef HAVE_TLX_CONTAINER_BTREE_SET_HPP
+#include <tlx/container/btree_set.hpp>
 #endif
 #include <set>
 #include <unordered_set>
@@ -136,10 +136,10 @@ struct sethack_{ //
 	}
 };
 /*--------------------------------------------------------------------------*/
-#ifdef HAVE_STX_BTREE_SET_H
+#ifdef HAVE_TLX_CONTAINER_BTREE_SET_HPP
 template<>
-struct sethack_<stx::btree_set<size_t> >{ //
-	typedef stx::btree_set<size_t> S;
+struct sethack_<tlx::btree_set<size_t> >{ //
+	typedef tlx::btree_set<size_t> S;
 	static typename S::iterator reverse(typename S::reverse_iterator& x)
 	{untested();
 		return S::iterator(x);

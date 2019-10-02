@@ -28,8 +28,8 @@
 
 #include <deque>
 #include <set>
-#ifdef HAVE_STX_BTREE_SET_H
-#include <stx/btree_set.h>
+#ifdef HAVE_TLX_CONTAINER_BTREE_SET_HPP
+#include <tlx/container/btree_set.hpp>
 #endif
 // #endif
 #include <boost/container/flat_set.hpp>
@@ -75,10 +75,10 @@ std::set<typename S::value_type, typename S::key_compare, typename S::allocator_
 	static constexpr bool value = true;
 
 };
-#ifdef HAVE_STX_BTREE_SET_H
+#ifdef HAVE_TLX_CONTAINER_BTREE_SET_HPP
 template<class S, class T>
 struct is_set<S, typename std::enable_if < std::is_same<
-stx::btree_set<typename S::value_type, typename S::key_compare, typename S::allocator_type >, S
+tlx::btree_set<typename S::value_type, typename S::key_compare, typename S::allocator_type >, S
 >::value, any >::type , T>{ //
 
 	typedef T type;
