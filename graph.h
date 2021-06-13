@@ -24,6 +24,7 @@
 #include "trace.h"
 
 #include <cstdlib>
+#include <algorithm>
 #include <vector>
 #include <map>
 #include <forward_list>
