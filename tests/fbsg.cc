@@ -8,17 +8,39 @@
 
 template<class T, class...>
 using myset=boost::container::flat_set<T>;
+static_assert(gala::sfinae::is_set_tpl<myset>::value);
+
+template<class T, class...>
+using myset1=boost::container::flat_set<T, std::less<T>, boost::container::new_allocator<T> >;
+static_assert(gala::sfinae::is_set_tpl<myset1>::value); // BUG
+
+template<class T, class...>
+using myset2=boost::container::flat_set<T, std::less<T> >;
+static_assert(gala::sfinae::is_set_tpl<myset2>::value);
+
+template<class T, class...>
+using myset3=boost::container::flat_set<T, std::less<T>, std::vector<T> >;
+static_assert(gala::sfinae::is_set_tpl<myset3>::value);
+
 
 typedef gala::graph<myset, std::vector, uint16_t> sg_fbs;
+typedef gala::graph<myset2, std::vector, uint16_t> sg_fbs2;
+typedef gala::graph<myset3, std::vector, uint16_t> sg_fbs3;
+
 
 using namespace std;
 
 int main(int , char* [])
 {
 	sg_fbs g;
+	sg_fbs2 g2;
+	sg_fbs3 g3;
+	assert(g3.is_ordered());
+
 	assert(boost::num_edges(g)==0);
 	assert(boost::num_vertices(g)==0);
 	assert(g.is_ordered());
+	assert(g2.is_ordered());
 
 	boost::add_vertex(g);
 	boost::add_vertex(g);

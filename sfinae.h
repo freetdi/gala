@@ -85,9 +85,29 @@ stx::btree_set<typename S::value_type, typename S::key_compare, typename S::allo
 	static constexpr bool value = true;
 };
 #endif
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 template<class S, class T>
 struct is_set<S, typename std::enable_if < std::is_same<
 boost::container::flat_set<typename S::value_type, typename S::key_compare, typename S::allocator_type >, S
+>::value, any >::type , T>{ //
+
+	typedef T type;
+	static constexpr bool value = true;
+};
+/*--------------------------------------------------------------------------*/
+template<class S, class T>
+struct is_set<S, typename std::enable_if < std::is_same<
+boost::container::flat_set<typename S::value_type, typename S::key_compare, typename S::container_type >, S
+>::value, any >::type , T>{ //
+
+	typedef T type;
+	static constexpr bool value = true;
+};
+/*--------------------------------------------------------------------------*/
+template<class S, class T>
+struct is_set<S, typename std::enable_if < std::is_same<
+boost::container::flat_set<typename S::value_type, typename S::key_compare>, S
 >::value, any >::type , T>{ //
 
 	typedef T type;
