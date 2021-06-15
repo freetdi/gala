@@ -20,7 +20,7 @@
  */
 
 #include <treedec/degree_config.hpp>
-#include <stx/btree_set.h>
+#include <tlx/container/btree_set.hpp>
 
 template<class G>
 struct m_deg_config : public misc::detail::deg_config<G> {
@@ -45,4 +45,4 @@ template<class G>
 struct svbs_config : public gala::graph_cfg_default<G> {
 };
 
-typedef gala::graph< stx::btree_set, std::vector, gala::vertex_ptr_tag, svbs_config> simplegraph_vector_bs;
+typedef gala::graph< tlx::btree_set, std::vector, gala::vertex_ptr_tag, svbs_config> simplegraph_vector_bs;

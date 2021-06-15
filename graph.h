@@ -28,8 +28,8 @@
 #include <vector>
 #include <map>
 #include <forward_list>
-#ifdef HAVE_STX_BTREE_SET_H
-#include <stx/btree_set.h>
+#ifdef HAVE_TLX_CONTAINER_BTREE_SET_HPP
+#include <tlx/container/btree_set.hpp>
 #endif
 #include <type_traits>
 		
@@ -2170,7 +2170,7 @@ graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
 			EL const& S = x.out_edges(sd); // ?!
 			bits::vertex_helper<VDP>::rebase(E, S, delta);
 #if 0
-			incomplete();// does not work for stx
+			incomplete();// does not work for tlx
 
 			EL& MS = const_cast<EL&>(S); // HACK!?
 			E = MS;

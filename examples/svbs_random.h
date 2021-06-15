@@ -58,7 +58,7 @@ struct svbs_config : public gala::graph_cfg_default<G> {
 };
 }
 
-typedef gala::graph< stx::btree_set, std::vector, gala::vertex_ptr_tag, svbsr::svbs_config> svbs_random;
+typedef gala::graph< tlx::btree_set, std::vector, gala::vertex_ptr_tag, svbsr::svbs_config> svbs_random;
 
 namespace treedec{
 template<>
