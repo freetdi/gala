@@ -40,7 +40,7 @@ CLEANFILES = ${TESTS} ${LOGS} gala ${TESTS:%=%.o}
 check: $(LOGS)
 
 dep: dep.mk
-dep.mk: $(TESTS:%=%.cc) | gala
+dep.mk: | $(TESTS:%=%.cc) gala
 	$(CXX) -c -MM $(CXXFLAGS) ${CPPFLAGS} $+ > $@
 
 include dep.mk

@@ -289,7 +289,7 @@ struct vertex_helper{ //
 	}
 	template<class E, class S>
 	static void rebase(E& e, S const& s, intptr_t /*delta*/)
-	{ untested();
+	{itested();
 		e=s;
 	}
 };
@@ -423,7 +423,7 @@ struct iter_helper<c_iter_tag, VDP, /*directed*/ true, is_multiedge> {
 	static size_t fill_pos(iter first, iter last, VL& _v, bool dir=false, bool dups=true)
 	{
 		if(dups){
-		}else{ untested();
+		}else{
 		}
 		assert(dir); (void) dir;
 		auto nv = _v.size();
@@ -1221,11 +1221,11 @@ struct copy_helper{
 /*--------------------------------------------------------------------------*/
 template<class Gsrc, class Gtgt, class X=void>
 struct move_helper{
-	static void move(Gsrc const&& s, Gtgt& t){ untested();
+	static void move(Gsrc const&& s, Gtgt& t){
 
 		t._v = std::move(s._v);
 
-		if(!s.is_symmetric() && t.is_symmetric()){ untested();
+		if(!s.is_symmetric() && t.is_symmetric()){
 			if(t.is_simple()){ itested();
 				t._num_edges=0;
 				symmetrify(t);
@@ -1258,7 +1258,7 @@ struct move_helper{
 		}
 
 		if(g.is_directed()){
-		}else{ untested();
+		}else{
 			g._num_edges/=2;
 			trace1("correcting edgecount", g._num_edges);
 		}
@@ -2153,7 +2153,7 @@ graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
 			is_nn_v, is_nn_v>::assign(x, *this);
 	}else if (num_vertices()!=x.num_vertices()){ incomplete();
 	// }else if( .. incomplete){ untested();
-	}else{ untested();
+	}else{itested();
 // 		dead?. should not get here.
 		// why not assign_?
 		const_iterator b = begin();
@@ -2163,7 +2163,7 @@ graph<SGARGS>& graph<SGARGS>::assign_same(graph<SGARGS> const& x)
 		iterator v = begin();
 		iterator e = end();
 		_num_edges = x._num_edges;
-		for(; v!=e ; ++v){ untested();
+		for(; v!=e ; ++v){itested();
 			vertex_type vd = iter::deref(v);
 			other_const_vertex_type sd = oG::iter::deref(s);
 			EL& E = out_edges(vd); // ?!
