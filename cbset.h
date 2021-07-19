@@ -637,7 +637,7 @@ public: // const xs
   const_iterator find(unsigned x) const{ untested();
     if(contains(x)){ untested();
       return const_iterator(x, *this);
-    }else{ untested();
+    }else{
       return end();
     }
   }
@@ -1496,7 +1496,7 @@ int BSET_DYNAMIC<BSDa>::compare_int(BSET_DYNAMIC const& other) const
     assert(i+delta>=howmany());
     if (other._d[i]) {
       return -1;
-    }else{ untested();
+    }else{
     }
   }
 
@@ -1698,7 +1698,7 @@ inline void BSET_DYNAMIC<BSDa>::erase(value_type i)
   unsigned chunksize=CHUNKBITS;
   assert(offset()<=W);
 
-  if(!contains(i)){ untested();
+  if(!contains(i)){
     // not there...
     return;
   }else if(howmany()==0){ untested();
@@ -1719,7 +1719,7 @@ inline void BSET_DYNAMIC<BSDa>::erase(value_type i)
     _d[chunk] &= ~ ( 1llu << j );
     if(!chunk){
       trim_below();
-    }else{ untested();
+    }else{
     }
   }else{ untested();
   }
