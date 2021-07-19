@@ -238,11 +238,13 @@ namespace boost { //
 			// base+=n;
 				std::advance(base,n);
 			}
-			vertex_iterator(typename gala::graph<SGARGS>::iterator
-			    e=typename gala::graph<SGARGS>::iterator(),
-			    const gala::graph<SGARGS>*g=NULL)
-			        : base(e)
-			{
+			vertex_iterator() : base(typename gala::graph<SGARGS>::iterator()) { untested();
+			}
+			vertex_iterator(typename gala::graph<SGARGS>::iterator e) : base(e) { untested();
+			}
+			vertex_iterator(typename gala::graph<SGARGS>::iterator e,
+			    const gala::graph<SGARGS>*g)
+			        : base(e) { untested();
 				(void)g;
 			}
 			vertex_iterator(const vertex_iterator& p)
@@ -316,9 +318,9 @@ namespace boost { //
 //		   typedef typename gala::graph<SGARGS>::vertex_type* difference_type; ??
 		   typedef intptr_t difference_type; // why?
 		public:
-			adjacency_iterator(typename ::gala::graph<SGARGS>::out_vertex_iterator
-			    e=typename gala::graph<SGARGS>::out_vertex_iterator()) : _base(e)
-			{
+			adjacency_iterator() : _base(typename gala::graph<SGARGS>::out_vertex_iterator()) { untested();
+			}
+			adjacency_iterator(typename ::gala::graph<SGARGS>::out_vertex_iterator e) : _base(e) { untested();
 			}
 			bool operator==(const_value_type other) const
 			{ untested();

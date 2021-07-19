@@ -53,7 +53,7 @@
 namespace gala{
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-struct vertex_ptr_tag {}; // not in use yet.
+struct vertex_ptr_tag {};
 /*--------------------------------------------------------------------------*/
 #define galaPARMS    template<class T, typename... > class ECT, \
                      template<class T, typename... > class VCT, \
@@ -567,24 +567,20 @@ struct storage : storage_base<STARGS>{ //
 	typedef edge_type_<vertex_type> edge_type;
 	typedef ECT<vertex_type> edge_container_type; // -> storage base?
 	typedef VCT<vertex_> VL;
-	static bool need_rewire()
-	{ untested();
+	static bool need_rewire() { untested();
 		return false;
 	}
-	static vertex_type new_node(container_type& _v)
-	{
+	static vertex_type new_node(container_type& _v) {
 		vertex_ n;
 		auto s=_v.size();
 		_v.push_back(n);
 		return s;
 	}
-	static VDP degree(const VDP v, container_type const& _v)
-	{
+	static VDP degree(const VDP v, container_type const& _v) {
 		assert(v<_v.size());
 		return _v[v].size();
 	}
-	static VDP degree(container_type const& _v)
-	{ untested();
+	static VDP degree(container_type const& _v) { untested();
 		vertex_index_type ret=0;
 		for(auto const& e : _v){ untested();
 			vertex_index_type d = e.size();
@@ -592,20 +588,16 @@ struct storage : storage_base<STARGS>{ //
 		}
 		return ret;
 	}
-	static void clear_vertex(const VDP v, container_type& _v)
-	{ untested();
+	static void clear_vertex(const VDP v, container_type& _v) { untested();
 		_v[v].clear();
 	}
-	static edge_container_type& out_edges(vertex_type& v, container_type& _v)
-	{
+	static edge_container_type& out_edges(vertex_type& v, container_type& _v) {
 		return _v[v];
 	}
-	static edge_container_type& out_edges(const_vertex_type& v, container_type& _v)
-	{
+	static edge_container_type& out_edges(const_vertex_type& v, container_type& _v) {
 		return _v[v];
 	}
-	static const edge_container_type& out_edges(const_vertex_type& v, const container_type& _v)
-	{ itested();
+	static const edge_container_type& out_edges(const_vertex_type& v, const container_type& _v) { itested();
 		return _v[v];
 	}
 	static void remove_edge_single(vertex_index_type v, vertex_index_type w,
@@ -765,8 +757,6 @@ struct edge_helper<STARGS, false, true, is_symmetric> : public storage<STARGS>{
 	static std::pair<edge_type, bool> add_edge(vertex_type a, vertex_type b,
 	                                           N& num_edges, VC& vc)
 	{
-
-		// trace0("undiredted add_edge");
 		vertex_type* A=&a;
 		vertex_type* B=&b;
 		size_t s = out_edges(*A, vc).size();
@@ -1271,7 +1261,7 @@ template< template<class T, typename... > class ECT=GALA_DEFAULT_SET,
           template<class T, typename... > class VCT=GALA_DEFAULT_VECTOR,
           typename VDP=vertex_ptr_tag, // use_pointers,
           template<class G> class CFG=graph_cfg_default>
-class graph{ //
+class graph {
 	BOOST_STATIC_ASSERT( (std::numeric_limits<VDP>::is_integer
 	                 && !std::numeric_limits<VDP>::is_signed )
 						  || std::is_same<VDP, vertex_ptr_tag>::value );

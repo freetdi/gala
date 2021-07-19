@@ -7,7 +7,7 @@ TESTS = \
 	bidir \
 	bmd \
 	cbs \
-	cbsg \
+	cbsg.0 \
 	cbsg_cp \
 	concepts \
 	copy \
