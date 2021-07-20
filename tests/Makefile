@@ -1,5 +1,5 @@
-CPPFLAGS=-I. -DTRACE_UNTESTED $(LOCAL_CPPFLAGS)
-CXXFLAGS=-std=c++11 -O0 -g -Wall -Wextra $(LOCAL_CXXFLAGS)
+CPPFLAGS = -I. -DTRACE_UNTESTED $(LOCAL_CPPFLAGS)
+CXXFLAGS = -std=c++11 -O0 -g -Wall -Wextra $(LOCAL_CXXFLAGS)
 
 all: check
 
@@ -8,6 +8,7 @@ TESTS = \
 	bmd \
 	cbs \
 	cbsg.0 \
+	cbsg.2 \
 	cbsg_cp \
 	concepts \
 	copy \

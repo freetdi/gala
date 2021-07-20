@@ -27,6 +27,7 @@
 
 #include "trace.h"
 #include "assert.h"
+#include <string.h> // memcpy
 
 /*--------------------------------------------------------------------------*/
 // TODO: size/storage control
@@ -95,7 +96,7 @@ static inline bool contains(S const& s, typename S::value_type i)
 /*--------------------------------------------------------------------------*/
 template<class T>
 inline unsigned numberofones(T x)
-{ untested();
+{
 #if 1 // GCC
   return __builtin_popcount(x);
 #else
@@ -336,7 +337,7 @@ public:
 	  }
 	  _i += ctz;
 	  _c = _c >> ctz;
-	}else{ untested();
+	}else{
 	}
 	skip();
       }
@@ -376,11 +377,11 @@ private:
       }else{ itested();
         assert(_i/CHUNKBITS>=_s->offset());
         _c = _s->_d[_i/CHUNKBITS-_s->offset()];
-	if(_c){ untested();
+	if(_c){
 	  unsigned ctz;
 	  if(CHUNKBITS>32){ untested();
 	    ctz = __builtin_ctzl(_c);
-	  }else{ untested();
+	  }else{
 	    ctz = __builtin_ctz(_c);
 	  }
 	  _i += ctz;
@@ -582,9 +583,6 @@ private:
   }
   bool empty() const {
     incomplete();
-    return !size();
-  }
-  bool is_empty() const {
     return !size();
   }
   unsigned recount() const;

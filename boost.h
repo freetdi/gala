@@ -320,7 +320,7 @@ namespace boost { //
 		public:
 			adjacency_iterator() : _base(typename gala::graph<SGARGS>::out_vertex_iterator()) { untested();
 			}
-			adjacency_iterator(typename ::gala::graph<SGARGS>::out_vertex_iterator e) : _base(e) { untested();
+			adjacency_iterator(typename ::gala::graph<SGARGS>::out_vertex_iterator e) : _base(e) {
 			}
 			bool operator==(const_value_type other) const
 			{ untested();
