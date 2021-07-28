@@ -161,6 +161,9 @@ struct cbshelp{
   static unsigned get_size(BSET_DYNAMIC<BSDa> const&, unsigned size) {
     return size;
   }
+  static bool get_empty(BSET_DYNAMIC<BSDa> const&, unsigned size) {
+    return !size;
+  }
   static void set_size(SCT& x, unsigned size) {
     x = size;
   }
@@ -331,101 +334,76 @@ public:
 public:
   class const_iterator{
   public:
-    const_iterator() : _i(-1u), _s(NULL) {
+    const_iterator() : _k(0), _s(NULL) {
     }
     const_iterator(const const_iterator& o)
-      : _i(o._i), _c(o._c), _s(o._s)
+      : _k(o._k), _c(o._c), _s(o._s)
     {
     }
     const_iterator(unsigned x, BSET_DYNAMIC const& s) :
-      _i(x), _s(&s)
+      _k(0), _s(&s)
     {
       assert(x>=CHUNKBITS*s.offset());
+      _k = x/CHUNKBITS;
 
-      if(_i==-1u){
-//      }else if(_i>=CHUNKBITS*(s._offset+s._howmany)){ untested();
-//	unreachable();
-//        _i = -1u; // CHUNKBITS*(s._offset+s._howmany);
-//	_c = 0;
+      if(_k==NCHNK){
+	_c = 0;
       }else if(s.howmany()==0){
 	// skip to end...
-	_i=-1u;
+	_k = 1;
+	_c = 0;
       }else{
 	// assert(_i<CHUNKBITS*(s._offset+s._howmany));
-	_c = _s->_d[(x/CHUNKBITS)-_s->offset()] >> (x%CHUNKBITS);
-	if(_c){
-	  // newonb is not trimmed...
-	  // need to iterate anyway.
-	  unsigned ctz;
-	  if(CHUNKBITS>32){itested();
-	    ctz = __builtin_ctzl(_c);
-	  }else{
-	    ctz = __builtin_ctz(_c);
-	  }
-	  _i += ctz;
-	  _c = _c >> ctz;
-	}else{
-	}
+	_c = _s->_d[_k-_s->offset()] >> (x%CHUNKBITS);
 	skip();
       }
     }
 
     bool operator==(const_iterator const& o) const{
       assert(_s);
-      return _i==o._i;
+      if(_k!=o._k){
+	return false;
+      }else if(_c!=o._c){
+	return false;
+      }else{
+	return true;
+      }
     }
     bool operator!=(const_iterator const& o) const{
       return !operator==(o);
     }
-    unsigned operator*() const{return _i;}
+    unsigned operator*() const{
+      return _k * CHUNKBITS + __builtin_ctzl(_c);
+    }
     const_iterator& operator++(){
-      assert(_s);
-      assert(_i!=-1u);
-      inc();
+      _c ^= _c & -_c;
       skip();
       return *this;
     }
-    const_iterator& operator=(const_iterator const& o){
-      _i = o._i;
+    const_iterator& operator=(const_iterator const& o){ itested();
+      _k = o._k;
       _c = o._c;
       _s = o._s;
       return *this;
     }
 private:
-    void /*const_iterator::*/inc(){
-      assert(_s);
-      ++_i;
-//      assert(_i <= CHUNKBITS*(_s->_howmany+_s->offset()));
-      if(_i >= CHUNKBITS*(_s->howmany()+_s->offset())){
-	_i = -1u; // CHUNKBITS*(NCHNK+_s->offset());
-      }else if(_i%CHUNKBITS){
-        _c = _c >> 1;
-      }else{
-        assert(_i/CHUNKBITS>=_s->offset());
-        _c = _s->_d[_i/CHUNKBITS-_s->offset()];
-	if(_c){
-	  unsigned ctz;
-	  if(CHUNKBITS>32){ itested();
-	    ctz = __builtin_ctzl(_c);
-	  }else{
-	    ctz = __builtin_ctz(_c);
-	  }
-	  _i += ctz;
-	  _c = _c >> ctz;
-	}
-      }
-    }
     void /*const_iterator::*/skip(){
-      while(_i<CHUNKBITS*(_s->howmany()+_s->offset())){
-        if (_c & 1){
+      while(_k<(_s->howmany()+_s->offset())){
+        if (_c){
           break;
         }else{
+	  ++_k;
+//	  trace1("skip", _k);
+	  if(_k==NCHNK){
+	    _c = 0;
+	  }else{
+	    _c = _s->_d[_k-_s->offset()];
+	  }
         }
-        inc();
       }
     }
   private:
-    unsigned _i;
+    unsigned _k;
     CHUNK_T _c;
     BSET_DYNAMIC const* _s;
   }; // const_iterator
@@ -652,7 +630,7 @@ private:
     return detail::cbshelp<BSDa>::get_size(*this, _size);
   }
   bool empty() const {
-    return !size();
+    return detail::cbshelp<BSDa>::get_empty(*this, _size);
   }
   unsigned recount() const;
   unsigned long hash() const;
@@ -700,7 +678,7 @@ public: // const xs
     return const_reverse_iterator(CHUNKBITS*offset(), *this);
   }
   const_iterator end() const{
-    return const_iterator(-1u, *this);
+    return const_iterator(CHUNKBITS*(offset()+howmany()), *this);
   }
   const_iterator find(unsigned x) const{
     if(contains(x)){
@@ -774,6 +752,11 @@ struct cbshelp<NCHNK, CHUNK_T, HMT, OST, nosize_t>{
       BSET_DYNAMIC<NCHNK, CHUNK_T, HMT, OST, nosize_t> const& n, nosize_t)
   {
     return n.recount();
+  }
+  static unsigned get_empty(
+      BSET_DYNAMIC<NCHNK, CHUNK_T, HMT, OST, nosize_t> const& n, nosize_t)
+  {
+    return n.begin() == n.end();
   }
   static void set_size(nosize_t, unsigned)
   {

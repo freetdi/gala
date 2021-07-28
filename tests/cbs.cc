@@ -212,7 +212,7 @@ void test8()
 	assert(*b==1);
 	x1.erase(2);
 	++b;
-//	assert(*b==16); // not yet
+//	assert(*b==16); // not yet ?
 
 }
 
@@ -239,12 +239,36 @@ void test9()
 	x1.insert(16);
 
 //	assert(*x1.rbegin() == 16); // incomplete();
+}
 
+void test10(int o=0, unsigned m=100)
+{
+	typedef cbset::BSET_DYNAMIC<2, uint64_t, cbset::nohowmany_t, cbset::nooffset_t, cbset::nosize_t> myset;
+	myset x0;
+
+	int n = 0;
+
+	for(unsigned i = o; i<m; i+=2){
+		x0.insert(i);
+		++n;
+	}
+
+	for(auto v : x0){
+		trace1("..", v);
+		assert( ! ((v - o) % 2));
+		--n;
+	}
+
+	assert(!n);
 
 }
 
 int main(int , char* [])
 {
+	test8();
+	test10(0, 10);
+	test10();
+	test10(1);
 	test0();
 	test1();
 	test2();
@@ -253,7 +277,6 @@ int main(int , char* [])
 	test5();
 	test6();
 	test7();
-	test8();
 	test9();
 }
 

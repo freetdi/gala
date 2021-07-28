@@ -42,7 +42,7 @@ check: $(LOGS)
 
 dep: dep.mk
 dep.mk: | $(TESTS:%=%.cc) gala
-	$(CXX) -c -MM $(CXXFLAGS) ${CPPFLAGS} $+ > $@
+	$(CXX) -c -MM $(CXXFLAGS) ${CPPFLAGS} $(TESTS:%=%.cc) > $@
 
 include dep.mk
 
@@ -59,7 +59,7 @@ $(LOGS): %.log: %
 	./$< 2>&1 | tee $@; exit $${PIPESTATUS[0]}
 
 gala:
-	-ln -sf ../ gala
+	[ -L ./gala ] || ln -sf ../ gala
 
 $(LOGS): .P
 
