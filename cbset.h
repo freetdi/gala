@@ -28,6 +28,7 @@
 #include "trace.h"
 #include "assert.h"
 #include <string.h> // memcpy
+#include <bit>
 
 /*--------------------------------------------------------------------------*/
 // TODO: size/storage control
@@ -372,9 +373,19 @@ public:
     bool operator!=(const_iterator const& o) const{
       return !operator==(o);
     }
+#if __cplusplus >= 201709
     unsigned operator*() const{
-      return _k * CHUNKBITS + __builtin_ctzl(_c);
+      return _k * CHUNKBITS + std::countr_zero(_c);
     }
+#else
+    unsigned operator*() const{
+      if(CHUNKBITS>32) {
+	return _k * CHUNKBITS + __builtin_ctzl(_c);
+      }else{
+	return _k * CHUNKBITS + __builtin_ctz(_c);
+      }
+    }
+#endif
     const_iterator& operator++(){
       _c ^= _c & -_c;
       skip();

@@ -188,7 +188,7 @@ void test8()
 	BSET_DYNAMIC<5> x0;
 	assert(x0.begin()==x0.end());
 
-	BSET_DYNAMIC<3> x1;
+	BSET_DYNAMIC<3, uint64_t> x1;
 	assert(x1.begin()==x1.end());
 
 	x1.insert(1);
