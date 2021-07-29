@@ -10,7 +10,7 @@ TESTS = \
 	cbsg.0 \
 	cbsg.2 \
 	cbsg_cp \
-	concepts \
+	concepts0 \
 	copy \
 	copy2 \
 	copy3 \
@@ -47,7 +47,7 @@ dep.mk: | $(TESTS:%=%.cc) gala
 include dep.mk
 
 $(TESTS:%=%.o): %.o: %.cc
-	$(CXX) -c $(CXXFLAGS) ${CPPFLAGS} $< -o $@
+	$(CXX) $(CXXFLAGS) ${CPPFLAGS} -c $< -o $@
 
 $(TESTS): %: %.o
 	$(CXX) $(LDFLAGS) ${LIBS} $< -o $@
