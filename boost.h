@@ -205,7 +205,7 @@ namespace boost { //
 	}
 
 	VCTtemplate
-	struct graph_traits<gala::graph<SGARGS> > { //
+	struct graph_traits<gala::graph<SGARGS> > {
 		using G=gala::graph<SGARGS>;
 		typedef typename myVDP<VDP>::type vertices_size_type;
 		typedef size_t edges_size_type; // FIXME: use v^2
@@ -247,8 +247,11 @@ namespace boost { //
 			        : base(e) {
 				(void)g;
 			}
-			vertex_iterator(const vertex_iterator& p)
-			    : base(p.base) /*,g(p.g)*/
+			vertex_iterator(vertex_iterator const& p)
+			    : base(p.base)
+#ifdef EXTRA_G // ?
+					, _g(p._g)
+#endif
 			{
 			}
 
@@ -262,6 +265,10 @@ namespace boost { //
 					return std::move(a);
 				}
 #else
+			vertex_iterator& operator=(vertex_iterator const& p){
+				base = p.base;
+				return *this;
+			}
 			vertex_iterator operator+(size_t n) {
 				vertex_iterator a=*this;
 				a.advance(n);
@@ -770,23 +777,23 @@ namespace boost {
 			typedef vertex_index_type value_type;
 			typedef vertex_index_type reference;
 			typedef vertex_descriptor key_type;
+
+			gala_graph_index_map(gala_graph_index_map const& p)
+			    : _g(p._g) {
+			}
 			gala_graph_index_map(gala::graph<SGARGS>const & g, boost::vertex_index_t)
-			    : _g(g)
-			{
+			    : _g(g) {
 			}
 			// bug?
 			gala_graph_index_map(gala::graph<SGARGS>const & g)
-			    : _g(g)
-			{
+			    : _g(g) {
 			}
 			template <class T>
-			value_type operator[](T x) const
-			{
+			value_type operator[](T x) const {
 //				assert(x == _g.position(x));
 				return _g.position(x);
 			}
-			gala_graph_index_map& operator=(const gala_graph_index_map& s)
-			{
+			gala_graph_index_map& operator=(const gala_graph_index_map& s) {
 				assert(&s._g==&_g); (void)s;
 				return *this;
 			}

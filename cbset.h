@@ -925,16 +925,10 @@ void BSET_DYNAMIC<BSDa>::carve(const BSET_DYNAMIC& t)
 #endif
 
   for (; i<howmany() && i+delta<t.howmany() ; i++) {itested();
-    assert(i>=0);
-    assert(i+delta>=0);
     set_size(size() - numberofones(_d[i] & t._d[i+delta]));
     _d[i] &= ~t._d[i+delta];
   }
 
-  for (; i<howmany(); i++) { untested();
-    assert(i>=0);
-    assert(i+delta>=0);
-  }
   assert(size()==recount());
 
 #if 0
@@ -1126,7 +1120,6 @@ void BSET_DYNAMIC<BSDa>::merge(
     for(; i<t.howmany() && i<s.howmany(); ++i)
 #endif
     {
-      assert(i>=0);
       _d[i] = s._d[i] | t._d[i];
     }
 
@@ -1155,7 +1148,6 @@ void BSET_DYNAMIC<BSDa>::merge(
 #else
   for(; i<t.howmany() && i<delta; ++i){ // }
 #endif
-    assert(i>=0);
     _d[i] = t._d[i];
   }
 
@@ -1169,8 +1161,6 @@ void BSET_DYNAMIC<BSDa>::merge(
   for(; i<t.howmany() && i<delta+s.howmany(); ++i)
 #endif
   { untested();
-    assert(i>=0);
-    assert(i+delta>=0);
     _d[i] = sb[i] | t._d[i];
   }
   // no overlap?
@@ -1757,7 +1747,6 @@ inline void BSET_DYNAMIC<BSDa>::add_sorted_sequence(S const& s)
     // }
     detail::hmhelp<HMT>::pad(_howmany, chunk, _d);
 
-    assert(chunk>=0);
     assert(chunk<NCHNK);
     _d[chunk] |= 1llu << j;
     assert(contains(*i));
@@ -1790,7 +1779,6 @@ inline void BSET_DYNAMIC<BSDa>::erase(value_type i)
   }
   unsigned j = i % CHUNKBITS;
 
-  assert(chunk>=0);
   assert(chunk<NCHNK);
   if( _d[chunk] & ( 1llu << j ) ) {
     set_size(size() - 1);
