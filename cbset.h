@@ -1539,12 +1539,12 @@ static inline void fullSet(BSET_DYNAMIC<BSDa>& s, unsigned n)
 BSDt
 int BSET_DYNAMIC<BSDa>::compare_int(BSET_DYNAMIC const& other) const
 {
-  trace2("compare_int", int(offset()), int(other.offset()));
-  trace2("compare_int", int(howmany()), int(other.howmany()));
+  // trace2("compare_int", int(offset()), int(other.offset()));
+  // trace2("compare_int", int(howmany()), int(other.howmany()));
   int delta = other.offset()-offset();
 
   // other has high bits.
-  trace3("ohigh?", int(other.howmany()), int(howmany()), delta);
+  // trace3("ohigh?", int(other.howmany()), int(howmany()), delta);
   // i = 0 .. o.howmany()-1
   // i+delta >= howmany
   for (int i=other.howmany(); i>=1+int(howmany()-delta) && i>0;){
@@ -1563,7 +1563,7 @@ int BSET_DYNAMIC<BSDa>::compare_int(BSET_DYNAMIC const& other) const
   // this has high bits.
   // i >= 0. i< howmany()
   // i-delta >= other.howmany()
-  trace4("high?", i, int(other.howmany()), int(howmany()), delta);
+//  trace4("high?", i, int(other.howmany()), int(howmany()), delta);
   for (; i>0 && int(i) >= 1+(int(other.howmany())+delta);){
     i--;
     trace4("high", i, int(other.howmany()), int(howmany()), delta);
@@ -1578,7 +1578,7 @@ int BSET_DYNAMIC<BSDa>::compare_int(BSET_DYNAMIC const& other) const
 
   for (; int(i)-delta<=int(other.howmany()) && int(i)-delta>0 && i>0;){
     --i;
-    trace3("overlap", delta, int(howmany()), i);
+  //  trace3("overlap", delta, int(howmany()), i);
     assert(int(i)>=delta);
     assert(int(i)< delta+int(other.howmany()));
     assert(i<=howmany());
@@ -1590,7 +1590,7 @@ int BSET_DYNAMIC<BSDa>::compare_int(BSET_DYNAMIC const& other) const
     }
   }
 
-  trace3("tail?", delta, int(howmany()), i);
+  //trace3("tail?", delta, int(howmany()), i);
   // i= 0 .. howmany()-1
   // i-delta < 0 .. other.howmany()-1
   for (i=delta; i<=howmany() && i>0;){
@@ -1602,7 +1602,7 @@ int BSET_DYNAMIC<BSDa>::compare_int(BSET_DYNAMIC const& other) const
     }
   }
 
-  trace3("other tail?", delta, int(howmany()), i);
+  //trace3("other tail?", delta, int(howmany()), i);
   for (i=-delta; i>0 && i<=other.howmany();){
     trace3("other tail", delta, int(howmany()), int(other.howmany()));
     --i;
