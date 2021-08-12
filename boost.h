@@ -455,36 +455,45 @@ namespace boost { //
 			typedef typename std::pair<
 			    typename gala::graph<SGARGS>::vertex_type,
 			    typename gala::graph<SGARGS>::out_vertex_iterator> value_type;
-		   typedef intptr_t difference_type; // why?
+		   typedef intptr_t difference_type;
 			typedef typename gala::graph<SGARGS>::edge_type reference;
 			typedef typename gala::graph<SGARGS>::edge_type edge_type;
 
 		public: // construct
-			out_edge_iterator()
-			{
+			out_edge_iterator() {
 			}
 			out_edge_iterator(
 			    typename boost::graph_traits<gala::graph<SGARGS> >::vertex_descriptor v,
-			    typename gala::graph<SGARGS>::out_vertex_iterator w)
-			{
+			    typename gala::graph<SGARGS>::out_vertex_iterator w) {
 				base.first = v;
 				base.second = w;
 			}
+		public: // op
+			out_edge_iterator operator+(int a) const{ untested();
+				out_edge_iterator ret(*this);
+				ret.base.first += a;
+				return ret;
+			}
+			out_edge_iterator operator-(int a) const{ untested();
+				out_edge_iterator ret(*this);
+				ret.base.first -= a;
+				return ret;
+			}
+			difference_type operator-(out_edge_iterator const& other) const{ untested();
+				out_edge_iterator ret(*this);
+				return ret.base.first - other.base.first;
+			}
 		private:
-			reference dereference() const
-			{
+			reference dereference() const {
 				return edge_type(base.first, *base.second);
 			}
-			bool equal(const out_edge_iterator& other) const
-			{
+			bool equal(out_edge_iterator const& other) const {
 				return base.second == other.base.second;
 			}
-			void increment()
-			{
+			void increment() {
 				++(base.second);
 			}
-			void decrement()
-			{ untested();
+			void decrement() { untested();
 				--(base.second);
 			}
 //			bool operator==(const out_edge_iterator& other) const
@@ -499,7 +508,7 @@ namespace boost { //
 		private:
 			value_type base;
 			friend class iterator_core_access;
-		};
+		}; // out_edge_iterator
 
 	}; // graph_traits<sgVCT>
 	// =============================================================================//
@@ -558,10 +567,15 @@ namespace boost { //
 
 	template< galaPARMS, class PRED >
 	void remove_out_edge_if(
-			typename graph_traits<gala::graph<SGARGS> >::vertex_descriptor u, PRED& p, gala::graph<SGARGS>& g)
-	{
+			typename graph_traits<gala::graph<SGARGS> >::vertex_descriptor u, PRED& p, gala::graph<SGARGS>& g) {
 		// wrap P?
 		g.remove_out_edge_if(u, p);
+	}
+
+	template< galaPARMS >
+	void clear_out_edges(
+			typename graph_traits<gala::graph<SGARGS> >::vertex_descriptor u, gala::graph<SGARGS>& g) { untested();
+		g.vertices()[u].clear();
 	}
 
 	VCTtemplate
