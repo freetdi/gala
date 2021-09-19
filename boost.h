@@ -574,7 +574,7 @@ namespace boost { //
 
 	template< galaPARMS >
 	void clear_out_edges(
-			typename graph_traits<gala::graph<SGARGS> >::vertex_descriptor u, gala::graph<SGARGS>& g) { untested();
+			typename graph_traits<gala::graph<SGARGS> >::vertex_descriptor u, gala::graph<SGARGS>& g) {
 		g.vertices()[u].clear();
 	}
 

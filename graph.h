@@ -244,9 +244,9 @@ struct outedge_helper<ECT, typename sfinae::is_vec_tpl<ECT>::type > {
 	//this is inefficient. probably not what you need.
 	//just for backwards compatibility
 	template<class C, class V>
-	static void erase(C& s, V w){ untested();
-		for(auto& i: s){ untested();
-			if(i==w){ untested();
+	static void erase(C& s, V w){
+		for(auto& i: s){
+			if(i==w){
 				i=s.back();
 				s.pop_back();
 			}
@@ -588,7 +588,7 @@ struct storage : storage_base<STARGS>{ //
 		}
 		return ret;
 	}
-	static void clear_vertex(const VDP v, container_type& _v) { untested();
+	static void clear_vertex(const VDP v, container_type& _v) {
 		_v[v].clear();
 	}
 	static edge_container_type& out_edges(vertex_type& v, container_type& _v) {
@@ -602,7 +602,7 @@ struct storage : storage_base<STARGS>{ //
 	}
 	static void remove_edge_single(vertex_index_type v, vertex_index_type w,
 	                         container_type& _v)
-	{ untested();
+	{
 		outedge_helper<ECT>::erase(out_edges(v, _v), w);
 	}
 	static void add_pos_edge(vertex_index_type v, vertex_index_type w,
@@ -1222,7 +1222,7 @@ struct move_helper{
 			}else{ untested();
 				incomplete();
 			}
-		}else{ untested();
+		}else{ itested();
 			t._num_edges = s._num_edges;
 		}
 	}
@@ -1655,7 +1655,7 @@ public: // iterators
 		return iter::pos(v, _v);
 	}
 public: // BUG: should not expose this...?
-	vertex_container_type& vertices() { untested();
+	vertex_container_type& vertices() {
 		// incomplete(); later
 		return _v;
 	}
@@ -1687,7 +1687,7 @@ public:
 	}
 private:
 	//O(log d), where d is the degree of a
-	void remove_edge_single(vertex_type a, vertex_type b) { untested();
+	void remove_edge_single(vertex_type a, vertex_type b) {
 		assert(a!=b);
 		assert(_num_edges);
 		storage::remove_edge_single(a, b, _v);
@@ -1744,7 +1744,7 @@ public:
 	//O(num_edges+num_vertices)
 	void make_symmetric(bool oriented=false)
 	{
-		if(!is_directed()){ untested();
+		if(!is_directed()){itested();
 		}else if(is_symmetric()){ itested();
 		}else{
 			reverse_helper::make_symmetric(_v, _num_edges, oriented);
@@ -1878,16 +1878,16 @@ public:
 	// O(n + deg(v)*log(D)), where D is the maximum of the degrees of the
 	// neighbours of v
 	void clear_vertex(vertex_type v)
-	{ untested();
+	{
 		assert(is_valid(v));
 		unsigned c = 0;
 		// this is not entirely correct for directed graphs
-		for(auto& nIt : out_edges(v)){ untested();
+		for(auto& nIt : out_edges(v)){
 			remove_edge_single(nIt, v);
 			++c;
 		}
 		assert(c==out_edges(v).size());
-		if(is_directed()){ untested();
+		if(is_directed()){
 			_num_edges -= degree(v);
 		}else{ untested();
 		}
