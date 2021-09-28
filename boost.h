@@ -369,10 +369,10 @@ namespace boost { //
 		class edge_iterator
 			: public iterator_facade<
 			             edge_iterator,
-			             typename gala::graph<SGARGS>::edge_iterator, // value_type
+			             typename gala::graph<SGARGS>::edge_type, // value_type
 			             bidirectional_traversal_tag,
-			             const typename gala::graph<SGARGS>::edge_type, // reference (?)
-			             const typename gala::graph<SGARGS>::out_vertex_iterator*>
+			             typename gala::graph<SGARGS>::edge_type // "reference"
+			  >
 		{ //
 		public: // types
 			typedef gala::graph<SGARGS> G;
