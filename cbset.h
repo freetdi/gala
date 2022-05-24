@@ -1399,8 +1399,9 @@ inline unsigned long BSET_DYNAMIC<BSDa>::hash() const
     return ret;
 
   }else if(false && NCHNK<=16){ untested();
-
+    incomplete();
     assert(CHUNKBITS==8);
+#if 0
     // 64 = 8x8 bit...
     __uint128_t ret=0;
 
@@ -1411,6 +1412,7 @@ inline unsigned long BSET_DYNAMIC<BSDa>::hash() const
 
     altret = ret; // % nHash;
     return altret;
+#endif
   }else{ untested();
   }
 
