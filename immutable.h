@@ -127,7 +127,7 @@ namespace boost_dissect{ //
 
 // hmm, template argument only needed for construction/assignment?
 template<class G>
-class immvecgraph{ //
+class immvecgraph{
 public: // types
 	typedef typename boost::graph_traits<G>::vertices_size_type vertex_descriptor;
 	typedef typename boost::graph_traits<G>::vertices_size_type vertex_index_t;

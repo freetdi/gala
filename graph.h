@@ -21,9 +21,9 @@
 #ifndef GALA_GRAPH_H
 #define GALA_GRAPH_H
 
+#include "platform.h"
 #include "trace.h"
 
-#include <cstdlib>
 #include <algorithm>
 #include <vector>
 #include <map>
@@ -38,7 +38,6 @@
 #include <boost/tuple/tuple.hpp>
 
 #include "sfinae.h"
-#include <assert.h>
 #include <boost/mpl/bool.hpp>
 
 /*--------------------------------------------------------------------------*/
