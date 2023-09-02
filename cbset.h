@@ -25,6 +25,7 @@
 #ifndef GALA_CBSET_H
 #define GALA_CBSET_H
 
+#include "platform.h"
 #include "trace.h"
 #include "assert.h"
 #include <string.h> // memcpy

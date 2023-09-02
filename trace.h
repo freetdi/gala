@@ -23,7 +23,6 @@
 //    DO_TRACE to trace program flow
 //
 //
-#include <iostream>
 #include <vector>
 
 #ifndef HP_hp

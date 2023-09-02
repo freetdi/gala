@@ -20,13 +20,14 @@
 #ifndef GALA_PLATFORM_H
 #define GALA_PLATFORM_H
 
-// TODO: system headers go here
+#include <iostream>
 #include <cstdlib>
 #include <assert.h>
 
-// #ifdef DARWIN // or so (TODO)
+#ifdef __APPLE__
 #ifdef howmany
 #undef howmany
+#endif
 #endif
 // #endif
 
