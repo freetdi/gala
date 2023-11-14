@@ -23,6 +23,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <assert.h>
+#include <cstdint>
 
 #ifdef __APPLE__
 #ifdef howmany
