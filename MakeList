@@ -9,6 +9,7 @@ HEADERS = \
 	digraph.h \
 	graph.h \
 	immutable.h \
+	platform.h \
 	sethack.h \
 	sfinae.h \
 	td.h \
