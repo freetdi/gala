@@ -60,3 +60,7 @@ $ make check
 
 will compile and run some tests. dependencys only work locally. Test status
 is the return code. Anything printed is for orientation only.
+
+PYTHON PACKAGE
+
+See python subdirectory for supplementary material

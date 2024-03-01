@@ -1,0 +1,65 @@
+README: gala python package.
+
+== Create a "Source Distribution"
+
+   $ python setup.py sdist
+
+   Will produce a dist/gala*.tar.gz containing the source code.
+
+== A "Wheel Distribution"
+
+   Prerequisite: Install the wheel python package, e.g.
+
+   $ pip install wheel
+
+   then
+
+   $ python setup.py bdist_wheel
+
+   Will create dist/gala*.whl. This file may be installed using
+
+   $ pip install dist/gala*whl
+
+== Immediate Install from source
+
+   For local installs from source, the wheel is not needed.
+
+   $ pip install dist/gala-*.tar.gz
+
+   When using git, the tarball is not required either
+
+   $ python setup.py install
+
+== Troubleshooting
+
+   $ python setup.py install --dry-run
+
+   Does not actually install anything.
+
+   $ python setup.py build_ext
+
+   Will prepare a build and check prerequisites.
+
+== Twine
+
+   Twine checks the artifacts for common issues.
+
+   $ twine check dist/*
+
+   This will check files in the `dist/` directory and report issues.
+
+== Uploading to PyPI
+
+   $ twine upload dist/*
+
+== Additional notes
+
+- setup.py does not seem to support out-of-tree builds. We use symlinks to
+  keep cruft out of the git repository root.
+
+- A bunch of files may interfere with subsequent runs. Use "git clean -dxf ."
+  to tidy up, or start from scratch.
+
+- TODO: Newer setuptools complains about the python invocation used above.
+
+- Several BUGs are highlighted in setup.py
