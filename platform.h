@@ -24,12 +24,74 @@
 #include <cstdlib>
 #include <assert.h>
 #include <cstdint>
-
+#include "trace.h"
+/*--------------------------------------------------------------------------*/
 #ifdef __APPLE__
 #ifdef howmany
 #undef howmany
 #endif
 #endif
-// #endif
-
+/*--------------------------------------------------------------------------*/
+// count the number of ones. some platforms offer fast implementations
+template<class T>
+inline unsigned generic_popcount(T x)
+{ untested();
+  unsigned r = 0;
+  while(x){ untested();
+    r += x&1;
+    x =x >>1;
+  }
+  return r;
+}
+/*--------------------------------------------------------------------------*/
+#ifdef _MSC_VER
+#include <intrin.h>
 #endif
+/*--------------------------------------------------------------------------*/
+// #ifdef C++20 // TODO
+// using std::popcount
+// #else // TODO
+template<class T>
+inline unsigned popcount(T x)
+{ untested();
+#ifdef __GNUC__
+  { untested();
+    return __builtin_popcount(x);
+  }
+#elif defined(_MSC_VER)
+  { untested();
+    return __popcnt(x);
+  }
+#else
+  { untested();
+    return generic_popcount(x);
+  }
+#endif
+}
+/*--------------------------------------------------------------------------*/
+template<>
+inline unsigned popcount(uint64_t x)
+{
+#ifdef __GNUC__
+  {
+    return __builtin_popcountl(x);
+  }
+#elif defined(_MSC_VER) && defined(_WIN64)
+  { untested();
+    return __popcnt64(x);
+  }
+#elif defined(_MSC_VER)
+  { untested();
+    return generic_popcount(x); // what?
+  }
+#else
+  { untested();
+    return generic_popcount(x);
+  }
+#endif
+}
+// # endif // TODO
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+#endif
+// vim:ts=8:sw=2:noet

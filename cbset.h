@@ -96,36 +96,6 @@ static inline bool contains(S const& s, typename S::value_type i)
   return s.contains(i);
 }
 /*--------------------------------------------------------------------------*/
-template<class T>
-inline unsigned numberofones(T x)
-{
-#if 1 // GCC
-  return __builtin_popcount(x);
-#else
-  unsigned r=0;
-  while(x){ untested();
-    r+=x&1;
-    x=x>>1;
-  }
-  return r;
-#endif
-}
-/*--------------------------------------------------------------------------*/
-template<>
-inline unsigned numberofones(uint64_t x)
-{
-#if 1 // GCC
-  return __builtin_popcountl(x);
-#else
-  unsigned r=0;
-  while(x){ untested();
-    r+=x&1;
-    x=x>>1;
-  }
-  return r;
-#endif
-}
-/*--------------------------------------------------------------------------*/
 struct nosize_t{
   nosize_t(int){
   }
@@ -154,7 +124,7 @@ template<unsigned NCHNK,
          typename OST=uint8_t,
          typename HMT=uint8_t,
 	 typename SCT=unsigned>
-struct BSET_DYNAMIC;
+class BSET_DYNAMIC;
 /*--------------------------------------------------------------------------*/
 namespace detail{
 /*--------------------------------------------------------------------------*/
@@ -751,7 +721,7 @@ private:
   CHUNK_T _d[NCHNK];
 public:
   template<unsigned W_, typename CHUNK_T_, typename H_, typename O_, class SCT_>
-  friend struct BSET_DYNAMIC;
+  friend class BSET_DYNAMIC;
   template<class A, class B>
   friend class lazy_intersection; // too many?!
 }; // BSET_DYNAMIC
@@ -789,7 +759,7 @@ struct cnt{
       for (; w+(size/chunksize)<=h;){
 	window_t d;
 	memcpy(&d, dd+w, size);
-	k += numberofones(d);
+	k += popcount(d);
 
 	w += size/chunksize;
       }
@@ -880,7 +850,7 @@ BSET_DYNAMIC<BSDa>::BSET_DYNAMIC(const BSET_DYNAMIC& s,
 
   for (; unsigned(i)<s.howmany() && (i+delta)<int(t.howmany()); i++) {itested();
     assert(i+delta>=0);
-    set_size(size() - numberofones(s._d[i] & t._d[i+delta]));
+    set_size(size() - popcount(s._d[i] & t._d[i+delta]));
     _d[i] = s._d[i] & ~t._d[i+delta];
   }
 
@@ -926,7 +896,7 @@ void BSET_DYNAMIC<BSDa>::carve(const BSET_DYNAMIC& t)
 #endif
 
   for (; i<howmany() && i+delta<t.howmany() ; i++) {itested();
-    set_size(size() - numberofones(_d[i] & t._d[i+delta]));
+    set_size(size() - popcount(_d[i] & t._d[i+delta]));
     _d[i] &= ~t._d[i+delta];
   }
 
@@ -1016,7 +986,7 @@ inline void BSET_DYNAMIC<BSDa>::merge(BSET_DYNAMIC<BSDa2> const& t)
       newhowmany = t.howmany();
       unsigned x=t.howmany()-1;
       for(; x>howmany()+unsigned(delta-1); --x) { untested();
-	set_size(size() + numberofones(t._d[x]));
+	set_size(size() + popcount(t._d[x]));
         _d[x] = t._d[x];
       }
 
@@ -1043,13 +1013,13 @@ inline void BSET_DYNAMIC<BSDa>::merge(BSET_DYNAMIC<BSDa2> const& t)
       }else{ untested();
       }
       for(; x+1 && unsigned(x+1)>unsigned(delta); --x){ untested();
-	set_size(size() + numberofones((~dd[x]) & t._d[x]));
+	set_size(size() + popcount((~dd[x]) & t._d[x]));
         _d[x] = _d[x-delta] | t._d[x];
       }
 
       // rest is t.
       for(; x+1; --x) { untested();
-	set_size(size() + numberofones(t._d[x]));
+	set_size(size() + popcount(t._d[x]));
         _d[x] = t._d[x];
       }
     _offset = t._offset;
@@ -1071,14 +1041,14 @@ inline void BSET_DYNAMIC<BSDa>::merge(BSET_DYNAMIC<BSDa2> const& t)
 
     // merge.
     for (; i<unsigned(t.howmany()-delta) && i<howmany(); ++i) {itested();
-      set_size(size() + numberofones((~_d[i]) & td[i]));
+      set_size(size() + popcount((~_d[i]) & td[i]));
       _d[i] |= td[i];
     }
 
     // tail.
     for (; i+delta<t.howmany(); ++i) { untested();
       _d[i] = td[i];
-      set_size(size() + numberofones(td[i]));
+      set_size(size() + popcount(td[i]));
     }
 
     if(newhowmany<i){itested();
@@ -1475,7 +1445,7 @@ inline void BSET_DYNAMIC<BSDa>::intersect(BSET_DYNAMIC const& t)
     assert(use_offset());
     unsigned delta=-delta_;
     for(unsigned i=0; i<delta+howmany(); ++i){ untested();
-//      _size -= numberofones(_d[i]);
+//      _size -= popcount(_d[i]);
       _d[i] = _d[i+delta];
     }
     set_offset(offset() + delta);
@@ -2085,12 +2055,12 @@ public:
     unsigned j=_scratch.offset()-_t.offset();
 
     assert(_scratch._d[0] == (_s._d[i] & _t._d[j]));
-    _scratch.set_size(_scratch.size() + numberofones(_scratch._d[0]));
+    _scratch.set_size(_scratch.size() + popcount(_scratch._d[0]));
     _scratch.set_howmany(1);
 
     for(unsigned k=1; i+k < _s.howmany() && j+k < _t.howmany(); ++k){ untested();
       _scratch._d[k] = _s._d[i+k] & _t._d[j+k];
-      _scratch.set_size(_scratch.size() + numberofones(_scratch._d[k]));
+      _scratch.set_size(_scratch.size() + popcount(_scratch._d[k]));
       _scratch.set_howmany(_scratch.howmany()+1);
     }
     while(!_scratch._d[_scratch.howmany()-1]) { untested();
