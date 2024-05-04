@@ -48,19 +48,15 @@ inline unsigned generic_popcount(T x)
 #include <intrin.h>
 #endif
 /*--------------------------------------------------------------------------*/
-// #ifdef C++20 // TODO
-// using std::popcount
-// #else // TODO
+#if __cplusplus >= 202002L
+using std::popcount;
+#else
 template<class T>
 inline unsigned popcount(T x)
 { untested();
 #ifdef __GNUC__
   { untested();
     return __builtin_popcount(x);
-  }
-#elif defined(_MSC_VER)
-  { untested();
-    return __popcnt(x);
   }
 #else
   { untested();
@@ -76,21 +72,13 @@ inline unsigned popcount(uint64_t x)
   {
     return __builtin_popcountl(x);
   }
-#elif defined(_MSC_VER) && defined(_WIN64)
-  { untested();
-    return __popcnt64(x);
-  }
-#elif defined(_MSC_VER)
-  { untested();
-    return generic_popcount(x); // what?
-  }
 #else
   { untested();
     return generic_popcount(x);
   }
 #endif
 }
-// # endif // TODO
+# endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
