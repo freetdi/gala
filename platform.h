@@ -49,6 +49,7 @@ inline unsigned generic_popcount(T x)
 #endif
 /*--------------------------------------------------------------------------*/
 #if __cplusplus >= 202002L
+#include <bit>
 using std::popcount;
 #else
 template<class T>
